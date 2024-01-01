@@ -34,12 +34,17 @@ return [
         ],
         'factories' => [
             Form\Element\MediaTypeSelect::class => Service\Form\Element\MediaTypeSelectFactory::class,
-            // These three elements are overridden from core in order to be able to fix prepend value "0".
+            // Overridden from Core.
+            Form\Element\DataTypeSelect::class => Service\Form\Element\DataTypeSelectFactory::class,
+            // Override in order to fix prepend value "0".
             Form\Element\ItemSetSelect::class => Service\Form\Element\ItemSetSelectFactory::class,
             Form\Element\ResourceTemplateSelect::class => Service\Form\Element\ResourceTemplateSelectFactory::class,
             Form\Element\SiteSelect::class => Service\Form\Element\SiteSelectFactory::class,
+            'Omeka\Form\Element\DataTypeSelect' => Service\Form\Element\DataTypeSelectFactory::class,
         ],
         'aliases' => [
+            // Use aliases to keep core keys.
+            'Omeka\Form\Element\DataTypeSelect' => Form\Element\DataTypeSelect::class,
             \Omeka\Form\Element\ItemSetSelect::class => Form\Element\ItemSetSelect::class,
             \Omeka\Form\Element\ResourceTemplateSelect::class => Form\Element\ResourceTemplateSelect::class,
             \Omeka\Form\Element\SiteSelect::class => Form\Element\SiteSelect::class,
