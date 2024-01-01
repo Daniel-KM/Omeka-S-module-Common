@@ -1,4 +1,4 @@
-Generic Module (module for Omeka S)
+Common Module (module for Omeka S)
 ===================================
 
 
@@ -7,68 +7,183 @@ Generic Module (module for Omeka S)
 > than the previous repository.__
 
 
-[Generic Module] is a module for [Omeka S] that allows to manage all common one
-time tasks (install, config, settings management…) from the config of another
-module, so it avoids the developer to copy-paste common code between modules.
+[Common Module] is a module for [Omeka S] that allows to manage internal
+features used in various modules: bulk functions, form elements, view helpers,
+one-time tasks for install and settings, etc., so it avoids the developer to
+copy-paste common code between modules.
 
-Internally, the logic is "config over code": so all settings have just to be set
-in the main `config/module.config.php` file, inside a key with the lowercase
-module name, with sub-keys `config`, `settings`, `site_settings`, `user_settings`
-and `block_settings`. All the forms have just to be standard Zend forms.
-Eventual install and uninstall sql can be set in `data/install/` and upgrade
-code in `data/scripts`. Another class allows to check and install resources
-(vocabulary, resource templates, custom vocab, etc.).
+- View helpers
+
+  - AssetUrl for internal assets
+  - EasyMeta to get ids, terms and labels from properties, classes and templates.
+
+- Form elements
+
+  - Media-type Select
+  - Optional Multi Checkbox
+  - Optional Radio
+  - Optional Select
+  - Optional Url
+  - Url Query
+
+- [PSR-3]
+
+  - The logger can log messages in a standard, simple and translatable way.
+  - The class PsrMessage allows to use PSR-3 messages and is compliant with
+    C-style messages (with sprintf: %s, %d, etc.).
+
+- One-Time tasks
+
+  Internally, the logic is "config over code": so all settings have just to be
+  set in the main `config/module.config.php` file, inside a key with the
+  lowercas emodule name, with sub-keys `config`, `settings`, `site_settings`,
+  `user_settings` and `block_settings`. All the forms have just to be standard
+  Laminas forms.
+
+  Eventual install and uninstall sql can be set in `data/install/` and upgrade
+  code in `data/scripts`. Another class allows to check and install resources
+  (vocabularies, resource templates, custom vocabs, etc.).
 
 
 Installation
 ------------
 
-Uncompress files and rename module folder `Generic`.
-
-Unlike other modules, this one is available once unzipped, even if it is not
-installed or not enabled in the admin modules panel.
+Uncompress files and rename module folder `Common`.
 
 
 Usage (for developer)
 ---------------------
 
-### Main Usage
+### PSR-3
 
-This module contains a generic abstract class `AbstractModule`, that extends
-itself the Omeka one, so make your module extends it.
+#### Role of PSR-3
 
-Replace the following:
+The PHP Framework Interop Group ([PHP-FIG]) represents the majority of php
+frameworks, in particular all main CMS.
+
+[PSR-3] means that the message and its context may be separated in the logs, so
+they can be translated and managed by any other compliant tools. This is useful
+in particular when an external database is used to store logs.
+
+The message uses placeholders that are not in C-style of the function `sprintf`
+(`%s`, `%d`, etc.), but in moustache-style, identified with `{` and `}`, without
+spaces.
+
+The new and old format are automatically managed by the messenger and the
+logger.
+
+So, instead of logging like this:
 
 ```php
-namespace MyModule;
-use Omeka\Module\AbstractModule;
-class Module extends AbstractModule
-{}
+// Classic logging (not translatable).
+$this->logger()->info(sprintf($message, ...$args));
+$this->logger()->info(sprintf('The %s #%d has been updated.', 'item', 43));
+// output: The item #43 has been updated.
 ```
 
-with:
+A PSR-3 standard log is:
+
+```php
+// PSR-3 logging.
+$this->logger()->info($message, $context);
+$this->logger()->info(
+    'The {resource} #{id} has been updated.', // @translate
+    ['resource' => 'item', 'id' => 43]
+);
+// output: The item #43 has been updated.
+```
+
+If an Exception object is passed in the context data, it must be in the `exception`
+key.
+
+Because the logs are translatable at user level, with a message and context, the
+message must not be translated when logging.
+
+#### Helpers
+
+- PSR-3 Message
+
+If the message may be reused or for the messenger, the helper `PsrMessage()` can
+be used, with all the values:
+
+```php
+$message = new \Common\Stdlib\PsrMessage(
+    'The {resource} #{id} has been updated by user #{userId}.', // @translate
+    ['resource' => 'item', 'id' => 43, 'userId' => $user->id()]
+);
+$this->logger()->info($message->getMessage(), $message->getContext());
+echo $message;
+// With translation.
+echo $message->setTranslator($translator);
+```
+
+#### Compatibility
+
+* Compatibility with messenger
+
+The helper `messenger()` is compatible and can translate PSR-3 messages.
+
+* Compatibility with the default stream logger
+
+The PSR-3 messages are converted into simple messages for the default logger.
+Other extra data are appended.
+
+* Compatibility with core messages
+
+The logger stores the core messages as it, without context, so they can be
+displayed. They are not translatable if they use placeholders.
+
+#### Plural
+
+By construction, the plural is not managed: only one message is saved in the
+log. So, if any, the plural message should be prepared before the logging.
+
+### One-time tasks
+
+Unlike old module Generic, there are two ways to get the one-time features
+inside any module: the trait (recommended) or the abstract class (deprecated).
+
+To use them, replace the following:
 
 ```php
 namespace MyModule;
-require_once dirname(__DIR__) . '/Generic/AbstractModule.php';
-use Generic\AbstractModule;
+
+use Omeka\Module\AbstractModule;
+
+class Module extends AbstractModule
+{
+}
+```
+
+with this class with the trait:
+
+```php
+namespace MyModule;
+
+if (!class_exists(\Common\TraitModule::class)) {
+    require_once dirname(__DIR__) . '/Common/TraitModule.php';
+}
+
+use Common\TraitModule;
+use Omeka\Module\AbstractModule;
+
 class Module extends AbstractModule
 {
     const NAMESPACE = __NAMESPACE__;
+
+    use TraitModule;
 }
 ```
 
-If you prefer not to force install of module Generic, you can copy the file `Generic/AbstractModule.php`
-in folder `src/` of your module, then require it like that:
+Or extend the abstract class:
 
 ```php
-namespace MyModule;
-if (!class_exists(\Generic\AbstractModule::class)) {
-    require file_exists(dirname(__DIR__) . '/Generic/AbstractModule.php')
-        ? dirname(__DIR__) . '/Generic/AbstractModule.php'
-        : __DIR__ . '/src/Generic/AbstractModule.php';
+if (!class_exists(\Common\AbstractModule::class)) {
+    require_once dirname(__DIR__) . '/Common/AbstractModule.php';
 }
-use Generic\AbstractModule;
+
+use Common\AbstractModule;
+
 class Module extends AbstractModule
 {
     const NAMESPACE = __NAMESPACE__;
@@ -85,8 +200,7 @@ automatically imported.
 TODO
 ----
 
-- [ ] Check version for themes.
-- [ ] Merge with EasyAdmin?
+- [ ] Use key "psr_log" instead of "log" (see https://docs.laminas.dev/laminas-log/service-manager/#psrloggerabstractadapterfactory).
 
 
 Warning
@@ -130,13 +244,15 @@ altered, and that no provisions are either added or removed herefrom.
 Copyright
 ---------
 
-* Copyright Daniel Berthereau, 2018-2023 (see [Daniel-KM] on GitLab)
+* Copyright Daniel Berthereau, 2017-2024 (see [Daniel-KM] on GitLab)
 
 
-[Generic module]: https://gitlab.com/Daniel-KM/Omeka-S-module-Generic
+[Common module]: https://gitlab.com/Daniel-KM/Omeka-S-module-Common
 [Omeka S]: https://omeka.org/s
-[GitLab]: https://gitlab.com/Daniel-KM/Omeka-S-module-Generic
-[module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-Generic/-/issues
+[GitLab]: https://gitlab.com/Daniel-KM/Omeka-S-module-Common
+[PSR-3]: http://www.php-fig.org/psr/psr-3
+[PHP-FIG]: http://www.php-fig.org
+[module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-Common/-/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
 [FSF]: https://www.fsf.org
