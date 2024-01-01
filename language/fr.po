@@ -7,114 +7,150 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-03 00:00+0000\n"
-"PO-Revision-Date: 2022-01-03 00:00+0000\n"
+"POT-Creation-Date: 2024-01-01 00:00+0000\n"
+"PO-Revision-Date: 2024-01-01 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.0.1\n"
+"X-Generator: Poedit 3.2.2\n"
 
-#: AbstractModule.php:66
+#: src/Stdlib/PsrMessage.php:160
+msgid "default"
+msgstr "défaut"
+
+#: TraitModule.php:68 TraitModule.php:859
 #, php-format
 msgid "This module requires the module \"%s\"."
-msgstr "Ce module requiert le module \"%s\"."
+msgstr "Ce module requiert le module « %s »."
 
-#: AbstractModule.php:73
+#: TraitModule.php:73
 #, php-format
 msgid "This module requires modules \"%s\"."
 msgstr "Ce module requiert les modules \"%s\"."
 
-#: AbstractModule.php:80
+#: TraitModule.php:81
 msgid "This module has resources that cannot be installed."
 msgstr "Ce module a des ressources qui ne peuvent pas être installées."
 
-#: AbstractModule.php:725
+#: TraitModule.php:88
+msgid ""
+"This module cannot install its tables, because they exist already. Try to "
+"remove them first."
+msgstr ""
+"Ce module ne peut pas installer ses tables car elles existent déjà. Essayez "
+"de les supprimer manuellement."
+
+#: TraitModule.php:380
+#, php-format
+msgid "The module removed tables \"%s\" from a previous broken install."
+msgstr ""
+"Le module a supprimé les tables « %s » depuis une installation échouée."
+
+#: TraitModule.php:854
+#, php-format
+msgid "This module requires the module \"%1$s\", version %2$s or above."
+msgstr "Ce module requiert le module « %1$s », version %2$s ou supérieure."
+
+#: TraitModule.php:951
 #, php-format
 msgid ""
 "The module \"%s\" was automatically deactivated because the dependencies are "
 "unavailable."
 msgstr ""
-"Le module \"%s\" a été automatiquement désactivé car ses dépendances ne sont "
+"Le module « %s » a été automatiquement désactivé car ses dépendances ne sont "
 "plus disponibles."
 
-#: InstallResources.php:85
+#: src/View/Helper/MediaTypeSelect.php:40
+#: src/Service/Form/Element/MediaTypeSelectFactory.php:27
+msgid "Select media type…"
+msgstr "Choisir un type de média…"
+
+#: InstallResources.php:84
 #, php-format
 msgid ""
 "An error occured when loading vocabulary \"%s\": file has no json content."
 msgstr ""
-"Une erreur est survenue en chargeant le vocabulaire \"%s\" : le fichier n’a "
+"Une erreur est survenue en chargeant le vocabulaire « %s » : le fichier n’a "
 "pas de contenu json."
 
-#: InstallResources.php:92
+#: InstallResources.php:91
 #, php-format
 msgid ""
 "An error occured when adding the prefix \"%s\": another vocabulary exists. "
 "Resolve the conflict before installing this module."
 msgstr ""
-"Une erreur est survenue en ajoutant le préfixe \"%s\" : un autre vocabulaire "
-"existe. Merci de résoudre le conflit avant d'installer ce module."
+"Une erreur est survenue en ajoutant le préfixe « %s » : un autre vocabulaire "
+"existe. Merci de résoudre le conflit avant d’installer ce module."
 
-#: InstallResources.php:104
+#: InstallResources.php:103
 #, php-format
 msgid ""
 "A custom vocab exists for \"%s\". Remove it or rename it before installing "
 "this module."
 msgstr ""
-"Un vocabulaire personnalisé existe pour \"%s\" : renommez-le ou supprimez-le "
+"Un vocabulaire personnalisé existe pour « %s » : renommez-le ou supprimez-le "
 "avant d’installer ce module."
 
-#: InstallResources.php:115
+#: InstallResources.php:114
 #, php-format
 msgid ""
 "A resource template exists for %s. Rename it or remove it before installing "
 "this module."
 msgstr ""
-"Un modèle de ressource nommé \"%s\" existe : merci de le renommer ou de le "
-"supprimer avant d'installer ce module."
+"Un modèle de ressource nommé « %s » existe : renommez ou supprimez-le avant "
+"d’installer ce module."
 
-#: InstallResources.php:304
+#: InstallResources.php:318
 #, php-format
 msgid "The vocabulary \"%s\" was already installed and was kept."
-msgstr "Le vocabulaire \"%s\" a déjà été installé et a été conservé."
+msgstr "Le vocabulaire « %s » a déjà été installé et a été conservé."
 
-#: InstallResources.php:313
+#: InstallResources.php:327
 #, php-format
 msgid ""
 "An error occured when adding the prefix \"%s\": another vocabulary exists "
 "with the same prefix. Resolve the conflict before installing this module."
 msgstr ""
-"Une erreur est survenue lors de l'ajout du préfixe \"%s\" : un autre "
+"Une erreur est survenue lors de l’ajout du préfixe « %s » : un autre "
 "vocabulaire existe avec le même préfixe. Merci de résoudre le conflit avant "
-"d'installer ce module."
+"d’installer ce module."
 
-#: InstallResources.php:325
+#: InstallResources.php:339
 #, php-format
 msgid ""
-"An error occured when adding the prefix \"%s\" and the associated "
-"properties: %s"
+"An error occured when adding the prefix \"%1$s\" and the associated "
+"properties: %2$s"
 msgstr ""
-"Une erreur est survenue en ajoutant le préfixe \"%s\" et les propriétés "
-"associées : %s"
+"Une erreur est survenue en ajoutant le préfixe « %1$s » et les propriétés "
+"associées : %2$s"
 
-#: InstallResources.php:405 InstallResources.php:415
+#: InstallResources.php:419
 #, php-format
 msgid ""
 "An error occured when updating vocabulary \"%s\" and the associated "
 "properties: %s"
 msgstr ""
-"Une erreur est survenue en ajoutant le préfixe \"%s\" et les propriétés "
-"associées : %s"
+"Une erreur est survenue lors de la mise à jour du vocabulaire « %s » et les "
+"propriétés associées : %s"
 
-#: InstallResources.php:509
+#: InstallResources.php:429
+#, php-format
+msgid ""
+"An error occured when updating vocabulary \"%1$s\" and the associated "
+"properties: %2$s"
+msgstr ""
+"Une erreur est survenue lors de la mise à jour du vocabulaire « %1$s » et "
+"les propriétés associées : %2$s"
+
+#: InstallResources.php:523
 #, php-format
 msgid "The following \"%1$s\" of the vocabulary \"%2$s\" were replaced: %3$s"
-msgstr ""
-"Les \"%1$s\" suivantes du vocabulaire \"%2$s\" ont été remplacées : %3$s"
+msgstr "Les « %1$s » suivants du vocabulaire « %2$s » ont été remplacés : %3$s"
 
-#: InstallResources.php:518
+#: InstallResources.php:532
 msgid ""
 "Resources, values and templates were updated, but you may check settings "
 "where the old ones were used."
@@ -122,31 +158,39 @@ msgstr ""
 "Les ressources, valeurs et modèles ont été mis à jour, mais vous pouvez "
 "vérifier les paramètres où les anciennes valeurs étaient utilisées."
 
-#: InstallResources.php:543
+#: InstallResources.php:558
 #, php-format
 msgid "The resource template named \"%s\" is already available and is skipped."
 msgstr ""
-"Le modèle de ressource nommé \"%s\" est déjà disponible et a été conservé."
+"Le modèle de ressource nommé « %s » est déjà disponible et a été conservé."
 
-#: InstallResources.php:805
+#: InstallResources.php:830
 #, php-format
 msgid "The custom vocab named \"%s\" is not available."
-msgstr "Le vocabulaire personnalisé nommé \"%s\" n'est pas disponible."
+msgstr "Le vocabulaire personnalisé nommé « %s » n’est pas disponible."
 
-#: InstallResources.php:911
+#: InstallResources.php:1039
 msgid "No file or url set for the vocabulary."
 msgstr "Pas de fichier ou d’url pour le vocabulaire."
 
-#: InstallResources.php:921
+#: InstallResources.php:1049
 #, php-format
 msgid "The file \"%s\" cannot be read. Check the url."
-msgstr "Le fichier \"%s\" ne peut pas être lu. Merci de vérifier l’url."
+msgstr "Le fichier « %s » ne peut pas être lu. Merci de vérifier l’url."
 
-#: InstallResources.php:931
+#: InstallResources.php:1059
 #, php-format
 msgid "The file \"%s\" cannot be read. Check the file."
-msgstr "Le fichier \"%s\" ne peut pas être lu. Merci de vérifier le fichier."
+msgstr "Le fichier « %s » ne peut pas être lu. Merci de vérifier le fichier."
 
-#: InstallResources.php:952
+#: InstallResources.php:1080
 msgid "A vocabulary must have a namespace uri and a prefix."
 msgstr "Un vocabulaire doit avoir une uri pour l’espace de nom et un préfixe."
+
+#: TraitModule.php:973
+msgid "The directory \"{path}\" is not writeable."
+msgstr "Le dossier « {path} » n’est pas inscriptible."
+
+#: TraitModule.php:984
+msgid "The directory \"{path}\" is not writeable: {error}."
+msgstr "Le dossier « {path} » n’est pas inscriptible : {error}"
