@@ -45,7 +45,7 @@ class PsrMessage implements \JsonSerializable, PsrInterpolateInterface, Translat
     /**
      * @var string
      */
-    protected $message;
+    protected $message = '';
 
     /**
      * @var array
@@ -58,12 +58,30 @@ class PsrMessage implements \JsonSerializable, PsrInterpolateInterface, Translat
     protected $escapeHtml = true;
 
     /**
-     * Set the message string and its context. The plural is not managed.
+     * @var bool
      */
-    public function __construct($message, array $context = [])
+    protected $isSprintf = false;
+
+    /**
+     * Set the message string and its context.
+     *
+     * The plural is not managed.
+     * The message can be set as PSR-3 (recommended) or C-style (for sprintf).
+     *
+     * Variadic args allows to simplify upgrade from standard messages.
+     */
+    public function __construct($message, ...$context)
     {
-        $this->message = $message;
-        $this->context = $context;
+        // Early cast to string.
+        $this->message = (string) $message;
+        if (count($context)) {
+            if (is_array($context[0])) {
+                $this->context = $context[0];
+            } else {
+                $this->isSprintf = true;
+                $this->context = $context;
+            }
+        }
     }
 
     /**
@@ -71,7 +89,7 @@ class PsrMessage implements \JsonSerializable, PsrInterpolateInterface, Translat
      */
     public function getMessage(): string
     {
-        return (string) $this->message;
+        return $this->message;
     }
 
     /**
@@ -98,7 +116,8 @@ class PsrMessage implements \JsonSerializable, PsrInterpolateInterface, Translat
      */
     public function getArgs()
     {
-        return array_values($this->getContext());
+        // Always use array_values for compatibility.
+        return array_values($this->context);
     }
 
     /**
@@ -109,7 +128,7 @@ class PsrMessage implements \JsonSerializable, PsrInterpolateInterface, Translat
      */
     public function hasArgs()
     {
-        return $this->hasContext();
+        return (bool) $this->context;
     }
 
     public function setEscapeHtml($escapeHtml): self
@@ -125,9 +144,12 @@ class PsrMessage implements \JsonSerializable, PsrInterpolateInterface, Translat
 
     public function __toString()
     {
-        return $this->isTranslatorEnabled()
-            ? $this->translate()
-            : $this->interpolate($this->getMessage(), $this->getContext());
+        if ($this->isSprintf) {
+            return (string) vsprintf($this->message, array_values($this->context));
+        }
+        return $this->isTranslatorEnabled() && $this->hasTranslator()
+            ? $this->interpolate($this->translator->translate($this->message), $this->context)
+            : $this->interpolate($this->message, $this->context);
     }
 
     /**
@@ -137,9 +159,14 @@ class PsrMessage implements \JsonSerializable, PsrInterpolateInterface, Translat
      */
     public function translate($textDomain = 'default', $locale = null): string
     {
-        return $this->hasTranslator()
-            ? $this->interpolate($this->translator->translate($this->getMessage(), $textDomain, $locale), $this->getContext())
-            : $this->interpolate($this->getMessage(), $this->getContext());
+        if ($this->hasTranslator()) {
+            return $this->isSprintf
+                ? (string) vsprintf($this->translator->translate($this->message, $textDomain, $locale), array_values($this->context))
+                : $this->interpolate($this->translator->translate($this->message, $textDomain, $locale), $this->context);
+        }
+        return $this->isSprintf
+            ? (string) vsprintf($this->message, array_values($this->context))
+            : $this->interpolate($this->message, $this->context);
     }
 
     public function jsonSerialize(): string
