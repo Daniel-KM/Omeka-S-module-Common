@@ -17,10 +17,6 @@ class AssetUrlFactory implements FactoryInterface
      *
      * Override core helper to allow to override internal assets in a generic way.
      *
-     * @see \AdvancedResourceTemplate\Service\ViewHelper\AssetUrlFactory
-     * @see \Common\Service\ViewHelper\AssetUrlFactory
-     * @see \BlockPlus\Service\ViewHelper\AssetUrlFactory
-     *
      * @return AssetUrl
      */
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)

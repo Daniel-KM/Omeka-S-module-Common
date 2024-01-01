@@ -6,9 +6,6 @@ namespace Common\View\Helper;
  * View helper for returning a path to an asset.
  *
  * Override core helper to allow to override internal assets in a generic way.
- *
- * @see \AdvancedResourceTemplate\View\Helper\AssetUrl
- * @see \Common\View\Helper\AssetUrl
  */
 class AssetUrl extends \Omeka\View\Helper\AssetUrl
 {

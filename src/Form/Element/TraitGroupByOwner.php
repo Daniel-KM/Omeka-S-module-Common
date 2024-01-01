@@ -10,9 +10,6 @@ trait TraitGroupByOwner
      * Fix prepending value "0" and owner without resource.
      *
      * @see \Omeka\Form\Element\AbstractGroupByOwnerSelect::getValueOptions()
-     *
-     * @see \Common\Form\Element\TraitGroupByOwner
-     * @see \Table\Form\Element\TraitGroupByOwner
      */
     protected function getValueOptionsFix()
     {

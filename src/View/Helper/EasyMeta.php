@@ -5,13 +5,6 @@ namespace Common\View\Helper;
 use Doctrine\DBAL\Connection;
 use Laminas\View\Helper\AbstractHelper;
 
-/**
- * @see \AdvancedSearch\View\Helper\EasyMeta
- * @see \Annotate\View\Helper\EasyMeta
- *
- * @see \BulkImport\Mvc\Controller\Plugin\Bulk
- * @see \Reference\Mvc\Controller\Plugin\References
- */
 class EasyMeta extends AbstractHelper
 {
     /**
