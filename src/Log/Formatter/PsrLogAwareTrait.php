@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Common\Formatter;
+namespace Common\Log\Formatter;
 
 trait PsrLogAwareTrait
 {
@@ -15,7 +15,6 @@ trait PsrLogAwareTrait
     protected function normalizeLogContext(array $event)
     {
         if (empty($event['extra'])) {
-            unset($event['extra']);
             return $event;
         }
 

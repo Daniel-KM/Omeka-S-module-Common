@@ -2,7 +2,7 @@
 
 namespace Common\Service;
 
-use Common\Formatter\PsrLogSimple as PsrLogSimpleFormatter;
+use Common\Log\Formatter\PsrLogSimple as PsrLogSimpleFormatter;
 use Interop\Container\ContainerInterface;
 use Laminas\Log\Logger;
 use Laminas\Log\Writer\Noop;

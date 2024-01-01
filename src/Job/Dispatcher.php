@@ -18,7 +18,7 @@ class Dispatcher extends \Omeka\Job\Dispatcher
     public function send(Job $job, StrategyInterface $strategy)
     {
         $writer = new JobWriter($job);
-        $writer->setFormatter(new \Common\Formatter\PsrLogSimple);
+        $writer->setFormatter(new \Common\Log\Formatter\PsrLogSimple);
         $this->logger->addWriter($writer);
 
         // Copy of  the parent method.

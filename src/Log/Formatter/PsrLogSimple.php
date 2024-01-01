@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Common\Formatter;
+namespace Common\Log\Formatter;
 
 use Common\Stdlib\PsrInterpolateInterface;
 use Common\Stdlib\PsrInterpolateTrait;
@@ -36,9 +36,9 @@ class PsrLogSimple extends Simple implements PsrInterpolateInterface
         $event = $this->formatBase($event);
 
         foreach ($event as $name => $value) {
-            if ('extra' == $name && count($value)) {
+            if ('extra' === $name && count($value)) {
                 $value = $this->normalize($value);
-            } elseif ('extra' == $name) {
+            } elseif ('extra' === $name) {
                 // Don't print an empty array
                 $value = '';
             }
