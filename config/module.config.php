@@ -6,6 +6,8 @@ return [
     'service_manager' => [
         'factories' => [
             'EasyMeta' => Service\Stdlib\EasyMetaFactory::class,
+            // TODO Use a delegator for logger factory? A direct factory is simpler for the same result for this service.
+            'Omeka\Logger' => Service\LoggerFactory::class,
         ],
     ],
     'view_manager' => [
