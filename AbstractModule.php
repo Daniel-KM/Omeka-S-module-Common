@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 /*
- * Copyright Daniel Berthereau, 2018-2023
+ * Copyright Daniel Berthereau, 2018-2024
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -26,7 +26,7 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-namespace Generic;
+namespace Common;
 
 use Laminas\EventManager\Event;
 use Laminas\Mvc\Controller\AbstractController;
@@ -44,7 +44,7 @@ use Omeka\Stdlib\Message;
  * The logic is "config over code": so all settings have just to be set in the
  * main `config/module.config.php` file, inside a key with the lowercase module
  * name,  with sub-keys `config`, `settings`, `site_settings`, `user_settings`
- * and `block_settings`. All the forms have just to be standard Zend form.
+ * and `block_settings`. All the forms have just to be standard Laminas form.
  * Eventual install and uninstall sql can be set in `data/install/` and upgrade
  * code in `data/scripts`.
  *
@@ -988,31 +988,5 @@ abstract class AbstractModule extends \Omeka\Module\AbstractModule
         $logger = $services->get('Omeka\Logger');
         $logger->warn($message);
         return true;
-    }
-
-    /**
-     * Get each line of a string separately.
-     *
-     * @deprecated Since 3.3.22. Use \Omeka\Form\Element\ArrayTextarea.
-     * @param string $string
-     * @return array
-     */
-    public function stringToList($string): array
-    {
-        return array_filter(array_map('trim', explode("\n", $this->fixEndOfLine($string))), 'strlen');
-    }
-
-    /**
-     * Clean the text area from end of lines.
-     *
-     * This method fixes Windows and Apple copy/paste from a textarea input.
-     *
-     * @deprecated Since 3.3.22. Use \Omeka\Form\Element\ArrayTextarea.
-     * @param string $string
-     * @return string
-     */
-    protected function fixEndOfLine($string): string
-    {
-        return str_replace(["\r\n", "\n\r", "\r"], ["\n", "\n", "\n"], $string);
     }
 }
