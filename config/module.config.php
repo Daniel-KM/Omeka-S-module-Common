@@ -17,6 +17,10 @@ return [
         ],
     ],
     'view_helpers' => [
+        'invokables' => [
+            // Required to manage PsrMessage.
+            'messages' => View\Helper\Messages::class,
+        ],
         'factories' => [
             'assetUrl' => Service\ViewHelper\AssetUrlFactory::class,
             'easyMeta' => Service\ViewHelper\EasyMetaFactory::class,
