@@ -669,7 +669,9 @@ SQL;
                 'resource:itemset',
                 'resource:media',
                 'uri',
-                // DataTypeGeometry
+                // Annotate.
+                'resource:annotation',
+                // DataTypeGeometry.
                 'geography',
                 'geography:coordinates',
                 'geometry',

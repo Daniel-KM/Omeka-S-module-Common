@@ -49,7 +49,6 @@ return [
             Form\Element\ItemSetSelect::class => Service\Form\Element\ItemSetSelectFactory::class,
             Form\Element\ResourceTemplateSelect::class => Service\Form\Element\ResourceTemplateSelectFactory::class,
             Form\Element\SiteSelect::class => Service\Form\Element\SiteSelectFactory::class,
-            'Omeka\Form\Element\DataTypeSelect' => Service\Form\Element\DataTypeSelectFactory::class,
         ],
         'aliases' => [
             // Use aliases to keep core keys.
