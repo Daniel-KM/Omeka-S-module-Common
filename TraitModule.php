@@ -148,21 +148,19 @@ trait TraitModule
 
     public function getInstallResources(): ?InstallResources
     {
-        if (!class_exists(\Generic\InstallResources::class)) {
+        if (!class_exists(\Common\InstallResources::class)) {
             // Use the module file first, since it must be present with the
             // right version, even if AbstractModule is older in another module.
-            if (file_exists($filepath = OMEKA_PATH . '/modules/' . static::NAMESPACE . '/src/Generic/InstallResources.php')) {
+            if (file_exists($filepath = OMEKA_PATH . '/modules/' . static::NAMESPACE . '/src/Common/InstallResources.php')) {
                 require_once $filepath;
-            } elseif (file_exists($filepath = dirname(__DIR__, 3) . '/Generic/InstallResources.php')) {
-                require_once $filepath;
-            } elseif (file_exists($filepath = __DIR__ . '/InstallResources.php')) {
+            } elseif (file_exists($filepath = dirname(__DIR__, 3) . '/Common/InstallResources.php')) {
                 require_once $filepath;
             } else {
                 return null;
             }
         }
         $services = $this->getServiceLocator();
-        return new \Generic\InstallResources($services);
+        return new \Common\InstallResources($services);
     }
 
     public function checkAllResourcesToInstall(): bool
