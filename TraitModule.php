@@ -376,7 +376,7 @@ trait TraitModule
             }
 
             $translator = $services->get('MvcTranslator');
-            $message = new \Omeka\Stdlib\Message(
+            $message = new Message(
                 $translator->translate('The module removed tables "%s" from a previous broken install.'), // @translate
                 implode('", "', $dropTables)
             );
@@ -850,17 +850,17 @@ trait TraitModule
         }
         $translator = $services->get('MvcTranslator');
         if ($version) {
-            $message = new \Omeka\Stdlib\Message(
+            $message = new Message(
                 $translator->translate('This module requires the module "%1$s", version %2$s or above.'), // @translate
                 $moduleName, $version
             );
         } else {
-            $message = new \Omeka\Stdlib\Message(
+            $message = new Message(
                 $translator->translate('This module requires the module "%s".'), // @translate
                 $moduleName
             );
         }
-        throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
+        throw new ModuleCannotInstallException((string) $message);
     }
 
     /**
@@ -946,7 +946,7 @@ trait TraitModule
         $moduleManager->deactivate($managedModule);
 
         $translator = $services->get('MvcTranslator');
-        $message = new \Omeka\Stdlib\Message(
+        $message = new Message(
             $translator->translate('The module "%s" was automatically deactivated because the dependencies are unavailable.'), // @translate
             $module
         );
@@ -956,5 +956,61 @@ trait TraitModule
         $logger = $services->get('Omeka\Logger');
         $logger->warn($message);
         return true;
+    }
+
+    /**
+     * Check or create the destination folder.
+     *
+     * @param string $dirPath Absolute path.
+     * @return string|null
+     */
+    protected function checkDestinationDir(string $dirPath): ?string
+    {
+        if (file_exists($dirPath)) {
+            if (!is_dir($dirPath) || !is_readable($dirPath) || !is_writeable($dirPath)) {
+                $this->getServiceLocator()->get('Omeka\Logger')->err(
+                    'The directory "{path}" is not writeable.', // @translate
+                    ['path' => $dirPath]
+                );
+                return null;
+            }
+            return $dirPath;
+        }
+
+        $result = @mkdir($dirPath, 0775, true);
+        if (!$result) {
+            $this->getServiceLocator()->get('Omeka\Logger')->err(
+                'The directory "{path}" is not writeable: {error}.', // @translate
+                ['path' => $dirPath, 'error' => error_get_last()['message']]
+            );
+            return null;
+        }
+        return $dirPath;
+    }
+
+    /**
+     * Remove a dir from filesystem.
+     *
+     * @param string $dirpath Absolute path.
+     * @return bool
+     */
+    private function rmDir(string $dirPath): bool
+    {
+        if (!file_exists($dirPath)) {
+            return true;
+        }
+        if (strpos($dirPath, '/..') !== false || substr($dirPath, 0, 1) !== '/') {
+            return false;
+        }
+        $files = array_diff(scandir($dirPath), ['.', '..']);
+        foreach ($files as $file) {
+            $path = $dirPath . '/' . $file;
+            if (is_dir($path)) {
+                $this->rmDir($path);
+            } else {
+                unlink($path);
+            }
+        }
+        return rmdir($dirPath);
     }
 }
