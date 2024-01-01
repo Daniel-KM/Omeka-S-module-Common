@@ -33,6 +33,7 @@ use Laminas\Mvc\Controller\AbstractController;
 use Laminas\Mvc\MvcEvent;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\View\Renderer\PhpRenderer;
+use Omeka\Module\AbstractModule;
 use Omeka\Module\Exception\ModuleCannotInstallException;
 use Omeka\Settings\SettingsInterface;
 use Omeka\Stdlib\Message;
@@ -225,6 +226,11 @@ trait TraitModule
 
     public function getConfigForm(PhpRenderer $renderer)
     {
+        return $this->getConfigFormAuto($renderer);
+    }
+
+    protected function getConfigFormAuto(PhpRenderer $renderer)
+    {
         $services = $this->getServiceLocator();
 
         $formManager = $services->get('FormElementManager');
@@ -253,6 +259,11 @@ trait TraitModule
     }
 
     public function handleConfigForm(AbstractController $controller)
+    {
+        return $this->handleConfigFormAuto($controller);
+    }
+
+    protected function handleConfigFormAuto(AbstractController $controller)
     {
         $config = $this->getConfig();
         $space = strtolower(static::NAMESPACE);
@@ -320,9 +331,16 @@ trait TraitModule
 
     protected function preInstall(): void
     {
+        // To be overridden. Automatically run on uninstall.
     }
 
     protected function postInstall(): void
+    {
+        // To be overridden. Automatically run on uninstall.
+        $this->postInstallAuto();
+    }
+
+    protected function postInstallAuto(): void
     {
         $services = $this->getServiceLocator();
         $filepath = $this->modulePath() . '/data/scripts/install.php';
@@ -334,9 +352,16 @@ trait TraitModule
 
     protected function preUninstall(): void
     {
+        // To be overridden. Automatically run on uninstall.
     }
 
     protected function postUninstall(): void
+    {
+        // To be overridden. Automatically run on uninstall.
+        $this->postUninstallAuto();
+    }
+
+    protected function postUninstallAuto(): void
     {
         $services = $this->getServiceLocator();
         $filepath = $this->modulePath() . '/data/scripts/uninstall.php';
@@ -912,8 +937,7 @@ trait TraitModule
 
         $moduleVersion = $module->getIni('version');
         return $moduleVersion
-            ? version_compare($moduleVersion, $version, '>=')
-            : false;
+            && version_compare($moduleVersion, $version, '>=');
     }
 
     /**
