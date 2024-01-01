@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Common\Service\ViewHelper;
+namespace Common\Service\ControllerPlugin;
 
-use Common\View\Helper\EasyMeta;
+use Common\Mvc\Controller\Plugin\EasyMeta;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 

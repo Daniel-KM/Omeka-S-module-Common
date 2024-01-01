@@ -3,6 +3,11 @@
 namespace Common;
 
 return [
+    'service_manager' => [
+        'factories' => [
+            'EasyMeta' => Service\Stdlib\EasyMetaFactory::class,
+        ],
+    ],
     'view_manager' => [
         'template_path_stack' => [
             dirname(__DIR__) . '/view',
@@ -38,6 +43,11 @@ return [
             \Omeka\Form\Element\ItemSetSelect::class => Form\Element\ItemSetSelect::class,
             \Omeka\Form\Element\ResourceTemplateSelect::class => Form\Element\ResourceTemplateSelect::class,
             \Omeka\Form\Element\SiteSelect::class => Form\Element\SiteSelect::class,
+        ],
+    ],
+    'controller_plugins' => [
+        'factories' => [
+            'easyMeta' => Service\ControllerPlugin\EasyMetaFactory::class,
         ],
     ],
     'translator' => [

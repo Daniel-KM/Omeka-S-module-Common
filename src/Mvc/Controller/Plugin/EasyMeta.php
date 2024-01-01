@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Common\View\Helper;
+namespace Common\Mvc\Controller\Plugin;
 
-use Laminas\View\Helper\AbstractHelper;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
-class EasyMeta extends AbstractHelper
+class EasyMeta extends AbstractPlugin
 {
     /**
      * @var \Common\Stdlib\EasyMeta
