@@ -6,7 +6,10 @@ return [
     'service_manager' => [
         'factories' => [
             'EasyMeta' => Service\Stdlib\EasyMetaFactory::class,
-            // TODO Use a delegator for logger factory? A direct factory is simpler for the same result for this service.
+            // TODO Use a delegator for dispatcher and logger factories? A direct factory is simpler for the same result for these services.
+            // Allow to use the PSR-3 formatter in job.
+            'Omeka\Job\Dispatcher' => Service\Job\DispatcherFactory::class,
+            // Allow to add the PSR-3 formatter to default logger.
             'Omeka\Logger' => Service\LoggerFactory::class,
         ],
     ],
