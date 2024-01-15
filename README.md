@@ -19,11 +19,23 @@ copy-paste common code between modules.
 
 - Form elements
 
-  - Media-type Select
+  - Data Type Select
+  - Media Type Select
+  - Sites Page Select
+  - Optional Checkbox
   - Optional Multi Checkbox
+  - Optional Number
   - Optional Radio
   - Optional Select
   - Optional Url
+  - Optional Item Set Select
+  - Optional Property Select
+  - Optional Resource Select
+  - Optional Resource Class Select
+  - Optional Resource Template Select
+  - Optional Role Select
+  - Optional Site Select
+  - Optional User Select
   - Url Query
 
 - [PSR-3]
