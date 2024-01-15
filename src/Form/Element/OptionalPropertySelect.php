@@ -2,9 +2,9 @@
 
 namespace Common\Form\Element;
 
-use Laminas\Form\Element\Select;
+use Omeka\Form\Element\PropertySelect;
 
-class MediaTypeSelect extends Select
+class OptionalPropertySelect extends PropertySelect
 {
     use TraitOptionalElement;
 }

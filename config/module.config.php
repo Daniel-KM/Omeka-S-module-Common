@@ -33,6 +33,8 @@ return [
             'mediaTypeSelect' => Service\ViewHelper\MediaTypeSelectFactory::class,
         ],
     ],
+    // Add some common elements and make standard elements and some omeka ones optional.
+    // The elements of the module Advanced Search that add features are not included.
     'form_elements' => [
         'invokables' => [
             Form\Element\OptionalCheckbox::class => Form\Element\OptionalCheckbox::class,
@@ -44,20 +46,19 @@ return [
             Form\Element\UrlQuery::class => Form\Element\UrlQuery::class,
         ],
         'factories' => [
-            Form\Element\MediaTypeSelect::class => Service\Form\Element\MediaTypeSelectFactory::class,
-            // Overridden from Core.
+            // This element does not exist in Omeka.
             Form\Element\DataTypeSelect::class => Service\Form\Element\DataTypeSelectFactory::class,
-            // Override in order to fix prepend value "0".
-            Form\Element\ItemSetSelect::class => Service\Form\Element\ItemSetSelectFactory::class,
-            Form\Element\ResourceTemplateSelect::class => Service\Form\Element\ResourceTemplateSelectFactory::class,
-            Form\Element\SiteSelect::class => Service\Form\Element\SiteSelectFactory::class,
+            // This element does not exist in Omeka.
+            Form\Element\MediaTypeSelect::class => Service\Form\Element\MediaTypeSelectFactory::class,
+            Form\Element\OptionalItemSetSelect::class => Service\Form\Element\OptionalItemSetSelectFactory::class,
+            Form\Element\OptionalPropertySelect::class => Service\Form\Element\OptionalPropertySelectFactory::class,
+            Form\Element\OptionalResourceClassSelect::class => Service\Form\Element\OptionalResourceClassSelectFactory::class,
+            Form\Element\OptionalResourceTemplateSelect::class => Service\Form\Element\OptionalResourceTemplateSelectFactory::class,
+            Form\Element\OptionalSiteSelect::class => Service\Form\Element\OptionalSiteSelectFactory::class,
         ],
         'aliases' => [
             // Use aliases to keep core keys.
             'Omeka\Form\Element\DataTypeSelect' => Form\Element\DataTypeSelect::class,
-            \Omeka\Form\Element\ItemSetSelect::class => Form\Element\ItemSetSelect::class,
-            \Omeka\Form\Element\ResourceTemplateSelect::class => Form\Element\ResourceTemplateSelect::class,
-            \Omeka\Form\Element\SiteSelect::class => Form\Element\SiteSelect::class,
         ],
     ],
     'controller_plugins' => [
