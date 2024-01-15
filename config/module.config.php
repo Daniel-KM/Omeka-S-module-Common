@@ -50,6 +50,9 @@ return [
             Form\Element\DataTypeSelect::class => Service\Form\Element\DataTypeSelectFactory::class,
             // This element does not exist in Omeka.
             Form\Element\MediaTypeSelect::class => Service\Form\Element\MediaTypeSelectFactory::class,
+            // This element is not the same than \Omeka\Form\Element\SitePageSelect (singular site).
+            Form\Element\SitesPageSelect::class => Service\Form\Element\SitesPageSelectFactory::class,
+            // Optional core elements.
             Form\Element\OptionalItemSetSelect::class => Service\Form\Element\OptionalItemSetSelectFactory::class,
             Form\Element\OptionalPropertySelect::class => Service\Form\Element\OptionalPropertySelectFactory::class,
             Form\Element\OptionalResourceClassSelect::class => Service\Form\Element\OptionalResourceClassSelectFactory::class,
