@@ -34,6 +34,7 @@ use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\View\Renderer\PhpRenderer;
 use Omeka\Module\AbstractModule;
 use Omeka\Module\Exception\ModuleCannotInstallException;
+use Omeka\Module\Manager as ModuleManager;
 use Omeka\Settings\SettingsInterface;
 use Omeka\Stdlib\Message;
 
@@ -864,10 +865,31 @@ trait TraitModule
     }
 
     /**
+     * Check if a module is active and optionally its version.
+     */
+    protected function checkModuleActiveVersion(string $module, ?string $version = null): bool
+    {
+        $services = $this->getServiceLocator();
+        /** @var \Omeka\Module\Manager $moduleManager */
+        $moduleManager = $services->get('Omeka\ModuleManager');
+        $module = $moduleManager->getModule($module);
+        if (!$module
+            || $module->getState() !== ModuleManager::STATE_ACTIVE
+        ) {
+            return false;
+        }
+
+        if (!$version) {
+            return true;
+        }
+
+        $moduleVersion = $module->getIni('version');
+        return $moduleVersion
+            && version_compare($moduleVersion, $version, '>=');
+    }
+
+    /**
      * Check the version of a module.
-     *
-     * It is recommended to use checkModuleAvailability(), that manages the fact
-     * that the module may be required or not.
      */
     protected function isModuleVersionAtLeast(string $module, string $version): bool
     {
@@ -897,7 +919,7 @@ trait TraitModule
         $moduleManager = $services->get('Omeka\ModuleManager');
         $module = $moduleManager->getModule($module);
         return $module
-            && $module->getState() === \Omeka\Module\Manager::STATE_ACTIVE;
+            && $module->getState() === ModuleManager::STATE_ACTIVE;
     }
 
     /**
@@ -913,7 +935,7 @@ trait TraitModule
         $moduleManager = $services->get('Omeka\ModuleManager');
         foreach ($modules as $module) {
             $module = $moduleManager->getModule($module);
-            if (!$module || $module->getState() !== \Omeka\Module\Manager::STATE_ACTIVE) {
+            if (!$module || $module->getState() !== ModuleManager::STATE_ACTIVE) {
                 return false;
             }
         }
