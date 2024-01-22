@@ -386,18 +386,18 @@ class EasyMeta
         $qb = $this->connection->createQueryBuilder();
         $qb
             ->select(
-                'DISTINCT CONCAT(vocabulary.prefix, ":", property.local_name) AS term',
-                'property.id AS id',
-                'property.label AS label',
-                // Required with only_full_group_by.
-                'vocabulary.id'
+                'CONCAT(`vocabulary`.`prefix`, ":", `property`.`local_name`) AS term',
+                '`property`.`id` AS id',
+                '`property`.`label` AS label',
             )
-            ->from('property', 'property')
-            ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')
-            ->orderBy('vocabulary.id', 'asc')
-            ->addOrderBy('property.id', 'asc')
+            ->from('`property`', 'property')
+            ->innerJoin('property', 'vocabulary', 'vocabulary', '`property`.`vocabulary_id` = `vocabulary`.`id`')
+            ->groupBy('`property`.`id`')
+            ->orderBy('`vocabulary`.`id`', 'asc')
+            ->addOrderBy('`property`.`id`', 'asc')
         ;
         $result = $this->connection->executeQuery($qb)->fetchAllAssociative();
+
         static::$propertyIdsByTerms = array_map('intval', array_column($result, 'id', 'term'));
         static::$propertyIdsByTermsAndIds = static::$propertyIdsByTerms + array_combine(static::$propertyIdsByTerms, static::$propertyIdsByTerms);
         static::$propertyLabelsByTerms = array_column($result, 'label', 'term');
@@ -409,16 +409,15 @@ class EasyMeta
         $qb = $this->connection->createQueryBuilder();
         $qb
             ->select(
-                'DISTINCT CONCAT(vocabulary.prefix, ":", resource_class.local_name) AS term',
-                'resource_class.id AS id',
-                'resource_class.label AS label',
-                // Required with only_full_group_by.
-                'vocabulary.id'
+                'CONCAT(`vocabulary`.`prefix`, ":", `resource_class`.`local_name`) AS term',
+                '`resource_class`.`id` AS id',
+                '`resource_class`.`label` AS label',
             )
-            ->from('resource_class', 'resource_class')
-            ->innerJoin('resource_class', 'vocabulary', 'vocabulary', 'resource_class.vocabulary_id = vocabulary.id')
-            ->orderBy('vocabulary.id', 'asc')
-            ->addOrderBy('resource_class.id', 'asc')
+            ->from('`resource_class`', 'resource_class')
+            ->innerJoin('resource_class', 'vocabulary', 'vocabulary', '`resource_class`.`vocabulary_id` = `vocabulary`.`id`')
+            ->groupBy('`resource_class`.`id`')
+            ->orderBy('`vocabulary`.`id`', 'asc')
+            ->addOrderBy('`resource_class`.`id`', 'asc')
         ;
         $result = $this->connection->executeQuery($qb)->fetchAllAssociative();
         static::$resourceClassIdsByTerms = array_map('intval', array_column($result, 'id', 'term'));
@@ -432,11 +431,12 @@ class EasyMeta
         $qb = $this->connection->createQueryBuilder();
         $qb
             ->select(
-                'resource_template.label AS label',
-                'resource_template.id AS id'
+                '`resource_template`.`label` AS label',
+                '`resource_template`.`id` AS id'
             )
             ->from('resource_template', 'resource_template')
-            ->orderBy('resource_template.label', 'asc')
+            ->groupBy('`resource_template`.`id`')
+            ->orderBy('`resource_template`.`label`', 'asc')
         ;
         $result = $this->connection->executeQuery($qb)->fetchAllKeyValue();
         static::$resourceTemplateIdsByLabels = array_map('intval', $result);
