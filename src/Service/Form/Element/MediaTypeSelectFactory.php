@@ -13,13 +13,14 @@ class MediaTypeSelectFactory implements FactoryInterface
         /** @var \Doctrine\DBAL\Connection $connection */
         $connection = $services->get('Omeka\Connection');
         $sql = <<<'SQL'
-SELECT DISTINCT(media_type)
+SELECT `media_type`, `media_type`
 FROM media
-WHERE media_type IS NOT NULL
-    AND media_type != ""
-ORDER BY media_type ASC;
+WHERE `media_type` IS NOT NULL
+    AND `media_type` != ""
+GROUP BY `media_type`
+ORDER BY `media_type` ASC;
 SQL;
-        $list = $connection->executeQuery($sql)->fetchFirstColumn();
+        $list = $connection->executeQuery($sql)->fetchAllKeyValue();
 
         $element = new MediaTypeSelect(null, $options ?? []);
         return $element
