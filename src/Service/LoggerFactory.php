@@ -4,10 +4,10 @@ namespace Common\Service;
 
 use Common\Log\Formatter\PsrLogSimple as PsrLogSimpleFormatter;
 use Interop\Container\ContainerInterface;
+use Laminas\Log\Filter\Priority;
 use Laminas\Log\Logger;
 use Laminas\Log\Writer\Noop;
 use Laminas\Log\Writer\Stream;
-use Laminas\Log\Filter\Priority;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 /**

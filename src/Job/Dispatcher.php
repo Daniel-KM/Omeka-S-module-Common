@@ -3,8 +3,8 @@
 namespace Common\Job;
 
 use DateTime;
-use Omeka\Job\DispatchStrategy\StrategyInterface;
 use Omeka\Entity\Job;
+use Omeka\Job\DispatchStrategy\StrategyInterface;
 use Omeka\Log\Writer\Job as JobWriter;
 
 class Dispatcher extends \Omeka\Job\Dispatcher
@@ -15,7 +15,7 @@ class Dispatcher extends \Omeka\Job\Dispatcher
      * {@inheritDoc}
      * @see \Omeka\Job\Dispatcher::send()
      */
-    public function send(Job $job, StrategyInterface $strategy)
+    public function send(Job $job, StrategyInterface $strategy): void
     {
         $writer = new JobWriter($job);
         $writer->setFormatter(new \Common\Log\Formatter\PsrLogSimple);
