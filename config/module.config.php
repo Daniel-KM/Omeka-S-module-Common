@@ -37,6 +37,7 @@ return [
     // The elements of the module Advanced Search that add features are not included.
     'form_elements' => [
         'invokables' => [
+            Form\Element\ArrayText::class => Form\Element\ArrayText::class,
             Form\Element\OptionalCheckbox::class => Form\Element\OptionalCheckbox::class,
             Form\Element\OptionalMultiCheckbox::class => Form\Element\OptionalMultiCheckbox::class,
             Form\Element\OptionalNumber::class => Form\Element\OptionalNumber::class,
