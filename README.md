@@ -15,14 +15,19 @@ copy-paste common code between modules.
 - View helpers
 
   - AssetUrl for internal assets
-  - EasyMeta to get ids, terms and labels from properties, classes and templates.
+  - EasyMeta to get ids, terms and labels from properties, classes, templates,
+    vocabularies; to get main data types too (literal, resource or uri); to get
+    resource api names from any names used in Omeka and modules.
 
 - Form elements
 
+  - Array Text
   - Data Type Select
   - Media Type Select
   - Sites Page Select
   - Optional Checkbox
+  - Optional Date
+  - Optional DateTime
   - Optional Multi Checkbox
   - Optional Number
   - Optional Radio
