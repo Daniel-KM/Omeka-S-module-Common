@@ -14,7 +14,7 @@ class EasyMeta
         'resource:item' => 'resource',
         'resource:itemset' => 'resource',
         'resource:media' => 'resource',
-        // Module Annotate.
+        // Module Annotate (for future usage).
         'resource:annotation' => 'resource',
         'annotation' => 'resource',
         // Module DataTypeGeometry.
