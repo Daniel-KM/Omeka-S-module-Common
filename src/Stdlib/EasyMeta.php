@@ -6,6 +6,149 @@ use Doctrine\DBAL\Connection;
 
 class EasyMeta
 {
+    const RESOURCE_CLASSES = [
+        'annotations' => \Annotate\Entity\Annotation::class,
+        'assets' => \Omeka\Entity\Asset::class,
+        'items' => \Omeka\Entity\Item::class,
+        'item_sets' => \Omeka\Entity\ItemSet::class,
+        'media' => \Omeka\Entity\Media::class,
+        'resources' => \Omeka\Entity\Resource::class,
+        'value_annotations' => \Omeka\Entity\ValueAnnotation::class,
+    ];
+
+    const RESOURCE_LABELS = [
+        'annotations' => 'annotation', // @translate
+        'assets' => 'asset', // @translate
+        'items' => 'item', // @translate
+        'item_sets' => 'item set', // @translate
+        'media' => 'media', // @translate
+        'resources' => 'resource', // @translate
+        'properties' => 'property', // @translate
+        'resource_classes' => 'resource class', // @translate
+        'resource_templates' => 'resource template', // @translate
+        'vocabularies' => 'vocabulary', // @translate
+    ];
+
+    const RESOURCE_LABELS_PLURAL = [
+        'annotations' => 'annotations', // @translate
+        'assets' => 'assets', // @translate
+        'items' => 'items', // @translate
+        'item_sets' => 'item sets', // @translate
+        'media' => 'media', // @translate
+        'resources' => 'resources', // @translate
+        'properties' => 'properties', // @translate
+        'resource_classes' => 'resource classes', // @translate
+        'resource_templates' => 'resource templates', // @translate
+        'vocabularies' => 'vocabularies', // @translate
+    ];
+
+    const RESOURCE_NAMES = [
+        // Resource names.
+        'annotations' => 'annotations',
+        'assets' => 'assets',
+        'items' => 'items',
+        'item_sets' => 'item_sets',
+        'media' => 'media',
+        'resources' => 'resources',
+        'value_annotations' => 'value_annotations',
+        // Json-ld type.
+        'oa:Annotation' => 'annotations',
+        'o:Asset' => 'assets',
+        'o:Item' => 'items',
+        'o:ItemSet' => 'item_sets',
+        'o:Media' => 'media',
+        'o:Resource' => 'resources',
+        'o:ValueAnnotation' => 'value_annotations',
+        // Keys in json-ld representation.
+        'oa:annotation' => 'annotations',
+        'o:asset' => 'assets',
+        'o:item' => 'items',
+        'o:items' => 'items',
+        'o:item_set' => 'item_sets',
+        'o:site_item_set' => 'item_sets',
+        'o:media' => 'media',
+        '@annotations' => 'value_annotations',
+        // Controllers and singular.
+        'annotation' => 'annotations',
+        'asset' => 'assets',
+        'item' => 'items',
+        'item-set' => 'item_sets',
+        // 'media' => 'media',
+        'resource' => 'resources',
+        'value-annotation' => 'value_annotations',
+        // Value data types.
+        'resource:annotation' => 'annotations',
+        // 'resource' => 'resources',
+        'resource:item' => 'items',
+        'resource:itemset' => 'item_sets',
+        'resource:media' => 'media',
+        // Representation class.
+        \Annotate\Api\Representation\AnnotationRepresentation::class => 'annotations',
+        \Omeka\Api\Representation\AssetRepresentation::class => 'assets',
+        \Omeka\Api\Representation\ItemRepresentation::class => 'items',
+        \Omeka\Api\Representation\ItemSetRepresentation::class => 'item_sets',
+        \Omeka\Api\Representation\MediaRepresentation::class => 'media',
+        \Omeka\Api\Representation\ResourceReference::class => 'resources',
+        \Omeka\Api\Representation\ValueAnnotationRepresentation::class => 'value_annotations',
+        // Entity class.
+        \Annotate\Entity\Annotation::class => 'annotations',
+        \Omeka\Entity\Asset::class => 'assets',
+        \Omeka\Entity\Item::class => 'items',
+        \Omeka\Entity\ItemSet::class => 'item_sets',
+        \Omeka\Entity\Media::class => 'media',
+        \Omeka\Entity\Resource::class => 'resources',
+        \Omeka\Entity\ValueAnnotation::class => 'value_annotations',
+        // Doctrine entity class (when using get_class() and not getResourceId().
+        \DoctrineProxies\__CG__\Annotate\Entity\Annotation::class => 'annotations',
+        \DoctrineProxies\__CG__\Omeka\Entity\Asset::class => 'assets',
+        \DoctrineProxies\__CG__\Omeka\Entity\Item::class => 'items',
+        \DoctrineProxies\__CG__\Omeka\Entity\ItemSet::class => 'item_sets',
+        \DoctrineProxies\__CG__\Omeka\Entity\Media::class => 'media',
+        // \DoctrineProxies\__CG__\Omeka\Entity\Resource::class => 'resources',
+        \DoctrineProxies\__CG__\Omeka\Entity\ValueAnnotation::class => 'value_annotations',
+        // Other deprecated, future or badly written names.
+        'o:annotation' => 'annotations',
+        'o:Annotation' => 'annotations',
+        'o:annotations' => 'annotations',
+        'o:assets' => 'assets',
+        'resource:items' => 'items',
+        'itemset' => 'item_sets',
+        'item set' => 'item_sets',
+        'item_set' => 'item_sets',
+        'itemsets' => 'item_sets',
+        'item sets' => 'item_sets',
+        'item-sets' => 'item_sets',
+        'o:itemset' => 'item_sets',
+        'o:item-set' => 'item_sets',
+        'o:itemsets' => 'item_sets',
+        'o:item-sets' => 'item_sets',
+        'o:item_sets' => 'item_sets',
+        'resource:itemsets' => 'item_sets',
+        'resource:item-set' => 'item_sets',
+        'resource:item-sets' => 'item_sets',
+        'resource:item_set' => 'item_sets',
+        'resource:item_sets' => 'item_sets',
+        'o:resource' => 'resources',
+        'valueannotation' => 'value_annotations',
+        'value annotation' => 'value_annotations',
+        'value_annotation' => 'value_annotations',
+        'valueannotations' => 'value_annotations',
+        'value annotations' => 'value_annotations',
+        'value-annotations' => 'value_annotations',
+        'o:valueannotation' => 'value_annotations',
+        'o:valueannotations' => 'value_annotations',
+        'o:value-annotation' => 'value_annotations',
+        'o:value-annotations' => 'value_annotations',
+        'o:value_annotation' => 'value_annotations',
+        'o:value_annotations' => 'value_annotations',
+        'resource:valueannotation' => 'value_annotations',
+        'resource:valueannotations' => 'value_annotations',
+        'resource:value-annotation' => 'value_annotations',
+        'resource:value-annotations' => 'value_annotations',
+        'resource:value_annotation' => 'value_annotations',
+        'resource:value_annotations' => 'value_annotations',
+    ];
+
     /**
      * @var \Doctrine\DBAL\Connection
      */
@@ -74,6 +217,48 @@ class EasyMeta
     public function __invoke(): self
     {
         return $this;
+    }
+
+    /**
+     * Get the entity class from any class, type or name.
+     *
+     * @param string $name
+     * @return string|null The entity class if any.
+     */
+    public function entityClass($name): ?string
+    {
+        return self::RESOURCE_CLASSES[self::RESOURCE_NAMES[$name] ?? null] ?? null;
+    }
+
+    /**
+     * Get the resource api name from any class, type or name.
+     *
+     * @param string $name
+     * @return string|null The resource name if any.
+     */
+    public function resourceName($name): ?string
+    {
+        return self::RESOURCE_NAMES[$name] ?? null;
+    }
+
+    /**
+     * Get the resource label from any common resource name.
+     *
+     * @return string|null The singular label if any, not translated.
+     */
+    public function resourceLabel($name): ?string
+    {
+        return self::RESOURCE_LABELS[self::RESOURCE_NAMES[$name] ?? null] ?? null;
+    }
+
+    /**
+     * Get the plural resource label from any common resource name.
+     *
+     * @return string|null The plural label if any, not translated.
+     */
+    public function resourceLabelPlural($name): ?string
+    {
+        return self::RESOURCE_LABELS_PLURAL[self::RESOURCE_NAMES[$name] ?? null] ?? null;
     }
 
     /**
