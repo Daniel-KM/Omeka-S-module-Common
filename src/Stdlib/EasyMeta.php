@@ -308,7 +308,7 @@ class EasyMeta
      */
     public function entityClass($name): ?string
     {
-        return self::RESOURCE_CLASSES[self::RESOURCE_NAMES[$name] ?? null] ?? null;
+        return static::RESOURCE_CLASSES[static::RESOURCE_NAMES[$name] ?? null] ?? null;
     }
 
     /**
@@ -319,7 +319,7 @@ class EasyMeta
      */
     public function resourceName($name): ?string
     {
-        return self::RESOURCE_NAMES[$name] ?? null;
+        return static::RESOURCE_NAMES[$name] ?? null;
     }
 
     /**
@@ -329,7 +329,7 @@ class EasyMeta
      */
     public function resourceLabel($name): ?string
     {
-        return self::RESOURCE_LABELS[self::RESOURCE_NAMES[$name] ?? null] ?? null;
+        return static::RESOURCE_LABELS[static::RESOURCE_NAMES[$name] ?? null] ?? null;
     }
 
     /**
@@ -339,7 +339,7 @@ class EasyMeta
      */
     public function resourceLabelPlural($name): ?string
     {
-        return self::RESOURCE_LABELS_PLURAL[self::RESOURCE_NAMES[$name] ?? null] ?? null;
+        return static::RESOURCE_LABELS_PLURAL[static::RESOURCE_NAMES[$name] ?? null] ?? null;
     }
 
     /**
@@ -353,11 +353,11 @@ class EasyMeta
         if (!$dataType) {
             return null;
         }
-        if (is_null(self::$dataTypesByNames)) {
+        if (is_null(static::$dataTypesByNames)) {
             $this->initDataTypes();
         }
         $dataType = mb_strtolower($dataType);
-        return self::$dataTypesByNames[$dataType] ?? null;
+        return static::$dataTypesByNames[$dataType] ?? null;
     }
 
     /**
@@ -367,10 +367,10 @@ class EasyMeta
      */
     public function dataTypeNames(): array
     {
-        if (is_null(self::$dataTypesByNames)) {
+        if (is_null(static::$dataTypesByNames)) {
             $this->initDataTypes();
         }
-        return self::$dataTypesByNames;
+        return static::$dataTypesByNames;
     }
 
     /**
@@ -385,8 +385,8 @@ class EasyMeta
             return null;
         }
         $name = mb_strtolower($dataType);
-        if (isset(self::DATA_TYPES_MAIN[$dataType])) {
-            return self::DATA_TYPES_MAIN[$dataType];
+        if (isset(static::DATA_TYPES_MAIN[$dataType])) {
+            return static::DATA_TYPES_MAIN[$dataType];
         }
         // Manage an exception in ValueSuggest: geonames features has no uri.
         if ($name === 'valuesuggestall:geonames:features') {
@@ -414,11 +414,11 @@ class EasyMeta
         if (!$dataType) {
             return null;
         }
-        if (is_null(self::$dataTypesMainCustomVocabs)) {
+        if (is_null(static::$dataTypesMainCustomVocabs)) {
             $this->initDataTypesMainCustomVocabs();
         }
         $dataType = mb_strtolower($dataType);
-        return self::$dataTypesMainCustomVocabs[$dataType] ?? null;
+        return static::$dataTypesMainCustomVocabs[$dataType] ?? null;
     }
 
     /**
@@ -844,7 +844,7 @@ class EasyMeta
             $this->initVocabularies();
         }
         if (is_null($prefixesOrUrisOrIds)) {
-            return array_combine(array_keys(self::$vocabularyIdsByPrefixes), array_keys(self::$vocabularyIdsByUris));
+            return array_combine(array_keys(static::$vocabularyIdsByPrefixes), array_keys(static::$vocabularyIdsByUris));
         }
         if (is_scalar($prefixesOrUrisOrIds)) {
             $prefixesOrUrisOrIds = [$prefixesOrUrisOrIds];
@@ -855,8 +855,8 @@ class EasyMeta
 
     protected function initDataTypes(): void
     {
-        self::$dataTypesByNames = $this->dataTypeManager->getRegisteredNames();
-        self::$dataTypesByNames = array_combine(self::$dataTypesByNames, self::$dataTypesByNames);
+        static::$dataTypesByNames = $this->dataTypeManager->getRegisteredNames();
+        static::$dataTypesByNames = array_combine(static::$dataTypesByNames, static::$dataTypesByNames);
     }
 
     protected function initDataTypesMainCustomVocabs(): void
@@ -884,9 +884,9 @@ SELECT
 FROM `custom_vocab`
 ORDER BY `id` ASC;
 SQL;
-            self::$dataTypesMainCustomVocabs = $this->connection->executeQuery($sql)->fetchAllKeyValue() ?: [];
+            static::$dataTypesMainCustomVocabs = $this->connection->executeQuery($sql)->fetchAllKeyValue() ?: [];
         } else {
-            self::$dataTypesMainCustomVocabs = [];
+            static::$dataTypesMainCustomVocabs = [];
         }
     }
 
