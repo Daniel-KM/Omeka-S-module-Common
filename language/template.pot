@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-01 00:00+0000\n"
+"POT-Creation-Date: 2024-02-05 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,37 +21,37 @@ msgstr ""
 msgid "default"
 msgstr ""
 
-#: TraitModule.php:68 TraitModule.php:859
+#: TraitModule.php:69 TraitModule.php:860
 #, php-format
 msgid "This module requires the module \"%s\"."
 msgstr ""
 
-#: TraitModule.php:73
+#: TraitModule.php:74
 #, php-format
 msgid "This module requires modules \"%s\"."
 msgstr ""
 
-#: TraitModule.php:81
+#: TraitModule.php:82
 msgid "This module has resources that cannot be installed."
 msgstr ""
 
-#: TraitModule.php:88
+#: TraitModule.php:89
 msgid ""
 "This module cannot install its tables, because they exist already. Try to "
 "remove them first."
 msgstr ""
 
-#: TraitModule.php:380
+#: TraitModule.php:381
 #, php-format
 msgid "The module removed tables \"%s\" from a previous broken install."
 msgstr ""
 
-#: TraitModule.php:854
+#: TraitModule.php:855
 #, php-format
 msgid "This module requires the module \"%1$s\", version %2$s or above."
 msgstr ""
 
-#: TraitModule.php:951
+#: TraitModule.php:972
 #, php-format
 msgid ""
 "The module \"%s\" was automatically deactivated because the dependencies are "
@@ -59,8 +59,64 @@ msgid ""
 msgstr ""
 
 #: src/View/Helper/MediaTypeSelect.php:40
-#: src/Service/Form/Element/MediaTypeSelectFactory.php:27
+#: src/Service/Form/Element/MediaTypeSelectFactory.php:28
 msgid "Select media type…"
+msgstr ""
+
+#: src/Form/Element/AbstractGroupBySiteSelect.php:151
+msgid "[No site]"
+msgstr ""
+
+#: src/Stdlib/EasyMeta.php:58
+msgid "annotation"
+msgstr ""
+
+#: src/Stdlib/EasyMeta.php:63
+msgid "resource"
+msgstr ""
+
+#: src/Stdlib/EasyMeta.php:64
+msgid "property"
+msgstr ""
+
+#: src/Stdlib/EasyMeta.php:65
+msgid "resource class"
+msgstr ""
+
+#: src/Stdlib/EasyMeta.php:71
+msgid "annotations"
+msgstr ""
+
+#: src/Stdlib/EasyMeta.php:72
+msgid "assets"
+msgstr ""
+
+#: src/Stdlib/EasyMeta.php:73
+msgid "items"
+msgstr ""
+
+#: src/Stdlib/EasyMeta.php:74
+msgid "item sets"
+msgstr ""
+
+#: src/Stdlib/EasyMeta.php:76
+msgid "resources"
+msgstr ""
+
+#: src/Stdlib/EasyMeta.php:77
+msgid "properties"
+msgstr ""
+
+#: src/Stdlib/EasyMeta.php:78
+msgid "resource classes"
+msgstr ""
+
+#: src/Stdlib/EasyMeta.php:79
+msgid "resource templates"
+msgstr ""
+
+#: src/Stdlib/EasyMeta.php:80
+msgid "vocabularies"
 msgstr ""
 
 #: InstallResources.php:84
@@ -139,33 +195,33 @@ msgstr ""
 msgid "The resource template named \"%s\" is already available and is skipped."
 msgstr ""
 
-#: InstallResources.php:830
+#: InstallResources.php:832
 #, php-format
 msgid "The custom vocab named \"%s\" is not available."
 msgstr ""
 
-#: InstallResources.php:1039
+#: InstallResources.php:1041
 msgid "No file or url set for the vocabulary."
 msgstr ""
 
-#: InstallResources.php:1049
+#: InstallResources.php:1051
 #, php-format
 msgid "The file \"%s\" cannot be read. Check the url."
 msgstr ""
 
-#: InstallResources.php:1059
+#: InstallResources.php:1061
 #, php-format
 msgid "The file \"%s\" cannot be read. Check the file."
 msgstr ""
 
-#: InstallResources.php:1080
+#: InstallResources.php:1082
 msgid "A vocabulary must have a namespace uri and a prefix."
 msgstr ""
 
-#: TraitModule.php:973
+#: TraitModule.php:994
 msgid "The directory \"{path}\" is not writeable."
 msgstr ""
 
-#: TraitModule.php:984
+#: TraitModule.php:1005
 msgid "The directory \"{path}\" is not writeable: {error}."
 msgstr ""
