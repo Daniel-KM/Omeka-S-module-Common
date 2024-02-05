@@ -361,16 +361,24 @@ class EasyMeta
     }
 
     /**
-     * Get data type names by names.
+     * Get data type names by names or all data types.
      *
-     * @return string[] The data type names.
+     * @param array|int|string|null $dataTypes One or multiple data types.
+     * @return string[] The matching data type names or all data types, by data
+     * types.
      */
-    public function dataTypeNames(): array
+    public function dataTypeNames($dataTypes = null): array
     {
         if (is_null(static::$dataTypesByNames)) {
             $this->initDataTypes();
         }
-        return static::$dataTypesByNames;
+        if (is_null($dataTypes)) {
+            return static::$dataTypesByNames;
+        }
+        if (is_scalar($dataTypes)) {
+            $dataTypes = [$dataTypes];
+        }
+        return array_intersect_key(static::$dataTypesByNames, array_flip($dataTypes));
     }
 
     /**
