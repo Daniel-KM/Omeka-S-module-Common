@@ -3,9 +3,47 @@
 namespace Common\Stdlib;
 
 use Doctrine\DBAL\Connection;
+use Omeka\DataType\Manager as DataTypeManager;
 
 class EasyMeta
 {
+    const DATA_TYPES_MAIN = [
+        'literal' => 'literal',
+        'uri' => 'uri',
+        'resource' => 'resource',
+        'resource:item' => 'resource',
+        'resource:itemset' => 'resource',
+        'resource:media' => 'resource',
+        // Module Annotate.
+        'resource:annotation' => 'resource',
+        'annotation' => 'resource',
+        // Module DataTypeGeometry.
+        'geography' => 'literal',
+        'geography:coordinates' => 'literal',
+        'geometry' => 'literal',
+        'geometry:coordinates' => 'literal',
+        'geometry:position' => 'literal',
+        // Module DataTypeGeometry (deprecated).
+        'geometry:geography' => 'literal',
+        'geometry:geography:coordinates' => 'literal',
+        'geometry:geometry' => 'literal',
+        'geometry:geometry:coordinates' => 'literal',
+        'geometry:geometry:position' => 'literal',
+        // Module DataTypePlace.
+        'place' => 'uri',
+        // Module DataTypeRdf.
+        'html' => 'literal',
+        'xml' => 'literal',
+        'boolean' => 'literal',
+        // Module NumericDataTypes.
+        'numeric:timestamp' => 'literal',
+        'numeric:integer' => 'literal',
+        'numeric:duration' => 'literal',
+        'numeric:interval' => 'literal',
+        // Specific module.
+        'email' => 'literal',
+    ];
+
     const RESOURCE_CLASSES = [
         'annotations' => \Annotate\Entity\Annotation::class,
         'assets' => \Omeka\Entity\Asset::class,
@@ -155,6 +193,21 @@ class EasyMeta
     protected $connection;
 
     /**
+     * @var \Omeka\DataType\Manager
+     */
+    protected $dataTypeManager;
+
+    /**
+     * @var array
+     */
+    protected static $dataTypesByNames;
+
+    /**
+     * @var array
+     */
+    protected static $dataTypesMainCustomVocabs;
+
+    /**
      * @var array
      */
     protected static $propertyIdsByTerms;
@@ -209,9 +262,12 @@ class EasyMeta
      */
     protected static $resourceTemplateLabelsByLabelsAndIds;
 
-    public function __construct(Connection $connection)
-    {
+    public function __construct(
+        Connection $connection,
+        DataTypeManager $dataTypeManager
+    ) {
         $this->connection = $connection;
+        $this->dataTypeManager = $dataTypeManager;
     }
 
     public function __invoke(): self
@@ -259,6 +315,85 @@ class EasyMeta
     public function resourceLabelPlural($name): ?string
     {
         return self::RESOURCE_LABELS_PLURAL[self::RESOURCE_NAMES[$name] ?? null] ?? null;
+    }
+
+    /**
+     * Get a data type name by name.
+     *
+     * @param string|null $name A name.
+     * @return string|null The data type name matching the name.
+     */
+    public function dataTypeName(?string $dataType): ?string
+    {
+        if (!$dataType) {
+            return null;
+        }
+        if (is_null(self::$dataTypesByNames)) {
+            $this->initDataTypes();
+        }
+        $dataType = mb_strtolower($dataType);
+        return self::$dataTypesByNames[$dataType] ?? null;
+    }
+
+    /**
+     * Get data type names by names.
+     *
+     * @return string[] The data type names.
+     */
+    public function dataTypeNames(): array
+    {
+        if (is_null(self::$dataTypesByNames)) {
+            $this->initDataTypes();
+        }
+        return self::$dataTypesByNames;
+    }
+
+    /**
+     * Get the main data type ("literal", "resource", or "uri") of a name.
+     *
+     * @param string|null $name A name.
+     * @return string|null The main data type name matching the name.
+     */
+    public function dataTypeMain(?string $dataType): ?string
+    {
+        if (!$dataType) {
+            return null;
+        }
+        $name = mb_strtolower($dataType);
+        if (isset(self::DATA_TYPES_MAIN[$dataType])) {
+            return self::DATA_TYPES_MAIN[$dataType];
+        }
+        // Manage an exception in ValueSuggest: geonames features has no uri.
+        if ($name === 'valuesuggestall:geonames:features') {
+            return 'literal';
+        }
+        // Module ValueSuggest.
+        if (substr($dataType, 0, 13) === 'valuesuggest:'
+            || substr($dataType, 0, 16) === 'valuesuggestall:'
+        ) {
+            return 'uri';
+        }
+        if (substr($dataType, 0, 12) === 'customvocab:') {
+            return $this->dataTypeMainCustomVocab($dataType);
+        }
+        return null;
+    }
+
+    /**
+     * Get the main type of the custom vocab: "literal", "resource" or "uri".
+     *
+     * @todo Check for dynamic custom vocabs.
+     */
+    public function dataTypeMainCustomVocab(?string $dataType): ?string
+    {
+        if (!$dataType) {
+            return null;
+        }
+        if (is_null(self::$dataTypesMainCustomVocabs)) {
+            $this->initDataTypesMainCustomVocabs();
+        }
+        $dataType = mb_strtolower($dataType);
+        return self::$dataTypesMainCustomVocabs[$dataType] ?? null;
     }
 
     /**
@@ -564,6 +699,43 @@ class EasyMeta
         }
         // TODO Keep original order.
         return array_intersect_key(static::$resourceTemplateLabelsByLabelsAndIds, array_flip($labelsOrIds));
+    }
+
+    protected function initDataTypes(): void
+    {
+        self::$dataTypesByNames = $this->dataTypeManager->getRegisteredNames();
+        self::$dataTypesByNames = array_combine(self::$dataTypesByNames, self::$dataTypesByNames);
+    }
+
+    protected function initDataTypesMainCustomVocabs(): void
+    {
+        $hasCustomVocab = class_exists('CustomVocab\Module');
+        if ($hasCustomVocab) {
+            /*
+            $sql = <<<'SQL'
+            SELECT
+                GROUP_CONCAT(DISTINCT CASE WHEN `terms` != "" THEN `id` ELSE NULL END ORDER BY `id` ASC SEPARATOR " ") AS 'literal',
+                GROUP_CONCAT(DISTINCT CASE WHEN `item_set_id` IS NOT NULL THEN `id` ELSE NULL END ORDER BY `id` ASC SEPARATOR " ") AS 'resource',
+                GROUP_CONCAT(DISTINCT CASE WHEN `uris` != "" THEN `id` ELSE NULL END ORDER BY `id` ASC SEPARATOR " ") AS 'uri'
+            FROM `custom_vocab`;
+            SQL;
+            $customVocabsByType = $site->get('Omeka\Connection')->executeQuery($sql)->fetchAssociative() ?: ['literal' => '', 'resource' => '', 'uri' => ''];
+             */
+            $sql = <<<'SQL'
+SELECT
+    `id` AS id,
+    CASE
+        WHEN `uris` != "" THEN "uri"
+        WHEN `item_set_id` IS NOT NULL THEN "resource"
+        ELSE "literal"
+    END AS "type"
+FROM `custom_vocab`
+ORDER BY `id` ASC;
+SQL;
+            self::$dataTypesMainCustomVocabs = $this->connection->executeQuery($sql)->fetchAllKeyValue() ?: [];
+        } else {
+            self::$dataTypesMainCustomVocabs = [];
+        }
     }
 
     protected function initProperties(): void

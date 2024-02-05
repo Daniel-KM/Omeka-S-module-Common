@@ -16,7 +16,8 @@ class EasyMetaFactory implements FactoryInterface
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
         return new EasyMeta(
-            $services->get('Omeka\Connection')
+            $services->get('Omeka\Connection'),
+            $services->get('Omeka\DataTypeManager')
         );
     }
 }
