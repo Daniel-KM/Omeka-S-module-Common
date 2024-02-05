@@ -20,4 +20,9 @@ class EasyMeta extends AbstractPlugin
     {
         return $this->easyMeta;
     }
+
+    public function __call(string $name , array $arguments)
+    {
+        return $this->easyMeta->$name(...$arguments);
+    }
 }

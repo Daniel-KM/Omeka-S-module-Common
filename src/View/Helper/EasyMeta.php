@@ -20,4 +20,9 @@ class EasyMeta extends AbstractHelper
     {
         return $this->easyMeta;
     }
+
+    public function __call(string $name , array $arguments)
+    {
+        return $this->easyMeta->$name(...$arguments);
+    }
 }
