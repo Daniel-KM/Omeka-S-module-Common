@@ -39,6 +39,8 @@ return [
         'invokables' => [
             Form\Element\ArrayText::class => Form\Element\ArrayText::class,
             Form\Element\OptionalCheckbox::class => Form\Element\OptionalCheckbox::class,
+            Form\Element\OptionalDate::class => Form\Element\OptionalDate::class,
+            Form\Element\OptionalDateTime::class => Form\Element\OptionalDateTime::class,
             Form\Element\OptionalMultiCheckbox::class => Form\Element\OptionalMultiCheckbox::class,
             Form\Element\OptionalNumber::class => Form\Element\OptionalNumber::class,
             Form\Element\OptionalRadio::class => Form\Element\OptionalRadio::class,
