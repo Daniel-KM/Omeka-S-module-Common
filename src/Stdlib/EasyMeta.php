@@ -274,7 +274,7 @@ class EasyMeta
      *
      * @param int|string|null $termOrId A id or a term.
      * @return string|null The resource class label matching term or id. The
-     * label is not translated
+     * label is not translated.
      */
     public function resourceClassLabel($termOrId): ?string
     {
@@ -312,7 +312,7 @@ class EasyMeta
      * Get a resource template id by label or by numeric id.
      *
      * @param int|string|null $labelOrId A id or a label.
-     * @return int|null The property id matching term or id.
+     * @return int|null The resource template id matching label or id.
      */
     public function resourceTemplateId($labelOrId): ?int
     {
@@ -323,7 +323,7 @@ class EasyMeta
     }
 
     /**
-     * Get one or more resource template ids by labels or by numeric ids.
+     * Get resource template ids by labels or by numeric ids.
      *
      * @param array|int|string|null $labelsOrIds One or multiple ids or labels.
      * @return string[] The resource template ids matching labels or ids, or all
@@ -388,7 +388,7 @@ class EasyMeta
             ->select(
                 'CONCAT(`vocabulary`.`prefix`, ":", `property`.`local_name`) AS term',
                 '`property`.`id` AS id',
-                '`property`.`label` AS label',
+                '`property`.`label` AS label'
             )
             ->from('`property`', 'property')
             ->innerJoin('property', 'vocabulary', 'vocabulary', '`property`.`vocabulary_id` = `vocabulary`.`id`')
@@ -399,9 +399,11 @@ class EasyMeta
         $result = $this->connection->executeQuery($qb)->fetchAllAssociative();
 
         static::$propertyIdsByTerms = array_map('intval', array_column($result, 'id', 'term'));
-        static::$propertyIdsByTermsAndIds = static::$propertyIdsByTerms + array_combine(static::$propertyIdsByTerms, static::$propertyIdsByTerms);
+        static::$propertyIdsByTermsAndIds = static::$propertyIdsByTerms
+            + array_column($result, 'id', 'id');
         static::$propertyLabelsByTerms = array_column($result, 'label', 'term');
-        static::$propertyLabelsByTermsAndIds = static::$propertyLabelsByTerms + array_column($result, 'label', 'id');
+        static::$propertyLabelsByTermsAndIds = static::$propertyLabelsByTerms
+            + array_column($result, 'label', 'id');
     }
 
     protected function initResourceClasses(): void
@@ -411,7 +413,7 @@ class EasyMeta
             ->select(
                 'CONCAT(`vocabulary`.`prefix`, ":", `resource_class`.`local_name`) AS term',
                 '`resource_class`.`id` AS id',
-                '`resource_class`.`label` AS label',
+                '`resource_class`.`label` AS label'
             )
             ->from('`resource_class`', 'resource_class')
             ->innerJoin('resource_class', 'vocabulary', 'vocabulary', '`resource_class`.`vocabulary_id` = `vocabulary`.`id`')
@@ -421,9 +423,11 @@ class EasyMeta
         ;
         $result = $this->connection->executeQuery($qb)->fetchAllAssociative();
         static::$resourceClassIdsByTerms = array_map('intval', array_column($result, 'id', 'term'));
-        static::$resourceClassIdsByTermsAndIds = static::$resourceClassIdsByTerms + array_combine(static::$resourceClassIdsByTerms, static::$resourceClassIdsByTerms);
+        static::$resourceClassIdsByTermsAndIds = static::$resourceClassIdsByTerms
+            + array_column($result, 'id', 'id');
         static::$resourceClassLabelsByTerms = array_column($result, 'label', 'term');
-        static::$resourceClassLabelsByTermsAndIds = static::$resourceClassLabelsByTerms + array_column($result, 'label', 'id');
+        static::$resourceClassLabelsByTermsAndIds = static::$resourceClassLabelsByTerms
+            + array_column($result, 'label', 'id');
     }
 
     protected function initResourceTemplates(): void
@@ -440,7 +444,9 @@ class EasyMeta
         ;
         $result = $this->connection->executeQuery($qb)->fetchAllKeyValue();
         static::$resourceTemplateIdsByLabels = array_map('intval', $result);
-        static::$resourceTemplateIdsByLabelsAndIds = static::$resourceTemplateIdsByLabels + array_combine(static::$resourceTemplateIdsByLabels, static::$resourceTemplateIdsByLabels);
-        static::$resourceTemplateLabelsByLabelsAndIds = array_combine(array_keys(static::$resourceTemplateIdsByLabels), array_keys(static::$resourceTemplateIdsByLabels)) + array_flip(static::$resourceTemplateIdsByLabels);
+        static::$resourceTemplateIdsByLabelsAndIds = static::$resourceTemplateIdsByLabels
+            + array_column($result, 'id', 'id');
+        static::$resourceTemplateLabelsByLabelsAndIds = array_combine(array_keys(static::$resourceTemplateIdsByLabels), array_keys(static::$resourceTemplateIdsByLabels))
+            + array_flip(static::$resourceTemplateIdsByLabels);
     }
 }
