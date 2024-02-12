@@ -12,6 +12,11 @@ return [
             // Allow to add the PSR-3 formatter to default logger.
             'Omeka\Logger' => Service\LoggerFactory::class,
         ],
+        'delegators' => [
+            'Laminas\I18n\Translator\TranslatorInterface' => [
+                __NAMESPACE__ => Service\Delegator\TranslatorDelegatorFactory::class,
+            ],
+        ],
     ],
     'view_manager' => [
         'template_path_stack' => [

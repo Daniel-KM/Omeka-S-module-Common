@@ -159,6 +159,9 @@ class PsrMessage implements \JsonSerializable, PsrInterpolateInterface, Translat
      */
     public function translate($textDomain = 'default', $locale = null): string
     {
+        // Check isTranslatorEnabled here? No: the check should be done outside
+        // of translate. Anyway, the default value is true and is is never
+        // checked.
         if ($this->hasTranslator()) {
             return $this->isSprintf
                 ? (string) vsprintf($this->translator->translate($this->message, $textDomain, $locale), array_values($this->context))
