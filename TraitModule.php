@@ -289,7 +289,7 @@ trait TraitModule
 
     protected function preInstall(): void
     {
-        // To be overridden. Automatically run on uninstall.
+        // To be overridden. Automatically run on install.
     }
 
     protected function postInstall(): void
@@ -865,7 +865,7 @@ trait TraitModule
     }
 
     /**
-     * Check if a module is active and optionally its version.
+     * Check if a module is active and optionally its minimum version.
      */
     protected function checkModuleActiveVersion(string $module, ?string $version = null): bool
     {
