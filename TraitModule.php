@@ -32,7 +32,6 @@ use Laminas\EventManager\Event;
 use Laminas\Mvc\Controller\AbstractController;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\View\Renderer\PhpRenderer;
-use Omeka\Module\AbstractModule;
 use Omeka\Module\Exception\ModuleCannotInstallException;
 use Omeka\Module\Manager as ModuleManager;
 use Omeka\Settings\SettingsInterface;
@@ -155,7 +154,7 @@ trait TraitModule
     /**
      * @return self
      */
-    public function installAllResources(): AbstractModule
+    public function installAllResources(): self
     {
         $installResources = $this->getInstallResources();
         if (!$installResources) {
@@ -169,7 +168,7 @@ trait TraitModule
     /**
      * @return self
      */
-    public function uninstallAllResources(): AbstractModule
+    public function uninstallAllResources(): self
     {
         $installResources = $this->getInstallResources();
         if (!$installResources
@@ -187,14 +186,14 @@ trait TraitModule
         return $this->getConfigFormAuto($renderer);
     }
 
-    protected function getConfigFormAuto(PhpRenderer $renderer)
+    protected function getConfigFormAuto(PhpRenderer $renderer): ?string
     {
         $services = $this->getServiceLocator();
 
         $formManager = $services->get('FormElementManager');
         $formClass = static::NAMESPACE . '\Form\ConfigForm';
         if (!$formManager->has($formClass)) {
-            return '';
+            return null;
         }
 
         // Simplify config of modules.
@@ -206,7 +205,7 @@ trait TraitModule
 
         $data = $this->prepareDataToPopulate($settings, 'config');
         if (is_null($data)) {
-            return '';
+            return null;
         }
 
         $form = $formManager->get($formClass);
@@ -221,7 +220,7 @@ trait TraitModule
         return $this->handleConfigFormAuto($controller);
     }
 
-    protected function handleConfigFormAuto(AbstractController $controller)
+    protected function handleConfigFormAuto(AbstractController $controller): bool
     {
         $config = $this->getConfig();
         $space = strtolower(static::NAMESPACE);
@@ -436,7 +435,7 @@ trait TraitModule
      * @param array $values Values to use when process is update.
      * @return self
      */
-    protected function manageConfig(string $process, array $values = []): AbstractModule
+    protected function manageConfig(string $process, array $values = []): self
     {
         $services = $this->getServiceLocator();
         $settings = $services->get('Omeka\Settings');
@@ -450,7 +449,7 @@ trait TraitModule
      * @param array $values Values to use when process is update.
      * @return self
      */
-    protected function manageMainSettings(string $process, array $values = []): AbstractModule
+    protected function manageMainSettings(string $process, array $values = []): self
     {
         $services = $this->getServiceLocator();
         $settings = $services->get('Omeka\Settings');
@@ -466,7 +465,7 @@ trait TraitModule
      * @param array $values Values to use when process is update, by site id.
      * @return self
      */
-    protected function manageSiteSettings(string $process, array $values = []): AbstractModule
+    protected function manageSiteSettings(string $process, array $values = []): self
     {
         $settingsType = 'site_settings';
         $config = $this->getConfig();
@@ -499,7 +498,7 @@ trait TraitModule
      * @param array $values Values to use when process is update, by user id.
      * @return self
      */
-    protected function manageUserSettings(string $process, array $values = []): AbstractModule
+    protected function manageUserSettings(string $process, array $values = []): self
     {
         $settingsType = 'user_settings';
         $config = $this->getConfig();
@@ -534,7 +533,7 @@ trait TraitModule
      * @param array $values
      * @return $this;
      */
-    protected function manageAnySettings(SettingsInterface $settings, string $settingsType, string $process, array $values = []): AbstractModule
+    protected function manageAnySettings(SettingsInterface $settings, string $settingsType, string $process, array $values = []): self
     {
         $config = $this->getConfig();
         $space = strtolower(static::NAMESPACE);
