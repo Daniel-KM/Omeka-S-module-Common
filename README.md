@@ -65,7 +65,19 @@ copy-paste common code between modules.
 Installation
 ------------
 
-Uncompress files and rename module folder `Common`.
+See general end user documentation for [installing a module].
+
+* From the zip
+
+Download the last release [Common.zip] from the list of releases, and
+uncompress it in the `modules` directory.
+
+* From the source and for development
+
+If the module was installed from the source, rename the name of the folder of
+the module to `Common`.
+
+Then install it like any other Omeka module and follow the config instructions.
 
 
 Usage (for developer)
@@ -207,6 +219,13 @@ class Module extends AbstractModule
 }
 ```
 
+**WARNING**: with an abstract class, `parent::method()` in the module calls the
+method of the abstract class (`Common\AbstractModule`), but with a trait,
+`parent::method()` is the method of `Omeka\AbstractModule` if it exists.
+Furthermore, it is not possible to call a method of the trait that is overridden
+by the class Module. This is why there are methods suffixed with "Auto" that can
+be used in such a case.
+
 ### Installing resources
 
 To install resources, you need to include the file `InstallResources.php`. The
@@ -269,6 +288,8 @@ Copyright
 [GitLab]: https://gitlab.com/Daniel-KM/Omeka-S-module-Common
 [PSR-3]: http://www.php-fig.org/psr/psr-3
 [PHP-FIG]: http://www.php-fig.org
+[Installing a module]: https://omeka.org/s/docs/user-manual/modules/
+[Common.zip]: https://github.com/Daniel-KM/Omeka-S-module-Common/releases
 [module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-Common/-/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
