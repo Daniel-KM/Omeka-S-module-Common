@@ -52,6 +52,11 @@ use Omeka\Stdlib\Message;
  */
 trait TraitModule
 {
+    /**
+     * Get the config of the current module.
+     *
+     * @return array
+     */
     public function getConfig()
     {
         return include $this->modulePath() . '/config/module.config.php';
@@ -60,7 +65,12 @@ trait TraitModule
     public function install(ServiceLocatorInterface $services): void
     {
         $this->setServiceLocator($services);
+
+        $this->initTranslations();
+
+        /**@var \Laminas\Mvc\I18n\Translator $translator */
         $translator = $services->get('MvcTranslator');
+
         $this->preInstall();
         if (!$this->checkDependencies()) {
             if (count($this->dependencies) === 1) {
@@ -76,12 +86,14 @@ trait TraitModule
             }
             throw new ModuleCannotInstallException((string) $message);
         }
+
         if (!$this->checkAllResourcesToInstall()) {
             $message = new Message(
                 $translator->translate('This module has resources that cannot be installed.') // @translate
             );
             throw new ModuleCannotInstallException((string) $message);
         }
+
         $sqlFile = $this->modulePath() . '/data/install/schema.sql';
         if (!$this->checkNewTablesFromFile($sqlFile)) {
             $message = new Message(
@@ -89,7 +101,9 @@ trait TraitModule
             );
             throw new ModuleCannotInstallException((string) $message);
         }
+
         $this->execSqlFromFile($sqlFile);
+
         $this
             ->installAllResources()
             ->manageConfig('install')
@@ -118,6 +132,7 @@ trait TraitModule
     {
         $filepath = $this->modulePath() . '/data/scripts/upgrade.php';
         if (file_exists($filepath) && filesize($filepath) && is_readable($filepath)) {
+            $this->initTranslations();
             // For compatibility with old upgrade files.
             $serviceLocator = $services;
             $this->setServiceLocator($serviceLocator);
@@ -326,6 +341,41 @@ trait TraitModule
             $this->setServiceLocator($services);
             require_once $filepath;
         }
+    }
+
+    /**
+     * Init translations during install and upgrade, when the config is not included early.
+     *
+     * @fixme The translation are currently not included here (earlier event and factory)
+     */
+    protected function initTranslations(): self
+    {
+        // Include translations early for translatable settings and messages.
+        $conf = $this->getConfig();
+        if (!isset($conf['translator']['translation_file_patterns'])
+            || is_array($conf['translator']['translation_file_patterns'])
+        ) {
+            return $this;
+        }
+
+        $services = $this->getServiceLocator();
+
+        /**
+         * @var \Laminas\I18n\Translator\TranslatorInterface $translator
+         * @var \Laminas\I18n\Translator\Translator $delegatedTranslator
+         */
+        $translator = $services->get(\Laminas\I18n\Translator\TranslatorInterface::class);
+        $delegatedTranslator = $translator->getDelegatedTranslator();
+        foreach ($conf['translator']['translation_file_patterns'] as $translationFilePattern) {
+            $delegatedTranslator->addTranslationFilePattern(
+                $translationFilePattern['type'],
+                $translationFilePattern['base_dir'],
+                $translationFilePattern['pattern'],
+                $translationFilePattern['text_domain'] ?? 'default',
+            );
+        }
+
+        return $this;
     }
 
     /**
@@ -540,22 +590,32 @@ trait TraitModule
         if (empty($config[$space][$settingsType])) {
             return $this;
         }
+
+        $translator = $this->getServiceLocator()->get('MvcTranslator');
+
         $defaultSettings = $config[$space][$settingsType];
         foreach ($defaultSettings as $name => $value) {
             switch ($process) {
                 case 'install':
-                    $settings->set($name, $value);
+                    $settings->set(
+                        $name,
+                        $this->isSettingTranslatable($settingsType, $name) ? $translator->translate($value) : $value
+                    );
                     break;
                 case 'uninstall':
                     $settings->delete($name);
                     break;
                 case 'update':
                     if (array_key_exists($name, $values)) {
-                        $settings->set($name, $values[$name]);
+                        $settings->set(
+                            $name,
+                            $this->isSettingTranslatable($settingsType, $name) ? $translator->translate($values[$name]) : $values[$name]
+                        );
                     }
                     break;
             }
         }
+
         return $this;
     }
 
@@ -813,6 +873,16 @@ trait TraitModule
             $data[$name] = $val;
         }
         return $data;
+    }
+
+    /**
+     * Check if a setting is translatable.
+     *
+     * The method can be overridden with to matching settings names.
+     */
+    protected function isSettingTranslatable(string $settingsType, string $name): bool
+    {
+        return false;
     }
 
     /**
