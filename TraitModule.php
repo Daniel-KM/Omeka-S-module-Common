@@ -217,7 +217,6 @@ trait TraitModule
         $settings = $services->get('Omeka\Settings');
 
         $this->initDataToPopulate($settings, 'config');
-
         $data = $this->prepareDataToPopulate($settings, 'config');
         if (is_null($data)) {
             return null;
@@ -794,11 +793,9 @@ trait TraitModule
      * @param SettingsInterface $settings
      * @param string $settingsType
      * @param int $id Site id or user id.
-     * @param array $values Specific values to populate, e.g. translated strings.
      * @param bool True if processed.
      */
-    protected function initDataToPopulate(SettingsInterface $settings, string $settingsType, $id = null, iterable $values = []): bool
-    {
+    protected function initDataToPopulate(SettingsInterface $settings, string $settingsType, $id = null): bool {
         // This method is not in the interface, but is set for config, site and
         // user settings.
         if (!method_exists($settings, 'getTableName')) {
@@ -812,7 +809,8 @@ trait TraitModule
         }
 
         /** @var \Doctrine\DBAL\Connection $connection */
-        $connection = $this->getServiceLocator()->get('Omeka\Connection');
+        $services = $this->getServiceLocator();
+        $connection = $services->get('Omeka\Connection');
         if ($id) {
             if (!method_exists($settings, 'getTargetIdColumnName')) {
                 return false;
@@ -823,6 +821,8 @@ trait TraitModule
             $sql = sprintf('SELECT id, value FROM %s', $settings->getTableName());
             $stmt = $connection->executeQuery($sql);
         }
+
+        $translator = $services->get('MvcTranslator');
 
         $currentSettings = $stmt->fetchAllKeyValue();
         $defaultSettings = $config[$space][$settingsType];
@@ -838,7 +838,10 @@ trait TraitModule
         $missingSettings = array_diff_key($defaultSettings, $currentSettings);
 
         foreach ($missingSettings as $name => $value) {
-            $settings->set($name, array_key_exists($name, $values) ? $values[$name] : $value);
+            $settings->set(
+                $name,
+                $this->isSettingTranslatable($settingsType, $name) ? $translator->translate($value) : $value
+            );
         }
 
         return true;
