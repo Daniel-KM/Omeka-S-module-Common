@@ -280,6 +280,11 @@ class EasyMeta
     /**
      * @var array
      */
+    protected static $vocabularyLabelsByPrefixesAndUrisAndIds;
+
+    /**
+     * @var array
+     */
     protected static $vocabularyPrefixesByPrefixesAndUrisAndIds;
 
     /**
@@ -752,7 +757,7 @@ class EasyMeta
      * Get vocabulary ids by uris, prefix or by numeric ids.
      *
      * @param array|int|string|null $prefixesOrUrisOrIds One or multiple ids,
-     *   uris or prefixes.
+     * uris or prefixes.
      * @return int[] The vocabulary ids matching uris, prefixes or ids, or all
      * vocabularies by prefixes. When the input contains uris, prefixes and ids
      * matching the same vocabularies, they are all returned.
@@ -796,7 +801,7 @@ class EasyMeta
      * Get vocabulary prefixes by uris, prefixes or numeric ids.
      *
      * @param array|int|string|null $prefixesOrUrisOrIds One or multiple ids,
-     *   uris or prefixes.
+     * uris or prefixes.
      * @return string[] The vocabulary prefixes matching uris, prefixes or ids,
      * or all vocabularies prefixes by ids. When the input contains uris,
      * prefixes and ids matching the same vocabularies, they are all returned.
@@ -841,10 +846,10 @@ class EasyMeta
      * Get vocabulary uris by uris, prefixes or numeric ids.
      *
      * @param array|int|string|null $prefixesOrUrisOrIds One or multiple ids,
-     *   uris or prefixes.
-     * @return string[] The vocabulary uris matching terms or ids, or all
-     * vocabulary uris by prefixes. When the input contains uris, prefixes and
-     * ids matching the same vocabularies, they are all returned.
+     * uris or prefixes.
+     * @return string[] The vocabulary uris matching ids, uris or prefixes, or
+     * all vocabulary uris by prefixes. When the input contains uris, prefixes
+     * and ids matching the same vocabularies, they are all returned.
      */
     public function vocabularyUrisByPrefixes($prefixesOrUrisOrIds = null): array
     {
@@ -859,6 +864,44 @@ class EasyMeta
         }
         // TODO Keep original order.
         return array_intersect_key(static::$vocabularyUrisByPrefixesAndUrisAndIds, array_flip($prefixesOrUrisOrIds));
+    }
+
+    /**
+     * Get a vocabulary label by uris, prefixes or numeric ids.
+     *
+     * @param array|int|string|null $prefixesOrUrisOrIds One or multiple ids,
+     * uris or prefixes.
+     * @return string|null The vocabulary label matching uri, prefix or id.
+     */
+    public function vocabularyLabel($prefixOrUriOrId): ?string
+    {
+        if (is_null(static::$vocabularyLabelsByPrefixesAndUrisAndIds)) {
+            $this->initVocabularies();
+        }
+        return static::$vocabularyLabelsByPrefixesAndUrisAndIds[$prefixOrUriOrId] ?? null;
+    }
+
+    /**
+     * Get vocabulary labels by uris, prefixes or numeric ids.
+     *
+     * @param array|int|string|null $prefixesOrUrisOrIds One or multiple ids,
+     * uris or prefixes.
+     * @return string[] The vocabulary labels matching ids, uris or prefixes, or
+     * all vocabulary uris by prefixes. When the input contains uris, prefixes
+     * and ids matching the same vocabularies, they are all returned.
+     */
+    public function vocabularyLabels($prefixesOrUrisOrIds = null): array
+    {
+        if (is_null(static::$vocabularyLabelsByPrefixesAndUrisAndIds)) {
+            $this->initVocabularies();
+        }
+        if (is_null($prefixesOrUrisOrIds)) {
+            return array_intersect_key(static::$vocabularyLabelsByPrefixesAndUrisAndIds, static::$vocabularyIdsByPrefixes);
+        }
+        if (is_scalar($prefixesOrUrisOrIds)) {
+            $prefixesOrUrisOrIds = [$prefixesOrUrisOrIds];
+        }
+        return array_intersect_key(static::$vocabularyLabelsByPrefixesAndUrisAndIds, array_flip($prefixesOrUrisOrIds));
     }
 
     protected function initDataTypes(): void
@@ -974,6 +1017,7 @@ SQL;
             ->select(
                 '`vocabulary`.`prefix` AS prefix',
                 '`vocabulary`.`namespace_uri` AS uri',
+                '`vocabulary`.`label` AS label',
                 '`vocabulary`.`id` AS id'
             )
             ->from('`vocabulary`', 'vocabulary')
@@ -988,6 +1032,9 @@ SQL;
         static::$vocabularyIdsByPrefixesAndUrisAndIds = static::$vocabularyIdsByPrefixes
             + static::$vocabularyIdsByUris
             + array_combine(static::$vocabularyIdsByPrefixes, static::$vocabularyIdsByPrefixes);
+        static::$vocabularyLabelsByPrefixesAndUrisAndIds = array_column($result, 'label', 'prefix')
+            + array_column($result, 'label', 'uri')
+            + array_column($result, 'label', 'id');
         static::$vocabularyPrefixesByPrefixesAndUrisAndIds = array_column($result, 'prefix', 'prefix')
             + array_column($result, 'prefix', 'uri')
             + array_column($result, 'prefix', 'id');
