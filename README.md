@@ -22,7 +22,11 @@ copy-paste common code between modules.
 - Form elements
 
   - Array Text
+  - Custom Vocabs Select
+  - Data Textarea
   - Data Type Select
+  - Media Ingester Select
+  - Media Renderer Select
   - Media Type Select
   - Sites Page Select
   - Optional Checkbox
@@ -162,6 +166,17 @@ Other extra data are appended.
 The logger stores the core messages as it, without context, so they can be
 displayed. They are not translatable if they use placeholders.
 
+* Compatibility with thrown exceptions
+
+An exception should not be translated early. Nevertheless, if you really need
+it, you can use:
+
+```php
+# Where `$this->translator` is the MvcTranslator from services, either:
+throw new \RuntimeException($this->translator->translate($message));
+throw new \Exception($message->setTranslator($this->translator)->translate());
+```
+
 #### Plural
 
 By construction, the plural is not managed: only one message is saved in the
@@ -237,6 +252,7 @@ TODO
 ----
 
 - [ ] Use key "psr_log" instead of "log" (see https://docs.laminas.dev/laminas-log/service-manager/#psrloggerabstractadapterfactory).
+- [ ] Use materialized views for EasyMeta?
 
 
 Warning
