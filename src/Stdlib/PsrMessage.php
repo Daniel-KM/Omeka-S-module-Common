@@ -14,11 +14,15 @@ use Laminas\I18n\Translator\TranslatorAwareTrait;
  *
  * ```
  * // To get a translator in a controller:
+ * $translator = $this->translator();
+ * // or:
  * $translator = $this->getEvent()->getApplication()->getServiceManager()->get('MvcTranslator');
  * // or:
  * $translator = $this->viewHelpers()->get('translate')->getTranslator();
  *
  * // To get translator in a view:
+ * $translator = $this->translator();
+ * // or:
  * $translator = $this->plugin('translate')->getTranslator();
  *
  * // To set the translator:
@@ -33,7 +37,8 @@ use Laminas\I18n\Translator\TranslatorAwareTrait;
  * logs), and as long as \Omeka\I18n\Translator doesn't manage PSR-3, the
  * message is interpolated directly, with translation if possible.
  *
- * @todo Move PsrMessage to its own module or in core.
+ * @todo Set translator on construct.
+ * @todo Move PsrMessage into core.
  *
  * @see \Omeka\Stdlib\Message
  */
@@ -144,6 +149,7 @@ class PsrMessage implements \JsonSerializable, PsrInterpolateInterface, Translat
 
     public function __toString()
     {
+        // isSprintf is a compatibility with Message, so no translation is done.
         if ($this->isSprintf) {
             return (string) vsprintf($this->message, array_values($this->context));
         }

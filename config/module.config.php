@@ -36,6 +36,7 @@ return [
             'easyMeta' => Service\ViewHelper\EasyMetaFactory::class,
             'matchedRouteName' => Service\ViewHelper\MatchedRouteNameFactory::class,
             'mediaTypeSelect' => Service\ViewHelper\MediaTypeSelectFactory::class,
+            'translator' => Service\ViewHelper\TranslatorFactory::class,
         ],
     ],
     // Add some common elements and make standard elements and some omeka ones optional.
@@ -80,6 +81,7 @@ return [
     'controller_plugins' => [
         'factories' => [
             'easyMeta' => Service\ControllerPlugin\EasyMetaFactory::class,
+            'translator' => Service\ControllerPlugin\TranslatorFactory::class,
         ],
     ],
     'translator' => [
