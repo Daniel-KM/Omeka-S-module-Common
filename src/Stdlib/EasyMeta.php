@@ -208,6 +208,11 @@ class EasyMeta
     /**
      * @var array
      */
+    protected static $dataTypeLabelsByNames;
+
+    /**
+     * @var array
+     */
     protected static $dataTypesMainCustomVocabs;
 
     /**
@@ -433,6 +438,27 @@ class EasyMeta
             return $this->dataTypeMainCustomVocab($dataType);
         }
         return null;
+    }
+
+    /**
+     * Get data type labels by names or all data types.
+     *
+     * @param array|int|string|null $dataTypes One or multiple data types.
+     * @return string[] The matching data type labels or all data types labels,
+     * by data types.
+     */
+    public function dataTypeLabels($dataTypes = null): array
+    {
+        if (is_null(static::$dataTypeLabelsByNames)) {
+            $this->initDataTypes();
+        }
+        if (is_null($dataTypes)) {
+            return static::$dataTypeLabelsByNames;
+        }
+        if (is_scalar($dataTypes)) {
+            $dataTypes = [$dataTypes];
+        }
+        return array_intersect_key(static::$dataTypeLabelsByNames, array_flip($dataTypes));
     }
 
     /**
@@ -1015,6 +1041,10 @@ class EasyMeta
     {
         static::$dataTypesByNames = $this->dataTypeManager->getRegisteredNames();
         static::$dataTypesByNames = array_combine(static::$dataTypesByNames, static::$dataTypesByNames);
+        foreach (static::$dataTypesByNames as $dataTypeName) {
+            $dataType = $this->dataTypeManager->get($dataTypeName);
+            static::$dataTypeLabelsByNames[$dataTypeName] = $dataType->getLabel();
+        }
     }
 
     protected function initDataTypesMainCustomVocabs(): void
