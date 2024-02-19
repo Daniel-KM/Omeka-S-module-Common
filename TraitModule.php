@@ -132,10 +132,10 @@ trait TraitModule
     {
         $filepath = $this->modulePath() . '/data/scripts/upgrade.php';
         if (file_exists($filepath) && filesize($filepath) && is_readable($filepath)) {
-            $this->initTranslations();
             // For compatibility with old upgrade files.
             $serviceLocator = $services;
             $this->setServiceLocator($serviceLocator);
+            $this->initTranslations();
             require_once $filepath;
         }
     }

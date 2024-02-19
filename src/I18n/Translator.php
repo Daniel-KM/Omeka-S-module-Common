@@ -26,6 +26,6 @@ class Translator extends \Omeka\I18n\Translator
                 ->translate($textDomain, $locale);
         }
 
-        return $this->translator->translate($message, $textDomain, $locale);
+        return $this->translator->translate((string) $message, $textDomain, $locale);
     }
 }

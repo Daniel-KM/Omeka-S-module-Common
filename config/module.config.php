@@ -14,7 +14,7 @@ return [
         ],
         'delegators' => [
             'Laminas\I18n\Translator\TranslatorInterface' => [
-                __NAMESPACE__ => Service\Delegator\TranslatorDelegatorFactory::class,
+                Service\Delegator\TranslatorDelegatorFactory::class,
             ],
         ],
     ],

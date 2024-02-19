@@ -15,7 +15,8 @@ class TranslatorDelegatorFactory implements DelegatorFactoryInterface
         callable $callback, array $options = null
     ) {
         /**
-         * The callback is already processed via Omeka TranslatorDelegatorFactory.
+         * The callback is processed via Omeka TranslatorDelegatorFactory, so it
+         * is useless to add the loaders.
          *
          * @see \Omeka\Service\Delegator\TranslatorDelegatorFactory
          * @see \Omeka\I18n\Translator
