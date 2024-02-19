@@ -142,17 +142,7 @@ trait TraitModule
 
     public function getInstallResources(): ?InstallResources
     {
-        if (!class_exists(\Common\InstallResources::class)) {
-            // Use the module file first, since it must be present with the
-            // right version, even if AbstractModule is older in another module.
-            if (file_exists($filepath = OMEKA_PATH . '/modules/' . static::NAMESPACE . '/src/Common/InstallResources.php')) {
-                require_once $filepath;
-            } elseif (file_exists($filepath = dirname(__DIR__, 3) . '/Common/InstallResources.php')) {
-                require_once $filepath;
-            } else {
-                return null;
-            }
-        }
+        require_once __DIR__ . '/InstallResources.php';
         $services = $this->getServiceLocator();
         return new \Common\InstallResources($services);
     }
@@ -160,10 +150,7 @@ trait TraitModule
     public function checkAllResourcesToInstall(): bool
     {
         $installResources = $this->getInstallResources();
-        return $installResources
-            ? $installResources->checkAllResources(static::NAMESPACE)
-            // Nothing to install.
-            : true;
+        return $installResources->checkAllResources(static::NAMESPACE);
     }
 
     /**
@@ -172,26 +159,16 @@ trait TraitModule
     public function installAllResources(): self
     {
         $installResources = $this->getInstallResources();
-        if (!$installResources) {
-            // Nothing to install.
-            return $this;
-        }
         $installResources->createAllResources(static::NAMESPACE);
         return $this;
     }
 
     /**
-     * @return self
+     * @todo Uninstall all resources is not implemented currently.
      */
     public function uninstallAllResources(): self
     {
         $installResources = $this->getInstallResources();
-        if (!$installResources
-            || !method_exists($installResources, 'deleteAllResources')
-        ) {
-            // Nothing to install.
-            return $this;
-        }
         $installResources->deleteAllResources(static::NAMESPACE);
         return $this;
     }
