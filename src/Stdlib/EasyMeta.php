@@ -453,6 +453,29 @@ class EasyMeta
     }
 
     /**
+     * Get the custom vocabs main type ("literal", "resource" or "uri").
+     *
+     * @todo Check for dynamic custom vocabs.
+     *
+     * @param array|int|string|null $dataTypes One or multiple data types.
+     * @return string[] The matching data type main types or all data types
+     * main types, by data types.
+     */
+    public function dataTypeMainCustomVocabs($dataTypes = null): array
+    {
+        if (is_null(static::$dataTypesMainCustomVocabs)) {
+            $this->initDataTypesMainCustomVocabs();
+        }
+        if (is_null($dataTypes)) {
+            return static::$dataTypesMainCustomVocabs;
+        }
+        if (is_scalar($dataTypes)) {
+            $dataTypes = [$dataTypes];
+        }
+        return array_intersect_key(static::$dataTypesMainCustomVocabs, array_flip($dataTypes));
+    }
+
+    /**
      * Get a property id by JSON-LD term or by numeric id.
      *
      * @param int|string|null $termOrId A id or a term.
