@@ -208,6 +208,11 @@ class EasyMeta
     /**
      * @var array
      */
+    protected static $dataTypesByNamesUsed;
+
+    /**
+     * @var array
+     */
     protected static $dataTypeLabelsByNames;
 
     /**
@@ -407,6 +412,27 @@ class EasyMeta
             $dataTypes = [$dataTypes];
         }
         return array_intersect_key(static::$dataTypesByNames, array_flip($dataTypes));
+    }
+
+    /**
+     * Get used data type names by names or all data types.
+     *
+     * @param array|int|string|null $dataTypes One or multiple data types.
+     * @return string[] The matching used data type names or all used data
+     * types, by data types.
+     */
+    public function dataTypeNamesUsed($dataTypes = null): array
+    {
+        if (is_null(static::$dataTypesByNamesUsed)) {
+            $this->initDataTypesUsed();
+        }
+        if (is_null($dataTypes)) {
+            return static::$dataTypesByNamesUsed;
+        }
+        if (is_scalar($dataTypes)) {
+            $dataTypes = [$dataTypes];
+        }
+        return array_intersect_key(static::$dataTypesByNamesUsed, array_flip($dataTypes));
     }
 
     /**
@@ -1045,6 +1071,23 @@ class EasyMeta
             $dataType = $this->dataTypeManager->get($dataTypeName);
             static::$dataTypeLabelsByNames[$dataTypeName] = $dataType->getLabel();
         }
+    }
+
+    protected function initDataTypesUsed(): void
+    {
+        // Most of the time, we don't need used data types and all data types at
+        // the same time, so fetching them is done separately of initDataTypes().
+        $qb = $this->connection->createQueryBuilder();
+        $qb
+            ->select(
+                '`value`.`type` AS name',
+                '`value`.`type` AS name2'
+            )
+            ->from('`value`', 'value')
+            ->groupBy('`value`.`type`')
+            ->orderBy('`value`.`type`', 'asc')
+        ;
+        static::$dataTypesByNamesUsed = $this->connection->executeQuery($qb)->fetchAllKeyValue();
     }
 
     protected function initDataTypesMainCustomVocabs(): void
