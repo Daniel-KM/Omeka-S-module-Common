@@ -44,6 +44,7 @@ return [
     'form_elements' => [
         'invokables' => [
             Form\Element\ArrayText::class => Form\Element\ArrayText::class,
+            Form\Element\DataTextarea::class => Form\Element\DataTextarea::class,
             Form\Element\OptionalCheckbox::class => Form\Element\OptionalCheckbox::class,
             Form\Element\OptionalDate::class => Form\Element\OptionalDate::class,
             Form\Element\OptionalDateTime::class => Form\Element\OptionalDateTime::class,
