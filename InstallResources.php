@@ -39,20 +39,26 @@ use Omeka\Stdlib\Message;
 class InstallResources
 {
     /**
-     * @var \Laminas\ServiceManager\ServiceLocatorInterface
-     */
-    protected $services;
-
-    /**
      * @var \Omeka\Mvc\Controller\Plugin\Api
      */
     protected $api;
+
+    /**
+     * @var \Common\Stdlib\EasyMeta
+     */
+    protected $easyMeta;
+
+    /**
+     * @var \Laminas\ServiceManager\ServiceLocatorInterface
+     */
+    protected $services;
 
     public function __construct(ServiceLocatorInterface $services)
     {
         $this->services = $services;
         // The api plugin allows to search one resource without throwing error.
         $this->api = $services->get('ControllerPluginManager')->get('api');
+        $this->easyMeta = $services->get('EasyMeta');
     }
 
     /**
@@ -61,7 +67,7 @@ class InstallResources
      *
      * @return self
      */
-    public function __invoke()
+    public function __invoke(): self
     {
         return $this;
     }
@@ -633,120 +639,50 @@ SQL;
      */
     protected function flagValid(iterable $import)
     {
-        $vocabs = [];
-
-        // The controller plugin Api is used to allow to search one resource.
-        $api = $this->services->get('ControllerPluginManager')->get('api');
-
-        $getVocab = function ($namespaceUri) use (&$vocabs, $api) {
-            if (isset($vocabs[$namespaceUri])) {
-                return $vocabs[$namespaceUri];
-            }
-            $vocab = $api->searchOne('vocabularies', [
-                'namespace_uri' => $namespaceUri,
-            ])->getContent();
-            if ($vocab) {
-                $vocabs[$namespaceUri] = $vocab;
-                return $vocab;
-            }
-            return false;
-        };
-
         $getDataTypesByName = function ($dataTypesNameLabels) {
             $result = [];
-            foreach ($dataTypesNameLabels ?? [] as $dataType) {
-                $result[$dataType['name']] = $dataType;
+            foreach ($dataTypesNameLabels ?? [] as $index => $dataTypeNameLabel) {
+                // Manage associative array name / label, even if it should not exist.
+                if (is_string($dataTypeNameLabel)) {
+                    if (is_numeric($index)) {
+                        $result[$dataTypeNameLabel] = is_numeric($index)
+                            ? ['name' => $dataTypeNameLabel, 'label' => $dataTypeNameLabel]
+                            : ['name' => $index, 'label' => $dataTypeNameLabel];
+                    } else {
+
+                    }
+                } else {
+                    $result[$dataTypeNameLabel['name']] = $dataTypeNameLabel;
+                }
             }
             return $result;
         };
 
-        // Manage core data types and common modules ones.
-        $getKnownDataType = function ($dataTypeNameLabel) use ($api): ?string {
-            if (in_array($dataTypeNameLabel['name'], [
-                'literal',
-                'resource',
-                'resource:item',
-                'resource:itemset',
-                'resource:media',
-                'uri',
-                // Annotate.
-                'resource:annotation',
-                // DataTypeGeometry.
-                'geography',
-                'geography:coordinates',
-                'geometry',
-                'geometry:coordinates',
-                'geometry:position',
-                // TODO Deprecated for v4.
-                'geometry:geometry',
-                'geometry:geography',
-                'geometry:geography:coordinates',
-                // DataTypeRdf.
-                'boolean',
-                'html',
-                'xml',
-                // DataTypePlace.
-                'place',
-                // NumericDataTypes
-                'numeric:timestamp',
-                'numeric:integer',
-                'numeric:duration',
-                'numeric:interval',
-            ])
-                || mb_substr((string) $dataTypeNameLabel['name'], 0, 13) === 'valuesuggest:'
-                || mb_substr((string) $dataTypeNameLabel['name'], 0, 16) === 'valuesuggestall:'
-            ) {
-                return $dataTypeNameLabel['name'];
-            }
-
-            if (mb_substr((string) $dataTypeNameLabel['name'], 0, 12) === 'customvocab:') {
-                try {
-                    $customVocab = $api->read('custom_vocabs', ['label' => $dataTypeNameLabel['label']])->getContent();
-                    return 'customvocab:' . $customVocab->id();
-                } catch (\Omeka\Api\Exception\NotFoundException $e) {
-                    return null;
-                }
-            }
-            return null;
-        };
-
         if (isset($import['o:resource_class'])) {
-            if ($vocab = $getVocab($import['o:resource_class']['vocabulary_namespace_uri'])) {
-                $import['o:resource_class']['vocabulary_prefix'] = $vocab->prefix();
-                $class = $api->searchOne('resource_classes', [
-                    'vocabulary_namespace_uri' => $import['o:resource_class']['vocabulary_namespace_uri'],
-                    'local_name' => $import['o:resource_class']['local_name'],
-                ])->getContent();
-                if ($class) {
-                    $import['o:resource_class']['o:id'] = $class->id();
-                }
+            $vocabPrefix = $this->easyMeta->vocabularyPrefix($import['o:resource_class']['vocabulary_namespace_uri']);
+            if ($vocabPrefix) {
+                $import['o:resource_class']['vocabulary_prefix'] = $vocabPrefix;
+                $import['o:resource_class']['o:id'] = $this->easyMeta->resourceClassId($vocabPrefix . ':' . $import['o:resource_class']['local_name']);
             }
         }
 
         foreach (['o:title_property', 'o:description_property'] as $property) {
             if (isset($import[$property])) {
-                if ($vocab = $getVocab($import[$property]['vocabulary_namespace_uri'])) {
-                    $import[$property]['vocabulary_prefix'] = $vocab->prefix();
-                    $prop = $api->searchOne('properties', [
-                        'vocabulary_namespace_uri' => $import[$property]['vocabulary_namespace_uri'],
-                        'local_name' => $import[$property]['local_name'],
-                    ])->getContent();
-                    if ($prop) {
-                        $import[$property]['o:id'] = $prop->id();
-                    }
+                $vocabPrefix = $this->easyMeta->vocabularyPrefix($import[$property]['vocabulary_namespace_uri']);
+                if ($vocabPrefix) {
+                    $import[$property]['vocabulary_prefix'] = $vocabPrefix;
+                    $import[$property]['o:id'] = $this->easyMeta->propertyId($vocabPrefix . ':' . $import[$property]['local_name']);
                 }
             }
         }
 
         foreach ($import['o:resource_template_property'] as $key => $property) {
-            if ($vocab = $getVocab($property['vocabulary_namespace_uri'])) {
-                $import['o:resource_template_property'][$key]['vocabulary_prefix'] = $vocab->prefix();
-                $prop = $api->searchOne('properties', [
-                    'vocabulary_namespace_uri' => $property['vocabulary_namespace_uri'],
-                    'local_name' => $property['local_name'],
-                ])->getContent();
-                if ($prop) {
-                    $import['o:resource_template_property'][$key]['o:property'] = ['o:id' => $prop->id()];
+            $vocabPrefix = $this->easyMeta->vocabularyPrefix($property['vocabulary_namespace_uri']);
+            if ($vocabPrefix) {
+                $import['o:resource_template_property'][$key]['vocabulary_prefix'] = $vocabPrefix;
+                $propertyId = $this->easyMeta->propertyId($vocabPrefix . ':' . $property['local_name']);
+                if ($propertyId) {
+                    $import['o:resource_template_property'][$key]['o:property'] = ['o:id' => $propertyId];
                     // Check the deprecated "data_type_name" if needed and
                     // normalize it.
                     if (!array_key_exists('data_types', $import['o:resource_template_property'][$key])) {
@@ -766,8 +702,8 @@ SQL;
                     $import['o:resource_template_property'][$key]['data_types'] = $getDataTypesByName($import['o:resource_template_property'][$key]['data_types']);
                     // Prepare the list of standard data types.
                     $import['o:resource_template_property'][$key]['o:data_type'] = [];
-                    foreach ($import['o:resource_template_property'][$key]['data_types'] as $name => $dataTypeNameLabel) {
-                        $known = $getKnownDataType($dataTypeNameLabel);
+                    foreach (array_keys($import['o:resource_template_property'][$key]['data_types']) as $name) {
+                        $known = $this->easyMeta->dataTypeName($name);
                         if ($known) {
                             $import['o:resource_template_property'][$key]['o:data_type'][] = $known;
                             $import['o:resource_template_property'][$key]['data_types'][$name]['name'] = $known;
@@ -793,8 +729,8 @@ SQL;
                             continue;
                         }
                         $import['o:resource_template_property'][$key]['o:data'][$k]['data_types'] = $getDataTypesByName($import['o:resource_template_property'][$key]['o:data'][$k]['data_types']);
-                        foreach ($import['o:resource_template_property'][$key]['o:data'][$k]['data_types'] as $name => $dataTypeNameLabel) {
-                            $known = $getKnownDataType($dataTypeNameLabel);
+                        foreach (array_keys($import['o:resource_template_property'][$key]['o:data'][$k]['data_types']) as $name) {
+                            $known = $this->easyMeta->dataTypeName($name);
                             if ($known) {
                                 $import['o:resource_template_property'][$key]['o:data'][$k]['o:data_type'][] = $known;
                                 $import['o:resource_template_property'][$key]['o:data'][$k]['data_types'][$name]['name'] = $known;
@@ -974,27 +910,6 @@ SQL;
         } catch (NotFoundException $e) {
         }
         return $this;
-    }
-
-    /**
-     * Check the version of a module.
-     *
-     * It is recommended to use checkModuleAvailability(), that manages the fact
-     * that the module may be required or not.
-     */
-    protected function isModuleVersionAtLeast(string $module, string $version): bool
-    {
-        /** @var \Omeka\Module\Manager $moduleManager */
-        $moduleManager = $this->services->get('Omeka\ModuleManager');
-        $module = $moduleManager->getModule($module);
-        if (!$module) {
-            return false;
-        }
-
-        $moduleVersion = $module->getIni('version');
-        return $moduleVersion
-            ? version_compare($moduleVersion, $version, '>=')
-            : false;
     }
 
     /**
