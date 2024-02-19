@@ -56,6 +56,8 @@ return [
         'factories' => [
             // This element does not exist in Omeka.
             Form\Element\DataTypeSelect::class => Service\Form\Element\DataTypeSelectFactory::class,
+            Form\Element\MediaIngesterSelect::class => Service\Form\Element\MediaIngesterSelectFactory::class,
+            Form\Element\MediaRendererSelect::class => Service\Form\Element\MediaRendererSelectFactory::class,
             // This element does not exist in Omeka.
             Form\Element\MediaTypeSelect::class => Service\Form\Element\MediaTypeSelectFactory::class,
             // This element is not the same than \Omeka\Form\Element\SitePageSelect (singular site).
