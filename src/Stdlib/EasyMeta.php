@@ -1268,7 +1268,6 @@ SQL;
             ->from('`vocabulary`', 'vocabulary')
             ->groupBy('`vocabulary`.`id`')
             ->orderBy('`vocabulary`.`id`', 'asc')
-            ->addOrderBy('`property`.`id`', 'asc')
         ;
         $result = $this->connection->executeQuery($qb)->fetchAllAssociative();
 
