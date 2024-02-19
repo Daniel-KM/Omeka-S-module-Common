@@ -3,8 +3,6 @@
 namespace Common\Service\Form\Element;
 
 use Common\Form\Element\OptionalResourceSelect;
-
-use Common\Form\Element\OptionalResourceSelect;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
