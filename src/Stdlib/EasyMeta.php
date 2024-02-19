@@ -273,6 +273,11 @@ class EasyMeta
     /**
      * @var array
      */
+    protected static $resourceTemplateIdsByLabelsAndIdsUsed;
+
+    /**
+     * @var array
+     */
     protected static $resourceTemplateLabelsByLabelsAndIds;
 
     /**
@@ -760,6 +765,28 @@ class EasyMeta
     }
 
     /**
+     * Get used resource template ids by labels or by numeric ids.
+     *
+     * @param array|int|string|null $labelsOrIds One or multiple ids or labels.
+     * @return string[] The used resource template ids matching labels or ids,
+     * or all used resource templates by labels. When the input contains labels
+     * and ids matching the same templates, they are all returned.
+     */
+    public function resourceTemplateIdsUsed($labelsOrIds = null): array
+    {
+        if (is_null(static::$resourceTemplateIdsByLabelsAndIdsUsed)) {
+            $this->initResourceTemplatesUsed();
+        }
+        if (is_null($labelsOrIds)) {
+            return array_diff_key(static::$resourceTemplateIdsByLabelsAndIdsUsed, array_flip(static::$resourceTemplateIdsByLabelsAndIdsUsed));
+        }
+        if (is_scalar($labelsOrIds)) {
+            $labelsOrIds = [$labelsOrIds];
+        }
+        return array_intersect_key(static::$resourceTemplateIdsByLabelsAndIdsUsed, array_flip($labelsOrIds));
+    }
+
+    /**
      * Get a resource template label by label or by numeric id.
      *
      * @param int|string|null $labelOrId A id or a label.
@@ -1111,6 +1138,25 @@ SQL;
             + array_column($result, 'id', 'id');
         static::$resourceTemplateLabelsByLabelsAndIds = array_combine(array_keys(static::$resourceTemplateIdsByLabels), array_keys(static::$resourceTemplateIdsByLabels))
             + array_flip(static::$resourceTemplateIdsByLabels);
+    }
+
+    protected function initResourceTemplatesUsed(): void
+    {
+        $qb = $this->connection->createQueryBuilder();
+        $qb
+            ->select(
+                '`resource_template`.`label` AS label',
+                '`resource_template`.`id` AS id'
+            )
+            ->from('resource_template', 'resource_template')
+            ->innerJoin('resource_template', 'resource', 'resource', '`resource_template`.`id` = `resource`.`resource_template_id`')
+            ->groupBy('`resource_template`.`id`')
+            ->orderBy('`resource_template`.`label`', 'asc')
+        ;
+        $result = $this->connection->executeQuery($qb)->fetchAllKeyValue();
+        $resourceTemplateIdsByLabels = array_map('intval', $result);
+        $resourceTemplateIdsByIds = array_combine($resourceTemplateIdsByLabels, $resourceTemplateIdsByLabels);
+        static::$resourceTemplateIdsByLabelsAndIdsUsed = $resourceTemplateIdsByLabels + $resourceTemplateIdsByIds;
     }
 
     protected function initVocabularies(): void
