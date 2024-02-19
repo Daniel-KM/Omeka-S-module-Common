@@ -54,7 +54,14 @@ class DataTypeSelect extends Select
         }
         // Always put data types not organized in option groups before data
         // types organized within option groups.
-        return array_merge($options, $optgroupOptions);
+        $valueOptions = array_merge($options, $optgroupOptions);
+
+        $prependValueOptions = $this->getOption('prepend_value_options');
+        if (is_array($prependValueOptions)) {
+            $valueOptions = array_merge($prependValueOptions, $valueOptions);
+        }
+
+        return $valueOptions;
     }
 
     public function setDataTypeManager(DataTypeManager $dataTypeManager): self
