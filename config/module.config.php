@@ -57,6 +57,8 @@ return [
         ],
         'factories' => [
             // This element does not exist in Omeka.
+            Form\Element\CustomVocabsSelect::class => Service\Form\Element\CustomVocabsSelectFactory::class,
+            // This element does not exist in Omeka.
             Form\Element\DataTypeSelect::class => Service\Form\Element\DataTypeSelectFactory::class,
             Form\Element\MediaIngesterSelect::class => Service\Form\Element\MediaIngesterSelectFactory::class,
             Form\Element\MediaRendererSelect::class => Service\Form\Element\MediaRendererSelectFactory::class,
