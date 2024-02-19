@@ -248,6 +248,11 @@ class EasyMeta
     /**
      * @var array
      */
+    protected static $resourceClassIdsByTermsAndIdsUsed;
+
+    /**
+     * @var array
+     */
     protected static $resourceClassLabelsByTerms;
 
     /**
@@ -614,6 +619,28 @@ class EasyMeta
             $termsOrIds = [$termsOrIds];
         }
         return array_intersect_key(static::$resourceClassIdsByTermsAndIds, array_flip($termsOrIds));
+    }
+
+    /**
+     * Get used resource class ids by JSON-LD terms or by numeric ids.
+     *
+     * @param array|int|string|null $termsOrIds One or multiple ids or terms.
+     * @return int[] The used resource class ids matching terms or ids, or all
+     * used resource classes by terms. When the input contains terms and ids
+     * matching the same resource classes, they are all returned.
+     */
+    public function resourceClassIdsUsed($termsOrIds = null): array
+    {
+        if (is_null(static::$resourceClassIdsByTermsAndIdsUsed)) {
+            $this->initResourceClassesUsed();
+        }
+        if (is_null($termsOrIds)) {
+            return array_diff_key(static::$resourceClassIdsByTermsAndIdsUsed, array_flip(static::$resourceClassIdsByTermsAndIdsUsed));
+        }
+        if (is_scalar($termsOrIds)) {
+            $termsOrIds = [$termsOrIds];
+        }
+        return array_intersect_key(static::$resourceClassIdsByTermsAndIdsUsed, array_flip($termsOrIds));
     }
 
     /**
@@ -1041,6 +1068,29 @@ SQL;
         static::$resourceClassLabelsByTerms = array_column($result, 'label', 'term');
         static::$resourceClassLabelsByTermsAndIds = static::$resourceClassLabelsByTerms
             + array_column($result, 'label', 'id');
+    }
+
+    protected function initResourceClassesUsed(): void
+    {
+        // Most of the time, we don't need used classes and all classes at the
+        // same time, so fetching them is done separately of initResourceClasses().
+        $qb = $this->connection->createQueryBuilder();
+        $qb
+            ->select(
+                'CONCAT(`vocabulary`.`prefix`, ":", `resource_class`.`local_name`) AS term',
+                '`resource_class`.`id` AS id'
+            )
+            ->from('`resource_class`', 'resource_class')
+            ->innerJoin('resource_class', 'vocabulary', 'vocabulary', '`resource_class`.`vocabulary_id` = `vocabulary`.`id`')
+            ->innerJoin('resource_class', 'resource', 'resource', '`resource_class`.`id` = `resource`.`resource_class_id`')
+            ->groupBy('`resource_class`.`id`')
+            ->orderBy('`vocabulary`.`id`', 'asc')
+            ->addOrderBy('`resource_class`.`id`', 'asc')
+        ;
+        $result = $this->connection->executeQuery($qb)->fetchAllKeyValue();
+        $resourceClassIdsByTerms = array_map('intval', $result);
+        $resourceClassIdsByIds = array_combine($resourceClassIdsByTerms, $resourceClassIdsByTerms);
+        static::$resourceClassIdsByTermsAndIdsUsed = $resourceClassIdsByTerms + $resourceClassIdsByIds;
     }
 
     protected function initResourceTemplates(): void
