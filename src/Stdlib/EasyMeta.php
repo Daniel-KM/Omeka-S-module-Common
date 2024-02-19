@@ -1010,7 +1010,7 @@ class EasyMeta
              */
             $sql = <<<'SQL'
 SELECT
-    `id` AS id,
+    CONCAT('customvocab:', `id`) AS "customvocab",
     CASE
         WHEN `uris` != "" THEN "uri"
         WHEN `item_set_id` IS NOT NULL THEN "resource"
