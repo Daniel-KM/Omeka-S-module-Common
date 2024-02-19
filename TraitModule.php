@@ -1065,7 +1065,7 @@ trait TraitModule
      * @param string $dirpath Absolute path.
      * @return bool
      */
-    private function rmDir(string $dirPath): bool
+    protected function rmDir(string $dirPath): bool
     {
         if (!file_exists($dirPath)) {
             return true;
