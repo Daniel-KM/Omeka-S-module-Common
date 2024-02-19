@@ -10,15 +10,20 @@ class MediaRendererSelectFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
-        // See MediaTypeSelect to get the list of used renderers.
+        // Unlike ingesters, there is no labels for renderers, so get the list
+        // of used renderers like media-type.
 
-        /** @var \Omeka\Media\Renderer\Manager $rendererManager */
-        $rendererManager = $services->get('Omeka\Media\Renderer\Manager');
-
-        $renderers = [];
-        foreach ($rendererManager->getRegisteredNames() as $renderer) {
-            $renderers[$renderer] = $rendererManager->get($renderer)->getLabel();
-        }
+        /** @var \Doctrine\DBAL\Connection $connection */
+        $connection = $services->get('Omeka\Connection');
+        $sql = <<<'SQL'
+SELECT `renderer`, `renderer`
+FROM media
+WHERE `renderer` IS NOT NULL
+    AND `renderer` != ""
+GROUP BY `renderer`
+ORDER BY `renderer` ASC;
+SQL;
+        $renderers = $connection->executeQuery($sql)->fetchAllKeyValue();
 
         $element = new MediaRendererSelect(null, $options ?? []);
         return $element

@@ -41,7 +41,7 @@ class Module extends AbstractModule
     }
 
     /**
-     * Early fix media_type index.
+     * Early fix media_type, ingester and renderer indexes.
      *
      * See migration 20240219000000_AddIndexMediaType.
      */
@@ -51,11 +51,28 @@ class Module extends AbstractModule
         // See migration 20240219000000_AddIndexMediaType.
         $connection = $services->get('Omeka\Connection');
         $messenger = $services->get('ControllerPluginManager')->get('messenger');
+        $sql = <<<'SQL'
+ALTER TABLE `media`
+CHANGE `ingester` `ingester` varchar(190) COLLATE 'utf8mb4_unicode_ci' NOT NULL AFTER `item_id`,
+CHANGE `renderer` `renderer` varchar(190) COLLATE 'utf8mb4_unicode_ci' NOT NULL AFTER `ingester`,
+CHANGE `media_type` `media_type` varchar(190) COLLATE 'utf8mb4_unicode_ci' NULL AFTER `source`,
+CHANGE `extension` `extension` varchar(190) COLLATE 'utf8mb4_unicode_ci' NULL AFTER `storage_id`;
+SQL;
+        $connection->executeStatement($sql);
         try {
-            $connection->executeStatement('ALTER TABLE `media` CHANGE `media_type` `media_type` varchar(190) COLLATE "utf8mb4_unicode_ci" NULL AFTER `source`;');
+            $connection->executeStatement('ALTER TABLE `media` ADD INDEX `ingester` (`ingester`);');
+        } catch (\Exception $e) {
+            // Index exists.
+        }
+        try {
+            $connection->executeStatement('ALTER TABLE `media` ADD INDEX `renderer` (`renderer`);');
+        } catch (\Exception $e) {
+            // Index exists.
+        }
+        try {
             $connection->executeStatement('ALTER TABLE `media` ADD INDEX `media_type` (`media_type`);');
             $message = new \Common\Stdlib\PsrMessage(
-                'An index has been added to media types to improve performance.' // @translate
+                'An index has been added to table media to improve performance.' // @translate
             );
             $messenger->addSuccess($message);
         } catch (\Exception $e) {
