@@ -5,6 +5,9 @@ namespace Common\Stdlib;
 use Doctrine\DBAL\Connection;
 use Omeka\DataType\Manager as DataTypeManager;
 
+/**
+ * @todo Replace by materialized views?
+ */
 class EasyMeta
 {
     const DATA_TYPES_MAIN = [
@@ -216,6 +219,11 @@ class EasyMeta
      * @var array
      */
     protected static $propertyIdsByTermsAndIds;
+
+    /**
+     * @var array
+     */
+    protected static $propertyIdsByTermsAndIdsUsed;
 
     /**
      * @var array
@@ -468,6 +476,28 @@ class EasyMeta
             $termsOrIds = [$termsOrIds];
         }
         return array_intersect_key(static::$propertyIdsByTermsAndIds, array_flip($termsOrIds));
+    }
+
+    /**
+     * Get used property ids by JSON-LD terms or by numeric ids.
+     *
+     * @param array|int|string|null $termsOrIds One or multiple ids or terms.
+     * @return int[] The used property ids matching terms or ids, or all
+     * used properties by terms. When the input contains terms and ids matching
+     * the same properties, they are all returned.
+     */
+    public function propertyIdsUsed($termsOrIds = null): array
+    {
+        if (is_null(static::$propertyIdsByTermsAndIdsUsed)) {
+            $this->initPropertiesUsed();
+        }
+        if (is_null($termsOrIds)) {
+            return array_diff_key(static::$propertyIdsByTermsAndIdsUsed, array_flip(static::$propertyIdsByTermsAndIdsUsed));
+        }
+        if (is_scalar($termsOrIds)) {
+            $termsOrIds = [$termsOrIds];
+        }
+        return array_intersect_key(static::$propertyIdsByTermsAndIdsUsed, array_flip($termsOrIds));
     }
 
     /**
@@ -960,10 +990,33 @@ SQL;
 
         static::$propertyIdsByTerms = array_map('intval', array_column($result, 'id', 'term'));
         static::$propertyIdsByTermsAndIds = static::$propertyIdsByTerms
-            + array_column($result, 'id', 'id');
+            + array_map('intval', array_column($result, 'id', 'id'));
         static::$propertyLabelsByTerms = array_column($result, 'label', 'term');
         static::$propertyLabelsByTermsAndIds = static::$propertyLabelsByTerms
             + array_column($result, 'label', 'id');
+    }
+
+    protected function initPropertiesUsed(): void
+    {
+        // Most of the time, we don't need used properties and all properties at
+        // the same time, so fetching them is done separately of initProperties().
+        $qb = $this->connection->createQueryBuilder();
+        $qb
+            ->select(
+                'CONCAT(`vocabulary`.`prefix`, ":", `property`.`local_name`) AS term',
+                '`property`.`id` AS id'
+            )
+            ->from('`property`', 'property')
+            ->innerJoin('property', 'vocabulary', 'vocabulary', '`property`.`vocabulary_id` = `vocabulary`.`id`')
+            ->innerJoin('property', 'value', 'value', '`property`.`id` = `value`.`property_id`')
+            ->groupBy('`property`.`id`')
+            ->orderBy('`vocabulary`.`id`', 'asc')
+            ->addOrderBy('`property`.`id`', 'asc')
+        ;
+        $result = $this->connection->executeQuery($qb)->fetchAllKeyValue();
+        $propertyIdsByTerms = array_map('intval', $result);
+        $propertyIdsByIds = array_combine($propertyIdsByTerms, $propertyIdsByTerms);
+        static::$propertyIdsByTermsAndIdsUsed = $propertyIdsByTerms + $propertyIdsByIds;
     }
 
     protected function initResourceClasses(): void
