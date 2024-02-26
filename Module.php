@@ -143,7 +143,8 @@ SQL;
         }
 
         if ($hasNewIndex) {
-            $message = new \Common\Stdlib\PsrMessage(
+            // Don't use a PsrMessage during install.
+            $message = new \Omeka\Stdlib\Message(
                 'Some indexes were added to tables to improve performance.' // @translate
             );
             $messenger = $services->get('ControllerPluginManager')->get('messenger');

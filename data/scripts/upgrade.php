@@ -2,6 +2,7 @@
 
 namespace Common;
 
+// Don't use a PsrMessage during install.
 use Omeka\Stdlib\Message;
 
 /**
