@@ -28,13 +28,13 @@
 
 namespace Common;
 
+use Common\Stdlib\PsrMessage;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Omeka\Api\Exception\NotFoundException;
 use Omeka\Api\Exception\RuntimeException;
 use Omeka\Api\Representation\ResourceTemplateRepresentation;
 use Omeka\Entity\Vocabulary;
 use Omeka\Module\Exception\ModuleCannotInstallException;
-use Omeka\Stdlib\Message;
 
 class InstallResources
 {
@@ -86,16 +86,16 @@ class InstallResources
             $data = file_get_contents($filepath);
             $data = json_decode($data, true);
             if (!is_array($data)) {
-                throw new ModuleCannotInstallException((string) new Message(
-                    'An error occured when loading vocabulary "%s": file has no json content.', // @translate
-                    pathinfo($filepath, PATHINFO_FILENAME)
+                throw new ModuleCannotInstallException((string) new PsrMessage(
+                    'An error occured when loading vocabulary "{vocabulary}": file has no json content.', // @translate
+                    ['vocabulary' => pathinfo($filepath, PATHINFO_FILENAME)]
                 ));
             }
             $exists = $this->checkVocabulary($data, $module);
             if (is_null($exists)) {
-                throw new ModuleCannotInstallException((string) new Message(
-                    'An error occured when adding the prefix "%s": another vocabulary exists. Resolve the conflict before installing this module.', // @translate
-                    $data['vocabulary']['o:prefix']
+                throw new ModuleCannotInstallException((string) new PsrMessage(
+                    'An error occured when adding the prefix "{prefix}": another vocabulary exists. Resolve the conflict before installing this module.', // @translate
+                    ['prefix' => $data['vocabulary']['o:prefix']]
                 ));
             }
         }
@@ -105,9 +105,9 @@ class InstallResources
         foreach ($this->listFilesInDir($filepathData . 'custom-vocabs') as $filepath) {
             $exists = $this->checkCustomVocab($filepath);
             if (is_null($exists)) {
-                throw new ModuleCannotInstallException((string) new Message(
-                    'A custom vocab exists for "%s". Remove it or rename it before installing this module.', // @translate
-                    pathinfo($filepath, PATHINFO_FILENAME)
+                throw new ModuleCannotInstallException((string) new PsrMessage(
+                    'A custom vocab exists for "{name}". Remove it or rename it before installing this module.', // @translate
+                    ['name' => pathinfo($filepath, PATHINFO_FILENAME)]
                 ));
             }
         }
@@ -116,9 +116,9 @@ class InstallResources
         foreach ($this->listFilesInDir($filepathData . 'resource-templates') as $filepath) {
             $exists = $this->checkResourceTemplate($filepath);
             if (is_null($exists)) {
-                throw new ModuleCannotInstallException((string) new Message(
-                    'A resource template exists for %s. Rename it or remove it before installing this module.', // @translate
-                    pathinfo($filepath, PATHINFO_FILENAME)
+                throw new ModuleCannotInstallException((string) new PsrMessage(
+                    'A resource template exists for {template}. Rename it or remove it before installing this module.', // @translate
+                    ['template' => pathinfo($filepath, PATHINFO_FILENAME)]
                 ));
             }
         }
@@ -321,17 +321,19 @@ class InstallResources
             // namespace are mixed. So, the last character ("#" or "/") is
             // skipped for easier management.
             if (rtrim($vocabularyRepresentation->namespaceUri(), '#/') === rtrim($vocabularyData['vocabulary']['o:namespace_uri'], '#/')) {
-                $message = new Message('The vocabulary "%s" was already installed and was kept.', // @translate
-                    $vocabularyData['vocabulary']['o:label']);
+                $message = new PsrMessage(
+                    'The vocabulary "{vocabulary}" was already installed and was kept.', // @translate
+                    ['vocabulary' => $vocabularyData['vocabulary']['o:label']]
+                );
                 $messenger = $this->services->get('ControllerPluginManager')->get('messenger');
                 $messenger->addWarning($message);
                 return false;
             }
 
             // It is another vocabulary with the same prefix.
-            throw new RuntimeException((string) new Message(
-                'An error occured when adding the prefix "%s": another vocabulary exists with the same prefix. Resolve the conflict before installing this module.', // @translate
-                $prefix
+            throw new RuntimeException((string) new PsrMessage(
+                'An error occured when adding the prefix "{prefix}": another vocabulary exists with the same prefix. Resolve the conflict before installing this module.', // @translate
+                ['prefix' => $prefix]
             ));
         }
 
@@ -341,10 +343,9 @@ class InstallResources
         try {
             $rdfImporter->import($vocabularyData['strategy'], $vocabularyData['vocabulary'], $vocabularyData['options']);
         } catch (\Omeka\Api\Exception\ValidationException $e) {
-            throw new RuntimeException((string) new Message(
-                'An error occured when adding the prefix "%1$s" and the associated properties: %2$s', // @translate
-                $prefix,
-                $e->getMessage()
+            throw new RuntimeException((string) new PsrMessage(
+                'An error occured when adding the prefix "{prefix}" and the associated properties: {message}', // @translate
+                ['prefix' => $prefix, 'message' => $e->getMessage()]
             ));
         }
 
@@ -421,20 +422,18 @@ class InstallResources
         try {
             $diff = $rdfImporter->getDiff($vocabularyData['strategy'], $vocabulary->getNamespaceUri(), $vocabularyData['options']);
         } catch (\Omeka\Api\Exception\ValidationException $e) {
-            throw new ModuleCannotInstallException((string) new Message(
-                'An error occured when updating vocabulary "%s" and the associated properties: %s', // @translate
-                $vocabularyData['vocabulary']['o:prefix'],
-                $e->getMessage()
+            throw new ModuleCannotInstallException((string) new PsrMessage(
+                'An error occured when updating vocabulary "{prefix}" and the associated properties: {message}', // @translate
+                ['prefix' => $vocabularyData['vocabulary']['o:prefix'], 'message' => $e->getMessage()]
             ));
         }
 
         try {
             $diff = $rdfImporter->update($vocabulary->getId(), $diff);
         } catch (\Omeka\Api\Exception\ValidationException $e) {
-            throw new ModuleCannotInstallException((string) new Message(
-                'An error occured when updating vocabulary "%1$s" and the associated properties: %2$s', // @translate
-                $vocabularyData['vocabulary']['o:prefix'],
-                $e->getMessage()
+            throw new ModuleCannotInstallException((string) new PsrMessage(
+                'An error occured when updating vocabulary "{prefix}" and the associated properties: {message}', // @translate
+                ['prefix' => $vocabularyData['vocabulary']['o:prefix'], 'message' => $e->getMessage()]
             ));
         }
 
@@ -526,8 +525,9 @@ SQL;
             }
             $hasReplace = true;
             // TODO Ideally, anywhere this option is used in the setting should be updated too.
-            $message = new Message('The following "%1$s" of the vocabulary "%2$s" were replaced: %3$s', // @translate
-                $name, $vocabularyData['vocabulary']['o:label'], json_encode($members, 448)
+            $message = new PsrMessage(
+                'The following "{name}" of the vocabulary "{label}" were replaced: {members}', // @translate
+                ['name' => $name, 'label' => $vocabularyData['vocabulary']['o:label'], 'members' => json_encode($members, 448)]
             );
             $messenger->addWarning($message);
         }
@@ -535,7 +535,9 @@ SQL;
             $entityManager = $this->services->get('Omeka\EntityManager');
             $entityManager->flush();
 
-            $message = new Message('Resources, values and templates were updated, but you may check settings where the old ones were used.'); // @translate
+            $message = new PsrMessage(
+                'Resources, values and templates were updated, but you may check settings where the old ones were used.' // @translate
+            );
             $messenger->addWarning($message);
         }
 
@@ -560,9 +562,9 @@ SQL;
 
         $resourceTemplate = $this->api->searchOne('resource_templates', ['label' => $label])->getContent();
         if ($resourceTemplate) {
-            $message = new Message(
-                'The resource template named "%s" is already available and is skipped.', // @translate
-                $label
+            $message = new PsrMessage(
+                'The resource template named "{template}" is already available and is skipped.', // @translate
+                ['template' => $label]
             );
             $messenger = $this->services->get('ControllerPluginManager')->get('messenger');
             $messenger->addWarning($message);
@@ -764,9 +766,9 @@ SQL;
             $customVocab = $this->api->read('custom_vocabs', ['label' => $label])->getContent();
         } catch (NotFoundException $e) {
             throw new RuntimeException(
-                (string) new Message(
-                    'The custom vocab named "%s" is not available.', // @translate
-                    $label
+                (string) new PsrMessage(
+                    'The custom vocab named "{custom_vocab}" is not available.', // @translate
+                    ['custom_vocab' => $label]
                 )
             );
         }
@@ -952,7 +954,7 @@ SQL;
         $filepath = $vocabularyData['options']['file'] ?? $vocabularyData['options']['url']
             ?? $vocabularyData['file'] ?? $vocabularyData['url'] ?? null;
         if (!$filepath) {
-            throw new RuntimeException((string) new Message(
+            throw new RuntimeException((string) new PsrMessage(
                 'No file or url set for the vocabulary.' // @translate
             ));
         }
@@ -962,9 +964,9 @@ SQL;
         if ($isUrl) {
             $fileContent = file_get_contents($filepath);
             if (empty($fileContent)) {
-                throw new RuntimeException((string) new Message(
-                    'The file "%s" cannot be read. Check the url.', // @translate
-                    strpos($filepath, '/') === 0 ? basename($filepath) : $filepath
+                throw new RuntimeException((string) new PsrMessage(
+                    'The file "{file}" cannot be read. Check the url.', // @translate
+                    ['file' => strpos($filepath, '/') === 0 ? basename($filepath) : $filepath]
                 ));
             }
             $vocabularyData['strategy'] = 'url';
@@ -972,9 +974,9 @@ SQL;
         } else {
             $filepath = $this->fileDataPath($filepath, $module, 'vocabularies');
             if (!$filepath) {
-                throw new RuntimeException((string) new Message(
-                    'The file "%s" cannot be read. Check the file.', // @translate
-                    strpos($filepath, '/') === 0 ? basename($filepath) : $filepath
+                throw new RuntimeException((string) new PsrMessage(
+                    'The file "{file}" cannot be read. Check the file.', // @translate
+                    ['file' => strpos($filepath, '/') === 0 ? basename($filepath) : $filepath]
                 ));
             }
             $vocabularyData['strategy'] = 'file';
@@ -993,7 +995,7 @@ SQL;
         $namespaceUri = $vocabularyData['vocabulary']['o:namespace_uri'] ?? '';
         $prefix = $vocabularyData['vocabulary']['o:prefix'] ?? '';
         if (!$namespaceUri || !$prefix) {
-            throw new RuntimeException((string) new Message(
+            throw new RuntimeException((string) new PsrMessage(
                 'A vocabulary must have a namespace uri and a prefix.' // @translate
             ));
         }
