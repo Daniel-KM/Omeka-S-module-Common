@@ -493,6 +493,31 @@ class EasyMeta
     }
 
     /**
+     * Get the main data types ("literal", "resource", or "uri") of names.
+     *
+     * @param string|null $name A name.
+     * @return string|null The main data type names matching the names.
+     */
+    public function dataTypeMains($dataTypes = null): array
+    {
+        static $dataTypesMains;
+        if (!is_array($dataTypesMains)) {
+            $dataTypesMains = [];
+            foreach ($this->dataTypeNames() as $dataType) {
+                $dataTypesMains[$dataType] = $this->dataTypeMain($dataType);
+            }
+        }
+        if ($dataTypes === null) {
+            return $dataTypesMains;
+        }
+        if (is_scalar($dataTypes)) {
+            $dataTypes = [$dataTypes];
+        }
+        // TODO Keep order.
+        return array_intersect_key($dataTypesMains, array_flip($dataTypes));
+    }
+
+    /**
      * Get the main type of the custom vocab: "literal", "resource" or "uri".
      *
      * @todo Check for dynamic custom vocabs.
