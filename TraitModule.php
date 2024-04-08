@@ -771,8 +771,11 @@ trait TraitModule
      * @param string $settingsType
      * @param int $id Site id or user id.
      * @param bool True if processed.
+     *
+     * @todo Allow to set default options for arrays (see module Reference).
      */
-    protected function initDataToPopulate(SettingsInterface $settings, string $settingsType, $id = null): bool {
+    protected function initDataToPopulate(SettingsInterface $settings, string $settingsType, $id = null): bool
+    {
         // This method is not in the interface, but is set for config, site and
         // user settings.
         if (!method_exists($settings, 'getTableName')) {
