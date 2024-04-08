@@ -683,10 +683,10 @@ class EasyMeta
      */
     public function propertyLabels($termsOrIds = null): array
     {
+        if (is_null(static::$propertyLabelsByTerms)) {
+            $this->initProperties();
+        }
         if (is_null($termsOrIds)) {
-            if (is_null(static::$propertyLabelsByTerms)) {
-                $this->initProperties();
-            }
             return static::$propertyLabelsByTerms;
         }
         if (is_scalar($termsOrIds)) {
@@ -820,10 +820,10 @@ class EasyMeta
      */
     public function resourceClassLabels($termsOrIds = null): array
     {
+        if (is_null(static::$resourceClassLabelsByTerms)) {
+            $this->initResourceClasses();
+        }
         if (is_null($termsOrIds)) {
-            if (is_null(static::$resourceClassLabelsByTerms)) {
-                $this->initResourceClasses();
-            }
             return static::$resourceClassLabelsByTerms;
         }
         if (is_scalar($termsOrIds)) {
