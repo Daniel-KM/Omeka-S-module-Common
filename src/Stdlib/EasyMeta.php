@@ -293,6 +293,11 @@ class EasyMeta
     /**
      * @var array
      */
+    protected static $resourceTemplateClassesByIds;
+
+    /**
+     * @var array
+     */
     protected static $vocabularyIdsByPrefixes;
 
     /**
@@ -899,6 +904,50 @@ class EasyMeta
     }
 
     /**
+     * Get a resource template class by label or id.
+     *
+     * @param int|string|null $labelOrId A id or a label.
+     * @return string|null The resource class matching label or id.
+     */
+    public function resourceTemplateClassId($labelOrId): ?int
+    {
+        $templateId = $this->resourceTemplateId($labelOrId);
+        if (!$templateId) {
+            return null;
+        }
+        $classIds = $this->resourceTemplateClassIds();
+        return $classIds[$templateId] ?? null;
+    }
+
+    /**
+     * Get one or more resource template class ids by labels or by numeric ids.
+     *
+     * @param array|int|string|null $labelsOrIds One or multiple ids or labels.
+     * @return int[] The resource template class ids matching labels or ids, or
+     * all resource template class ids. When the input contains labels and ids
+     * matching the same templates, they are mixed.
+     * @todo Return list by labels and ids together like other (but this method is rarely used).
+     */
+    public function resourceTemplateClassIds($labelsOrIds = null): array
+    {
+        if (is_null(static::resourceTemplateClassesByIds)) {
+            $this->initResourceTemplateClasses();
+        }
+        if (is_null($labelsOrIds)) {
+            return static::resourceTemplateClassesByIds;
+        }
+        if (is_scalar($labelsOrIds)) {
+            $labelsOrIds = [$labelsOrIds];
+        }
+        $templateIds = $this->resourceTemplateIds($labelsOrIds);
+        if (!$templateIds) {
+            return [];
+        }
+        // TODO Keep original order.
+        return array_intersect_key(static::resourceTemplateClassesByIds, array_flip($labelsOrIds));
+    }
+
+    /**
      * Get a vocabulary id by uri, prefix or by numeric id.
      *
      * @param int|string|null $prefixOrUriOrId A id, uri or prefix.
@@ -1253,6 +1302,21 @@ SQL;
         $resourceTemplateIdsByLabels = array_map('intval', $result);
         $resourceTemplateIdsByIds = array_combine($resourceTemplateIdsByLabels, $resourceTemplateIdsByLabels);
         static::$resourceTemplateIdsByLabelsAndIdsUsed = $resourceTemplateIdsByLabels + $resourceTemplateIdsByIds;
+    }
+
+    protected function initResourceTemplateClasses(): void
+    {
+        $qb = $this->connection->createQueryBuilder();
+        $qb
+            ->select(
+                'resource_template.id AS id',
+                'resource_template.resource_class_id AS class_id'
+            )
+            ->from('resource_template', 'resource_template')
+            ->orderBy('resource_template.id', 'asc')
+        ;
+        $result = $this->connection->executeQuery($qb)->fetchAllKeyValue();
+        static::$resourceTemplateClassesByIds = array_map(fn ($v) => $v ? null : (int) $v, $result);
     }
 
     protected function initVocabularies(): void
