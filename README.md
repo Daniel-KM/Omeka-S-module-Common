@@ -319,7 +319,7 @@ Copyright
 [GitLab]: https://gitlab.com/Daniel-KM/Omeka-S-module-Common
 [PSR-3]: http://www.php-fig.org/psr/psr-3
 [PHP-FIG]: http://www.php-fig.org
-[Installing a module]: https://omeka.org/s/docs/user-manual/modules/
+[installing a module]: https://omeka.org/s/docs/user-manual/modules/
 [Common.zip]: https://github.com/Daniel-KM/Omeka-S-module-Common/releases
 [module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-Common/-/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
