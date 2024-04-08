@@ -12,7 +12,7 @@ class Translator extends AbstractHelper
      */
     protected $translator;
 
-    public function __construct(Translator $translator)
+    public function __construct(LaminasTranslator $translator)
     {
         $this->translator = $translator;
     }
