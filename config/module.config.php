@@ -87,6 +87,7 @@ return [
     'controller_plugins' => [
         'factories' => [
             'easyMeta' => Service\ControllerPlugin\EasyMetaFactory::class,
+            'messenger' => Mvc\Controller\Plugin\Messenger::class,
             'specifyMediaType' => Service\ControllerPlugin\SpecifyMediaTypeFactory::class,
             'translator' => Service\ControllerPlugin\TranslatorFactory::class,
         ],
