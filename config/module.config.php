@@ -30,6 +30,7 @@ return [
     ],
     'view_helpers' => [
         'invokables' => [
+            'isHomePage' => View\Helper\IsHomePage::class,
             // Required to manage PsrMessage.
             'messages' => View\Helper\Messages::class,
         ],
