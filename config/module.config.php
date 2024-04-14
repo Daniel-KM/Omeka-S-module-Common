@@ -35,6 +35,7 @@ return [
         ],
         'factories' => [
             'assetUrl' => Service\ViewHelper\AssetUrlFactory::class,
+            'dataType' => Service\ViewHelper\DataTypeFactory::class,
             'defaultSite' => Service\ViewHelper\DefaultSiteFactory::class,
             'easyMeta' => Service\ViewHelper\EasyMetaFactory::class,
             'matchedRouteName' => Service\ViewHelper\MatchedRouteNameFactory::class,
