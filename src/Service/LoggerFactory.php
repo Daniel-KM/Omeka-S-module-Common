@@ -27,7 +27,7 @@ class LoggerFactory implements FactoryInterface
             && $config['logger']['log']
             && isset($config['logger']['path'])
             && is_file($config['logger']['path'])
-            && is_writable($config['logger']['path'])
+            && is_writeable($config['logger']['path'])
         ) {
             $writer = new Stream($config['logger']['path']);
             $writer->setFormatter(new PsrLogSimpleFormatter());
