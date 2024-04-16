@@ -89,7 +89,7 @@ return [
     ],
     'controller_plugins' => [
         'invokables' => [
-            'sendFile' => Common\Mvc\Controller\Plugin\SendFile::class,
+            'sendFile' => Mvc\Controller\Plugin\SendFile::class,
         ],
         'factories' => [
             'easyMeta' => Service\ControllerPlugin\EasyMetaFactory::class,

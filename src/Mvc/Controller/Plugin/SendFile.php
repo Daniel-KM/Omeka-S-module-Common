@@ -85,7 +85,8 @@ class SendFile extends AbstractPlugin
         $bypassRange = $params['bypass_range'] ?? false;
 
         /** @var \Laminas\Http\PhpEnvironment\Response $response */
-        $response = $this->getResponse();
+        $controller = $this->getController();
+        $response = $controller->getResponse();
 
         // Write headers.
         /** @var \Laminas\Http\Headers $headers */
