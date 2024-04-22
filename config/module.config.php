@@ -99,6 +99,11 @@ return [
             'translator' => Service\ControllerPlugin\TranslatorFactory::class,
         ],
     ],
+    'validators' => [
+        'invokables' => [
+            'readableDirectory' => Validator\ReadableDirectory::class,
+        ],
+    ],
     'translator' => [
         'translation_file_patterns' => [
             [
