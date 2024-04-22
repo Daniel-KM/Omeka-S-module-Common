@@ -51,7 +51,7 @@ class Module extends AbstractModule
         // See migration 20240219000000_AddIndexMediaType.
         $connection = $services->get('Omeka\Connection');
 
-        $sql = <<<'SQL'
+        $sqls = <<<'SQL'
 ALTER TABLE `asset`
 CHANGE `media_type` `media_type` varchar(190) COLLATE 'utf8mb4_unicode_ci' NOT NULL AFTER `name`,
 CHANGE `extension` `extension` varchar(190) COLLATE 'utf8mb4_unicode_ci' NULL AFTER `storage_id`;
@@ -81,7 +81,13 @@ CHANGE `type` `type` varchar(190) COLLATE 'utf8mb4_unicode_ci' NOT NULL AFTER `v
 CHANGE `lang` `lang` varchar(190) COLLATE 'utf8mb4_unicode_ci' NULL AFTER `type`;
 
 SQL;
-        $connection->executeStatement($sql);
+        foreach (explode(";\n\n", $sqls) as $sql) {
+            try {
+                $connection->executeStatement($sql);
+            } catch (\Exception $e) {
+                // Already done.
+            }
+        }
 
         if (version_compare(\Omeka\Module::VERSION, '4.1', '>=')) {
             $sql = <<<'SQL'
@@ -91,7 +97,7 @@ SQL;
             try {
                 $connection->executeStatement($sql);
             } catch (\Exception $e) {
-                // Omekas S version is not 4.1
+                // Already done.
             }
         }
 
