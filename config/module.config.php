@@ -72,6 +72,7 @@ return [
             Form\Element\MediaTypeSelect::class => Service\Form\Element\MediaTypeSelectFactory::class,
             // This element is not the same than \Omeka\Form\Element\SitePageSelect (singular site).
             Form\Element\SitesPageSelect::class => Service\Form\Element\SitesPageSelectFactory::class,
+            Form\Element\ThumbnailTypeSelect::class => Service\Form\Element\ThumbnailTypeSelectFactory::class,
             // Optional core elements.
             Form\Element\OptionalItemSetSelect::class => Service\Form\Element\OptionalItemSetSelectFactory::class,
             Form\Element\OptionalPropertySelect::class => Service\Form\Element\OptionalPropertySelectFactory::class,
