@@ -440,6 +440,9 @@ trait TraitModule
         return $result;
     }
 
+    /**
+     * @deprecated Not really useful. Will be removed in a future version.
+     */
     protected function getServiceSettings(string $settingsType): \Omeka\Settings\AbstractSettings
     {
         $settingsTypes = [
@@ -619,10 +622,14 @@ trait TraitModule
             return null;
         }
 
-        $settings = $this->getServiceSettings($settingsType);
-        if (!$settings) {
-            return null;
-        }
+        $settingsTypes = [
+            // 'config' => 'Omeka\Settings',
+            'settings' => 'Omeka\Settings',
+            'site_settings' => 'Omeka\Settings\Site',
+            'user_settings' => 'Omeka\Settings\User',
+        ];
+
+        $settings = $services->get($settingsTypes[$settingsType]);
 
         switch ($settingsType) {
             case 'settings':
@@ -637,6 +644,8 @@ trait TraitModule
                 $routeMatch = $services->get('Application')->getMvcEvent()->getRouteMatch();
                 $id = $routeMatch->getParam('id');
                 break;
+            default;
+                return null;
         }
 
         // Simplify config of settings.
