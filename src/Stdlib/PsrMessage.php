@@ -142,11 +142,33 @@ class PsrMessage implements \JsonSerializable, PsrInterpolateInterface, Translat
         return $this;
     }
 
+    /**
+     * Get the flag escapeHtml.
+     */
+    public function getEscapeHtml(): bool
+    {
+        return $this->escapeHtml;
+    }
+
+    /**
+     * Get the flag escapeHtml. Kept for compatibility.
+     *
+     * @deprecated This is a getter, so use getEscapeHtml().
+     */
     public function escapeHtml(): bool
     {
         return $this->escapeHtml;
     }
 
+    /**
+     * Get the contextualized final message, translated if translator is set.
+     *
+     * The translation is not done automatically for non-PSR messages, managed
+     * with sprintf(), for compatibiity with Message(). Use translate() to force
+     * it in that case.
+     *
+     * @return string
+     */
     public function __toString()
     {
         // isSprintf is a compatibility with Message, so no translation is done.

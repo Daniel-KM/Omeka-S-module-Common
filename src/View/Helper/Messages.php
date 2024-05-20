@@ -13,7 +13,7 @@ use Omeka\Stdlib\Message;
  * Replace Omeka core Messages in order to manage PsrMessage and translations.
  * @see \Omeka\View\Helper\Messages
  *
- * @todo Move PsrMessage to its own module or in core (pr #1372).
+ * @todo Move PsrMessage in core (pr #1372).
  */
 class Messages extends AbstractHelper
 {
@@ -69,7 +69,7 @@ class Messages extends AbstractHelper
             // another object (PsrMessage from Log or Guest, etc.), as long
             // as it's not in the core or in a specific module.
             if ($message instanceof TranslatorAwareInterface) {
-                $escapeHtml = $message->escapeHtml();
+                $escapeHtml = $message->getEscapeHtml();
                 $message = $message->setTranslator($translator)->translate();
             } elseif ($message instanceof Message) {
                 $escapeHtml = $message->escapeHtml();
