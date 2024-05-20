@@ -35,3 +35,5 @@ if (version_compare((string) $oldVersion, '3.4.57', '<')) {
     // In the case there was an issue in previous fix.
     $this->fixIndexes($services);
 }
+
+$this->checkGeneric();

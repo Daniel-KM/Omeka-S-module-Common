@@ -31,6 +31,7 @@ class Module extends AbstractModule
     public function install(ServiceLocatorInterface $services)
     {
         $this->fixIndexes($services);
+        $this->checkGeneric($services);
     }
 
     public function upgrade($oldVersion, $newVersion, ServiceLocatorInterface $services)
@@ -156,5 +157,24 @@ SQL;
             $messenger = $services->get('ControllerPluginManager')->get('messenger');
             $messenger->addSuccess($message);
         }
+    }
+
+    protected function checkGeneric(): void
+    {
+        $paths = glob(OMEKA_PATH . '/modules/*/src/Generic/AbstractModule.php');
+        if (count($paths)) {
+            return;
+        }
+
+        $services = $this->getServiceLocator();
+        $connection = $services->get('Omeka\Connection');
+        $connection->executeStatement('DELETE FROM module WHERE ID = "Generic";');
+
+        // Don't use a PsrMessage during install.
+        $message = new \Omeka\Stdlib\Message(
+            'The module Generic is not needed any more and can be removed.' // @translate
+        );
+        $messenger = $services->get('ControllerPluginManager')->get('messenger');
+        $messenger->addWarning($message);
     }
 }
