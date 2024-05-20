@@ -1033,4 +1033,55 @@ SQL;
         }
         return array_values($list);
     }
+
+    /**
+     * Check for a list of strings in files to handle upgrade of modules.
+     *
+     * @param array|string $stringsOrRegex If an array is passed, each string is
+     *   checked via method mb_strpos(); else it is a full regex for preg_match.
+     * @param string $globPath The glob path to get files to check, for example
+     *   "themes/* /view/search/*".
+     * @return array Results by key, even for regex. Return null if issue.
+     */
+    public function checkStringsInFiles($stringsOrRegex, string $globPath = ''): ?array
+    {
+        if (!$stringsOrRegex) {
+            return [];
+        }
+
+        // Forbid fake paths.
+        if (strpos($globPath, '..') !== false || strpos($globPath, './') !== false) {
+            return null;
+        }
+
+        $start = mb_strlen(OMEKA_PATH . '/');
+        if (mb_substr($globPath, 0, 1) === '/') {
+            if (strpos($globPath, $start) !== 0) {
+                return null;
+            }
+        } else {
+            $globPath = OMEKA_PATH . '/' . $globPath;
+        }
+
+        $result = [];
+
+        $paths = glob($globPath);
+        foreach ($paths as $filepath) {
+            if (!is_file($filepath) || !is_readable($filepath) || !filesize($filepath)) {
+                continue;
+            }
+            $phtml = file_get_contents($filepath);
+            if (is_array($stringsOrRegex)) {
+                foreach ($stringsOrRegex as $check) {
+                    if (strpos($phtml, $check)) {
+                        $result[] = mb_substr($filepath, $start);
+                    }
+                }
+            } elseif (preg_match($phtml, $stringsOrRegex)) {
+                $result[] = mb_substr($filepath, $start);
+            }
+        }
+
+        return $result;
+    }
 }
