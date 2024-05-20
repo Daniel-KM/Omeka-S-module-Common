@@ -140,16 +140,16 @@ trait TraitModule
         }
     }
 
-    public function getInstallResources(): ?InstallResources
+    public function getManageModuleAndResources(): \Common\ManageModuleAndResources
     {
-        require_once __DIR__ . '/InstallResources.php';
+        require_once __DIR__ . '/ManageModuleAndResources.php';
         $services = $this->getServiceLocator();
-        return new \Common\InstallResources($services);
+        return new \Common\ManageModuleAndResources($services);
     }
 
     public function checkAllResourcesToInstall(): bool
     {
-        $installResources = $this->getInstallResources();
+        $installResources = $this->getManageModuleAndResources();
         return $installResources->checkAllResources(static::NAMESPACE);
     }
 
@@ -158,7 +158,7 @@ trait TraitModule
      */
     public function installAllResources(): self
     {
-        $installResources = $this->getInstallResources();
+        $installResources = $this->getManageModuleAndResources();
         $installResources->createAllResources(static::NAMESPACE);
         return $this;
     }
@@ -168,8 +168,8 @@ trait TraitModule
      */
     public function uninstallAllResources(): self
     {
-        $installResources = $this->getInstallResources();
-        $installResources->deleteAllResources(static::NAMESPACE);
+        $manageModuleAndResources = $this->getManageModuleAndResources();
+        $manageModuleAndResources->deleteAllResources(static::NAMESPACE);
         return $this;
     }
 

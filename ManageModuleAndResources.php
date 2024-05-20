@@ -36,7 +36,10 @@ use Omeka\Api\Representation\ResourceTemplateRepresentation;
 use Omeka\Entity\Vocabulary;
 use Omeka\Module\Exception\ModuleCannotInstallException;
 
-class InstallResources
+/**
+ * Group methods that are useful to install, upgrade or uninstall a module.
+ */
+class ManageModuleAndResources
 {
     /**
      * @var \Omeka\Mvc\Controller\Plugin\Api
