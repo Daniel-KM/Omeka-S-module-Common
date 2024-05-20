@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-05 00:00+0000\n"
+"POT-Creation-Date: 2024-05-20 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,45 +17,71 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/Stdlib/PsrMessage.php:160
+#: src/Stdlib/PsrMessage.php:188
 msgid "default"
 msgstr ""
 
-#: TraitModule.php:69 TraitModule.php:860
+#: TraitModule.php:78 TraitModule.php:921
 #, php-format
 msgid "This module requires the module \"%s\"."
 msgstr ""
 
-#: TraitModule.php:74
+#: TraitModule.php:83
 #, php-format
 msgid "This module requires modules \"%s\"."
 msgstr ""
 
-#: TraitModule.php:82
+#: TraitModule.php:92
 msgid "This module has resources that cannot be installed."
 msgstr ""
 
-#: TraitModule.php:89
+#: TraitModule.php:100
 msgid ""
 "This module cannot install its tables, because they exist already. Try to "
 "remove them first."
 msgstr ""
 
-#: TraitModule.php:381
+#: TraitModule.php:406
 #, php-format
 msgid "The module removed tables \"%s\" from a previous broken install."
 msgstr ""
 
-#: TraitModule.php:855
+#: TraitModule.php:916
 #, php-format
 msgid "This module requires the module \"%1$s\", version %2$s or above."
 msgstr ""
 
-#: TraitModule.php:972
+#: TraitModule.php:1033
 #, php-format
 msgid ""
 "The module \"%s\" was automatically deactivated because the dependencies are "
 "unavailable."
+msgstr ""
+
+#: Module.php:155
+msgid "Some indexes were added to tables to improve performance."
+msgstr ""
+
+#: Module.php:175
+msgid "The module Generic is not needed any more and can be removed."
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:150
+msgid ""
+"Xml parsing error level {level}, code {code}, for file \"{file}\" (media "
+"#{media_id}), line {line}, column {column}: {message}"
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:172
+msgid ""
+"The file \"{file}\" (media #{media_id}) is not parsable by xml reader "
+"neither dom."
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:289
+msgid ""
+"Warning: some files contain invalid unicode characters and cannot be "
+"processed directly."
 msgstr ""
 
 #: src/View/Helper/MediaTypeSelect.php:40
@@ -63,165 +89,191 @@ msgstr ""
 msgid "Select media type…"
 msgstr ""
 
+#: src/Validator/ReadableDirectory.php:21
+msgid "The path should not contain double dot or be hidden."
+msgstr ""
+
+#: src/Validator/ReadableDirectory.php:22
+msgid "The path does not exist."
+msgstr ""
+
+#: src/Validator/ReadableDirectory.php:23
+msgid "The path is not a directory"
+msgstr ""
+
+#: src/Validator/ReadableDirectory.php:24
+msgid "The path is not readable"
+msgstr ""
+
+#: src/Validator/ReadableDirectory.php:25
+msgid "The path is not inside the restricted path"
+msgstr ""
+
 #: src/Form/Element/AbstractGroupBySiteSelect.php:151
 msgid "[No site]"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:58
+#: src/File/Validator.php:29
+msgid ""
+"Error validating \"{filename}\". Cannot store files with the media type "
+"\"{mediatype}\"."
+msgstr ""
+
+#: src/File/Validator.php:42
+msgid ""
+"Error validating \"{filename}\". Cannot store files with the resolved "
+"extension \"{extension}\"."
+msgstr ""
+
+#: src/Service/Form/Element/MediaIngesterSelectFactory.php:26
+msgid "Select media ingesters…"
+msgstr ""
+
+#: src/Service/Form/Element/MediaRendererSelectFactory.php:31
+msgid "Select media renderers…"
+msgstr ""
+
+#: src/Stdlib/EasyMeta.php:61
 msgid "annotation"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:63
+#: src/Stdlib/EasyMeta.php:66
 msgid "resource"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:64
+#: src/Stdlib/EasyMeta.php:67
 msgid "property"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:65
+#: src/Stdlib/EasyMeta.php:68
 msgid "resource class"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:71
+#: src/Stdlib/EasyMeta.php:74
 msgid "annotations"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:72
+#: src/Stdlib/EasyMeta.php:75
 msgid "assets"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:73
+#: src/Stdlib/EasyMeta.php:76
 msgid "items"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:74
+#: src/Stdlib/EasyMeta.php:77
 msgid "item sets"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:76
+#: src/Stdlib/EasyMeta.php:79
 msgid "resources"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:77
+#: src/Stdlib/EasyMeta.php:80
 msgid "properties"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:78
+#: src/Stdlib/EasyMeta.php:81
 msgid "resource classes"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:79
+#: src/Stdlib/EasyMeta.php:82
 msgid "resource templates"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:80
+#: src/Stdlib/EasyMeta.php:83
 msgid "vocabularies"
 msgstr ""
 
-#: InstallResources.php:84
-#, php-format
+#: InstallResources.php:90
 msgid ""
-"An error occured when loading vocabulary \"%s\": file has no json content."
+"An error occured when loading vocabulary \"{vocabulary}\": file has no json "
+"content."
 msgstr ""
 
-#: InstallResources.php:91
-#, php-format
+#: InstallResources.php:97
 msgid ""
-"An error occured when adding the prefix \"%s\": another vocabulary exists. "
-"Resolve the conflict before installing this module."
+"An error occured when adding the prefix \"{prefix}\": another vocabulary "
+"exists. Resolve the conflict before installing this module."
 msgstr ""
 
-#: InstallResources.php:103
-#, php-format
+#: InstallResources.php:109
 msgid ""
-"A custom vocab exists for \"%s\". Remove it or rename it before installing "
-"this module."
+"A custom vocab exists for \"{name}\". Remove it or rename it before "
+"installing this module."
 msgstr ""
 
-#: InstallResources.php:114
-#, php-format
+#: InstallResources.php:120
 msgid ""
-"A resource template exists for %s. Rename it or remove it before installing "
-"this module."
+"A resource template exists for {template}. Rename it or remove it before "
+"installing this module."
 msgstr ""
 
-#: InstallResources.php:318
-#, php-format
-msgid "The vocabulary \"%s\" was already installed and was kept."
+#: InstallResources.php:325
+msgid "The vocabulary \"{vocabulary}\" was already installed and was kept."
 msgstr ""
 
-#: InstallResources.php:327
-#, php-format
+#: InstallResources.php:335
 msgid ""
-"An error occured when adding the prefix \"%s\": another vocabulary exists "
-"with the same prefix. Resolve the conflict before installing this module."
+"An error occured when adding the prefix \"{prefix}\": another vocabulary "
+"exists with the same prefix. Resolve the conflict before installing this "
+"module."
 msgstr ""
 
-#: InstallResources.php:339
-#, php-format
+#: InstallResources.php:347
 msgid ""
-"An error occured when adding the prefix \"%1$s\" and the associated "
-"properties: %2$s"
+"An error occured when adding the prefix \"{prefix}\" and the associated "
+"properties: {message}"
 msgstr ""
 
-#: InstallResources.php:419
-#, php-format
+#: InstallResources.php:426 InstallResources.php:435
 msgid ""
-"An error occured when updating vocabulary \"%s\" and the associated "
-"properties: %s"
+"An error occured when updating vocabulary \"{prefix}\" and the associated "
+"properties: {message}"
 msgstr ""
 
-#: InstallResources.php:429
-#, php-format
+#: InstallResources.php:529
 msgid ""
-"An error occured when updating vocabulary \"%1$s\" and the associated "
-"properties: %2$s"
+"The following \"{name}\" of the vocabulary \"{label}\" were replaced: "
+"{members}"
 msgstr ""
 
-#: InstallResources.php:523
-#, php-format
-msgid "The following \"%1$s\" of the vocabulary \"%2$s\" were replaced: %3$s"
-msgstr ""
-
-#: InstallResources.php:532
+#: InstallResources.php:539
 msgid ""
 "Resources, values and templates were updated, but you may check settings "
 "where the old ones were used."
 msgstr ""
 
-#: InstallResources.php:558
-#, php-format
-msgid "The resource template named \"%s\" is already available and is skipped."
+#: InstallResources.php:566
+msgid ""
+"The resource template named \"{template}\" is already available and is "
+"skipped."
 msgstr ""
 
-#: InstallResources.php:832
-#, php-format
-msgid "The custom vocab named \"%s\" is not available."
+#: InstallResources.php:770
+msgid "The custom vocab named \"{custom_vocab}\" is not available."
 msgstr ""
 
-#: InstallResources.php:1041
+#: InstallResources.php:958
 msgid "No file or url set for the vocabulary."
 msgstr ""
 
-#: InstallResources.php:1051
-#, php-format
-msgid "The file \"%s\" cannot be read. Check the url."
+#: InstallResources.php:968
+msgid "The file \"{file}\" cannot be read. Check the url."
 msgstr ""
 
-#: InstallResources.php:1061
-#, php-format
-msgid "The file \"%s\" cannot be read. Check the file."
+#: InstallResources.php:978
+msgid "The file \"{file}\" cannot be read. Check the file."
 msgstr ""
 
-#: InstallResources.php:1082
+#: InstallResources.php:999
 msgid "A vocabulary must have a namespace uri and a prefix."
 msgstr ""
 
-#: TraitModule.php:994
+#: TraitModule.php:1055
 msgid "The directory \"{path}\" is not writeable."
 msgstr ""
 
-#: TraitModule.php:1005
+#: TraitModule.php:1066
 msgid "The directory \"{path}\" is not writeable: {error}."
 msgstr ""
