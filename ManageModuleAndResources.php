@@ -1041,9 +1041,10 @@ SQL;
      *   checked via method mb_strpos(); else it is a full regex for preg_match.
      * @param string $globPath The glob path to get files to check, for example
      *   "themes/* /view/search/*".
+     * @param bool $invert Get files without the string.
      * @return array Results by key, even for regex. Return null if issue.
      */
-    public function checkStringsInFiles($stringsOrRegex, string $globPath = ''): ?array
+    public function checkStringsInFiles($stringsOrRegex, string $globPath = '', bool $invert = false): ?array
     {
         if (!$stringsOrRegex) {
             return [];
@@ -1065,20 +1066,26 @@ SQL;
 
         $result = [];
 
+        $isStrings = is_array($stringsOrRegex);
+
         $paths = glob($globPath);
         foreach ($paths as $filepath) {
             if (!is_file($filepath) || !is_readable($filepath) || !filesize($filepath)) {
                 continue;
             }
             $phtml = file_get_contents($filepath);
-            if (is_array($stringsOrRegex)) {
+            if ($isStrings) {
                 foreach ($stringsOrRegex as $check) {
-                    if (strpos($phtml, $check)) {
+                    $pos = mb_strpos($phtml, $check);
+                    if ((!$invert && $pos) || ($invert && !$pos)) {
                         $result[] = mb_substr($filepath, $start);
                     }
                 }
-            } elseif (preg_match($phtml, $stringsOrRegex)) {
-                $result[] = mb_substr($filepath, $start);
+            } else {
+                $has = preg_match($phtml, $stringsOrRegex);
+                if ((!$invert && $has) || ($invert && !$has)) {
+                    $result[] = mb_substr($filepath, $start);
+                }
             }
         }
 
