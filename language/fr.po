@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-20 00:00+0000\n"
-"PO-Revision-Date: 2024-05-20 00:00+0000\n"
+"POT-Creation-Date: 2024-06-17 00:00+0000\n"
+"PO-Revision-Date: 2024-06-17 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -63,13 +63,13 @@ msgstr ""
 "Le module « %s » a été automatiquement désactivé car ses dépendances ne sont "
 "plus disponibles."
 
-#: Module.php:155
+#: Module.php:157
 msgid "Some indexes were added to tables to improve performance."
 msgstr ""
 "Certains index ont été ajoutés aux tables pour améliorer la performance."
 
-#: Module.php:175
-msgid "The module Generic is not needed any more and can be removed."
+#: Module.php:177
+msgid "The module Generic is no longer needed and can be removed."
 msgstr "Le module Generic n’est plus nécessaire et peux être supprimé."
 
 #: src/Mvc/Controller/Plugin/SpecifyMediaType.php:150
@@ -203,7 +203,7 @@ msgstr "modèles de ressource"
 msgid "vocabularies"
 msgstr "vocabulaires"
 
-#: InstallResources.php:90
+#: ManageModuleAndResources.php:93
 msgid ""
 "An error occured when loading vocabulary \"{vocabulary}\": file has no json "
 "content."
@@ -211,7 +211,7 @@ msgstr ""
 "Une erreur est survenue en chargeant le vocabulaire « {vocabulary} » : le "
 "fichier n’a pas de contenu json."
 
-#: InstallResources.php:97
+#: ManageModuleAndResources.php:100
 msgid ""
 "An error occured when adding the prefix \"{prefix}\": another vocabulary "
 "exists. Resolve the conflict before installing this module."
@@ -219,7 +219,7 @@ msgstr ""
 "Une erreur est survenue en ajoutant le préfixe « {prefix} » : un autre "
 "vocabulaire existe. Merci de résoudre le conflit avant d’installer ce module."
 
-#: InstallResources.php:109
+#: ManageModuleAndResources.php:112
 msgid ""
 "A custom vocab exists for \"{name}\". Remove it or rename it before "
 "installing this module."
@@ -227,7 +227,7 @@ msgstr ""
 "Un vocabulaire personnalisé existe pour « {name} » : renommez-le ou "
 "supprimez-le avant d’installer ce module."
 
-#: InstallResources.php:120
+#: ManageModuleAndResources.php:123
 msgid ""
 "A resource template exists for {template}. Rename it or remove it before "
 "installing this module."
@@ -235,11 +235,11 @@ msgstr ""
 "Un modèle de ressource nommé « {template} » existe : renommez ou supprimez-"
 "le avant d’installer ce module."
 
-#: InstallResources.php:325
+#: ManageModuleAndResources.php:328
 msgid "The vocabulary \"{vocabulary}\" was already installed and was kept."
 msgstr "Le vocabulaire « {vocabulary} » a déjà été installé et a été conservé."
 
-#: InstallResources.php:335
+#: ManageModuleAndResources.php:338
 msgid ""
 "An error occured when adding the prefix \"{prefix}\": another vocabulary "
 "exists with the same prefix. Resolve the conflict before installing this "
@@ -249,7 +249,7 @@ msgstr ""
 "vocabulaire existe avec le même préfixe. Merci de résoudre le conflit avant "
 "d’installer ce module."
 
-#: InstallResources.php:347
+#: ManageModuleAndResources.php:350
 msgid ""
 "An error occured when adding the prefix \"{prefix}\" and the associated "
 "properties: {message}"
@@ -257,7 +257,7 @@ msgstr ""
 "Une erreur est survenue en ajoutant le préfixe « {prefix} » et les "
 "propriétés associées : {message}"
 
-#: InstallResources.php:426 InstallResources.php:435
+#: ManageModuleAndResources.php:429 ManageModuleAndResources.php:438
 msgid ""
 "An error occured when updating vocabulary \"{prefix}\" and the associated "
 "properties: {message}"
@@ -265,7 +265,7 @@ msgstr ""
 "Une erreur est survenue lors de la mise à jour du vocabulaire « {prefix} » "
 "et les propriétés associées : {message}"
 
-#: InstallResources.php:529
+#: ManageModuleAndResources.php:532
 msgid ""
 "The following \"{name}\" of the vocabulary \"{label}\" were replaced: "
 "{members}"
@@ -273,7 +273,7 @@ msgstr ""
 "Les « {name} » suivants du vocabulaire « {label} » ont été remplacés : "
 "{members}"
 
-#: InstallResources.php:539
+#: ManageModuleAndResources.php:542
 msgid ""
 "Resources, values and templates were updated, but you may check settings "
 "where the old ones were used."
@@ -281,7 +281,7 @@ msgstr ""
 "Les ressources, valeurs et modèles ont été mis à jour, mais vous pouvez "
 "vérifier les paramètres où les anciennes valeurs étaient utilisées."
 
-#: InstallResources.php:566
+#: ManageModuleAndResources.php:569
 msgid ""
 "The resource template named \"{template}\" is already available and is "
 "skipped."
@@ -289,25 +289,25 @@ msgstr ""
 "Le modèle de ressource nommé « {template} » est déjà disponible et a été "
 "conservé."
 
-#: InstallResources.php:770
+#: ManageModuleAndResources.php:773
 msgid "The custom vocab named \"{custom_vocab}\" is not available."
 msgstr ""
 "Le vocabulaire personnalisé nommé « {custom_vocab} » n’est pas disponible."
 
-#: InstallResources.php:958
+#: ManageModuleAndResources.php:961
 msgid "No file or url set for the vocabulary."
 msgstr "Pas de fichier ou d’url pour le vocabulaire."
 
-#: InstallResources.php:968
+#: ManageModuleAndResources.php:971
 msgid "The file \"{file}\" cannot be read. Check the url."
 msgstr "Le fichier « {file} » ne peut pas être lu. Merci de vérifier l’url."
 
-#: InstallResources.php:978
+#: ManageModuleAndResources.php:981
 msgid "The file \"{file}\" cannot be read. Check the file."
 msgstr ""
 "Le fichier « {file} » ne peut pas être lu. Merci de vérifier le fichier."
 
-#: InstallResources.php:999
+#: ManageModuleAndResources.php:1002
 msgid "A vocabulary must have a namespace uri and a prefix."
 msgstr "Un vocabulaire doit avoir une uri pour l’espace de nom et un préfixe."
 

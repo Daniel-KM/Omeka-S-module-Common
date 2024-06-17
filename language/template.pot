@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-20 00:00+0000\n"
+"POT-Creation-Date: 2024-06-17 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -58,12 +58,12 @@ msgid ""
 "unavailable."
 msgstr ""
 
-#: Module.php:155
+#: Module.php:157
 msgid "Some indexes were added to tables to improve performance."
 msgstr ""
 
-#: Module.php:175
-msgid "The module Generic is not needed any more and can be removed."
+#: Module.php:177
+msgid "The module Generic is no longer needed and can be removed."
 msgstr ""
 
 #: src/Mvc/Controller/Plugin/SpecifyMediaType.php:150
@@ -185,88 +185,88 @@ msgstr ""
 msgid "vocabularies"
 msgstr ""
 
-#: InstallResources.php:90
+#: ManageModuleAndResources.php:93
 msgid ""
 "An error occured when loading vocabulary \"{vocabulary}\": file has no json "
 "content."
 msgstr ""
 
-#: InstallResources.php:97
+#: ManageModuleAndResources.php:100
 msgid ""
 "An error occured when adding the prefix \"{prefix}\": another vocabulary "
 "exists. Resolve the conflict before installing this module."
 msgstr ""
 
-#: InstallResources.php:109
+#: ManageModuleAndResources.php:112
 msgid ""
 "A custom vocab exists for \"{name}\". Remove it or rename it before "
 "installing this module."
 msgstr ""
 
-#: InstallResources.php:120
+#: ManageModuleAndResources.php:123
 msgid ""
 "A resource template exists for {template}. Rename it or remove it before "
 "installing this module."
 msgstr ""
 
-#: InstallResources.php:325
+#: ManageModuleAndResources.php:328
 msgid "The vocabulary \"{vocabulary}\" was already installed and was kept."
 msgstr ""
 
-#: InstallResources.php:335
+#: ManageModuleAndResources.php:338
 msgid ""
 "An error occured when adding the prefix \"{prefix}\": another vocabulary "
 "exists with the same prefix. Resolve the conflict before installing this "
 "module."
 msgstr ""
 
-#: InstallResources.php:347
+#: ManageModuleAndResources.php:350
 msgid ""
 "An error occured when adding the prefix \"{prefix}\" and the associated "
 "properties: {message}"
 msgstr ""
 
-#: InstallResources.php:426 InstallResources.php:435
+#: ManageModuleAndResources.php:429 ManageModuleAndResources.php:438
 msgid ""
 "An error occured when updating vocabulary \"{prefix}\" and the associated "
 "properties: {message}"
 msgstr ""
 
-#: InstallResources.php:529
+#: ManageModuleAndResources.php:532
 msgid ""
 "The following \"{name}\" of the vocabulary \"{label}\" were replaced: "
 "{members}"
 msgstr ""
 
-#: InstallResources.php:539
+#: ManageModuleAndResources.php:542
 msgid ""
 "Resources, values and templates were updated, but you may check settings "
 "where the old ones were used."
 msgstr ""
 
-#: InstallResources.php:566
+#: ManageModuleAndResources.php:569
 msgid ""
 "The resource template named \"{template}\" is already available and is "
 "skipped."
 msgstr ""
 
-#: InstallResources.php:770
+#: ManageModuleAndResources.php:773
 msgid "The custom vocab named \"{custom_vocab}\" is not available."
 msgstr ""
 
-#: InstallResources.php:958
+#: ManageModuleAndResources.php:961
 msgid "No file or url set for the vocabulary."
 msgstr ""
 
-#: InstallResources.php:968
+#: ManageModuleAndResources.php:971
 msgid "The file \"{file}\" cannot be read. Check the url."
 msgstr ""
 
-#: InstallResources.php:978
+#: ManageModuleAndResources.php:981
 msgid "The file \"{file}\" cannot be read. Check the file."
 msgstr ""
 
-#: InstallResources.php:999
+#: ManageModuleAndResources.php:1002
 msgid "A vocabulary must have a namespace uri and a prefix."
 msgstr ""
 
