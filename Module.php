@@ -30,14 +30,15 @@ class Module extends AbstractModule
 
     public function install(ServiceLocatorInterface $services)
     {
-        $this->fixIndexes($services);
-        $this->checkGeneric($services);
+        $this->setServiceLocator($services);
+        $this->fixIndexes();
+        $this->checkGeneric();
     }
 
     public function upgrade($oldVersion, $newVersion, ServiceLocatorInterface $services)
     {
-        $filepath = __DIR__ . '/data/scripts/upgrade.php';
         $this->setServiceLocator($services);
+        $filepath = __DIR__ . '/data/scripts/upgrade.php';
         require_once $filepath;
     }
 
@@ -46,10 +47,11 @@ class Module extends AbstractModule
      *
      * See migration 20240219000000_AddIndexMediaType.
      */
-    protected function fixIndexes(ServiceLocatorInterface $services)
+    protected function fixIndexes()
     {
         // Early fix media_type index and other common indexes.
         // See migration 20240219000000_AddIndexMediaType.
+        $services = $this->getServiceLocator();
         $connection = $services->get('Omeka\Connection');
 
         $sqls = <<<'SQL'
@@ -172,7 +174,7 @@ SQL;
 
         // Don't use a PsrMessage during install.
         $message = new \Omeka\Stdlib\Message(
-            'The module Generic is not needed any more and can be removed.' // @translate
+            'The module Generic is no longer needed and can be removed.' // @translate
         );
         $messenger = $services->get('ControllerPluginManager')->get('messenger');
         $messenger->addWarning($message);
