@@ -15,24 +15,38 @@ class Translator extends \Omeka\I18n\Translator
 {
     public function translate($message, $textDomain = 'default', $locale = null)
     {
-        if ($message instanceof Message) {
-            $translation = $this->translator->translate($message->getMessage(), $textDomain, $locale);
-            if ($message->hasArgs()) {
-                $translation = sprintf($translation, ...$message->getArgs());
+        if (is_scalar($message)) {
+            return $this->translator->translate((string) $message, $textDomain, $locale);
+        } elseif (is_null($message)) {
+            return '';
+        }
+
+        if (is_object($message)) {
+            // Check PsrMessage first because it is more standard.
+            if ($message instanceof PsrMessage) {
+                // Process translation here to avoid useless sub-call.
+                $translation = $this->translator->translate($message->getMessage(), $textDomain, $locale);
+                if ($message->hasContext()) {
+                    $translation = $message->isSprintFormat()
+                        ? sprintf($translation, ...$message->getArgs())
+                        : $message->interpolate($translation, $message->getContext());
+                }
+                return $translation;
             }
-            return $translation;
+
+            if ($message instanceof Message) {
+                $translation = $this->translator->translate($message->getMessage(), $textDomain, $locale);
+                if ($message->hasArgs()) {
+                    $translation = sprintf($translation, ...$message->getArgs());
+                }
+                return $translation;
+            }
+
+            if (method_exists($message, '__toString')) {
+                return $this->translator->translate((string) $message, $textDomain, $locale);
+            }
         }
 
-        if ($message instanceof PsrMessage) {
-            return $message
-                ->setTranslator($this->translator)
-                ->translate($textDomain, $locale);
-        }
-
-        if (!is_scalar($message)) {
-            throw new InvalidArgumentException('A message to translate should be stringable.'); // @translate
-        }
-
-        return $this->translator->translate((string) $message, $textDomain, $locale);
+        throw new InvalidArgumentException('A message to translate should be stringable.'); // @translate
     }
 }

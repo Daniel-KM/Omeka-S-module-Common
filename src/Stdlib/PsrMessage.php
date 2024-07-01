@@ -161,6 +161,14 @@ class PsrMessage implements \JsonSerializable, PsrInterpolateInterface, Translat
     }
 
     /**
+     * Check if the message uses `sprintf` (old message) or `interpolate` (PSR).
+     */
+    public function isSprintFormat(): bool
+    {
+        return $this->isSprintf;
+    }
+
+    /**
      * Get the contextualized final message, translated if translator is set.
      *
      * The translation is not done automatically for non-PSR messages, managed
@@ -173,7 +181,9 @@ class PsrMessage implements \JsonSerializable, PsrInterpolateInterface, Translat
     {
         // isSprintf is a compatibility with Message, so no translation is done.
         if ($this->isSprintf) {
-            return (string) vsprintf($this->message, array_values($this->context));
+            return $this->context
+                ? (string) vsprintf($this->message, array_values($this->context))
+                : (string) $this->message;
         }
         return $this->isTranslatorEnabled() && $this->hasTranslator()
             ? $this->interpolate($this->translator->translate($this->message), $this->context)
