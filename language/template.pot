@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-17 00:00+0000\n"
+"POT-Creation-Date: 2024-07-01 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/Stdlib/PsrMessage.php:188
+#: src/Stdlib/PsrMessage.php:198
 msgid "default"
 msgstr ""
 
@@ -87,6 +87,10 @@ msgstr ""
 #: src/View/Helper/MediaTypeSelect.php:40
 #: src/Service/Form/Element/MediaTypeSelectFactory.php:28
 msgid "Select media type…"
+msgstr ""
+
+#: src/I18n/Translator.php:50
+msgid "A message to translate should be stringable."
 msgstr ""
 
 #: src/Validator/ReadableDirectory.php:21

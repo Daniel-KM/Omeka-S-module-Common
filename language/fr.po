@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-17 00:00+0000\n"
-"PO-Revision-Date: 2024-06-17 00:00+0000\n"
+"POT-Creation-Date: 2024-07-01 00:00+0000\n"
+"PO-Revision-Date: 2024-07-01 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.2.2\n"
 
-#: src/Stdlib/PsrMessage.php:188
+#: src/Stdlib/PsrMessage.php:198
 msgid "default"
 msgstr "défaut"
 
@@ -101,6 +101,10 @@ msgstr ""
 #: src/Service/Form/Element/MediaTypeSelectFactory.php:28
 msgid "Select media type…"
 msgstr "Choisir un type de média…"
+
+#: src/I18n/Translator.php:50
+msgid "A message to translate should be stringable."
+msgstr "Un message à traduire doit être convertible en chaîne."
 
 #: src/Validator/ReadableDirectory.php:21
 msgid "The path should not contain double dot or be hidden."
