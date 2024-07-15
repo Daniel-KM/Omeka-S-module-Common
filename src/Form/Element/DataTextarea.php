@@ -58,8 +58,7 @@ class DataTextarea extends ArrayTextarea
     {
         if (is_string($array)) {
             return $array;
-        }
-        if (is_null($array)) {
+        } elseif (is_null($array)) {
             return '';
         }
         $textMode = $this->getDataTextMode();
@@ -73,8 +72,7 @@ class DataTextarea extends ArrayTextarea
     {
         if (is_array($string)) {
             return $string;
-        }
-        if (is_null($string)) {
+        } elseif (is_null($string)) {
             return [];
         }
         $textMode = $this->getDataTextMode();
@@ -171,9 +169,10 @@ class DataTextarea extends ArrayTextarea
      * This option allows to get an associative array instead of a simple list
      * for each row and to specify options for each of them.
      * Managed sub-options are:
-     * - separator (string): allow to create a sub-array
+     * - separator (string): allow to explode the string to create a sub-array
      * - associative (string): allow to create an associative sub-array. This
      *   option as no effect for last key when option "last_is_list" is set.
+     * When the value is a string, it's the separator used to get the sub-array.
      *
      * Each specified key will be used as the keys of each part of each line.
      * There is no default keys: in that case, the values are a simple array of
@@ -214,6 +213,7 @@ class DataTextarea extends ArrayTextarea
                 $arrayKeys[$key] = $value;
             }
         }
+
         $this->dataArrayKeys = $arrayKeys;
         $this->dataAssociativeKeys = $associativeKeys;
         return $this;
@@ -265,6 +265,9 @@ class DataTextarea extends ArrayTextarea
         if ($countDataKeys) {
             $arrayKeys = array_intersect_key($this->dataArrayKeys, $this->dataKeys);
             foreach ($array as $values) {
+                if (!is_array($values)) {
+                    $values = (array) $values;
+                }
                 $data = array_replace($this->dataKeys, $values);
                 // Manage sub-values.
                 foreach ($arrayKeys as $arrayKey => $arraySeparator) {
@@ -287,6 +290,9 @@ class DataTextarea extends ArrayTextarea
         // Simple list.
         else {
             foreach ($array as $values) {
+                if (!is_array($values)) {
+                    $values = (array) $values;
+                }
                 $data = array_values($values);
                 $string .= implode(' ' . $this->keyValueSeparator . ' ', array_map('strval', $data)) . "\n";
             }
@@ -309,6 +315,9 @@ class DataTextarea extends ArrayTextarea
                 return $this->arrayToStringByLine($array);
             }
             foreach ($array as $values) {
+                if (!is_array($values)) {
+                    $values = (array) $values;
+                }
                 $data = array_replace($this->dataKeys, $values);
                 // Manage sub-values.
                 foreach ($arrayKeys as $arrayKey => $arraySeparator) {
@@ -335,6 +344,9 @@ class DataTextarea extends ArrayTextarea
         // Simple list.
         else {
             foreach ($array as $values) {
+                if (!is_array($values)) {
+                    $values = (array) $values;
+                }
                 $data = array_values($values);
                 $string .= implode("\n", array_map('strval', $data)) . "\n\n";
             }
