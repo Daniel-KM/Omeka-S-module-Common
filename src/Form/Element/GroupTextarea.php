@@ -6,36 +6,11 @@ use Omeka\Form\Element\ArrayTextarea;
 
 class GroupTextarea extends ArrayTextarea
 {
-    public function setValue($value)
-    {
-        $this->value = $this->arrayToString($value);
-        return $this;
-    }
-
-    public function getInputSpecification(): array
-    {
-        return [
-            'name' => $this->getName(),
-            'required' => false,
-            'allow_empty' => true,
-            'filters' => [
-                [
-                    'name' => \Laminas\Filter\Callback::class,
-                    'options' => [
-                        'callback' => [$this, 'stringToArray'],
-                    ],
-                ],
-            ],
-        ];
-    }
-
     public function arrayToString($array): string
     {
         if (is_string($array)) {
             return $array;
-        }
-
-        if (!count($array)) {
+        } elseif (!$array) {
             return '';
         }
 
@@ -61,9 +36,7 @@ class GroupTextarea extends ArrayTextarea
     {
         if (is_array($string)) {
             return $string;
-        }
-
-        if ($string === '' || is_null($string)) {
+        } elseif ($string === '' || is_null($string)) {
             return [];
         }
 
