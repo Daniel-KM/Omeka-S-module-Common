@@ -15,6 +15,9 @@ class IsHtml extends AbstractHelper
      * Check if a string is a well-formed html with start/end tags for any part.
      * Don't check validity or security.
      *
+     * Because php < 8.4 does not manage html 5, the check is limited to the
+     * html produced by the ckeditor included in Omeka.
+     *
      * Support strings without a root tag, but require a tag for each fragment
      * of the string. So a simple string is not html, even if it contains valid
      * html tags.
@@ -43,7 +46,7 @@ class IsHtml extends AbstractHelper
         if (!$string
             || mb_substr($string, 0, 1) !== '<'
             || mb_substr($string, -1) !== '>'
-            // TODO Is it really a quick check to use strip_tags before domdocument?
+            // TODO Is it really a quick check to use strip_tags before simplexml?
             || $string === strip_tags($string)
         ) {
             return false;
@@ -56,22 +59,25 @@ class IsHtml extends AbstractHelper
         // Normally, libXml add missing html/body, etc., except with flags
         // LIBXML_HTML_NOIMPLIED and LIBXML_HTML_NODEFDTD,
         // but it work better when manually added.
-        if (mb_substr($string, 0, 9) !== '<!DOCTYPE'
+        if (mb_substr($string, 0, 2) !== '<?'
+            && mb_substr($string, 0, 2) !== '<!'
             && mb_substr($string, 0, 5) !== '<html'
             && mb_substr($string, -7) !== '</html>'
+            && mb_substr($string, 0, 5) !== '<body'
+            && mb_substr($string, -7) !== '</body>'
         ) {
-            $string = '<html>' . $string . '</html>';
+            $string = '<html><body>' . $string . '</body></html>';
         }
 
         libxml_use_internal_errors(true);
         libxml_clear_errors();
-        $dom = new \DOMDocument();
-        $result = $dom->loadHTML(
+        $simpleXml = simplexml_load_string(
             $string,
+            'SimpleXMLElement',
             LIBXML_COMPACT | LIBXML_NONET
         );
 
-        return $result
+        return $simpleXml !== false
             && !count(libxml_get_errors());
     }
 }
