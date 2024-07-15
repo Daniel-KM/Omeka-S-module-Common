@@ -31,6 +31,7 @@ return [
     'view_helpers' => [
         'invokables' => [
             'isHomePage' => View\Helper\IsHomePage::class,
+            'isXml' => View\Helper\IsXml::class,
             // Required to manage PsrMessage.
             'messages' => View\Helper\Messages::class,
         ],
