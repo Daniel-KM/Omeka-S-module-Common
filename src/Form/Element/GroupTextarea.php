@@ -6,6 +6,25 @@ use Omeka\Form\Element\ArrayTextarea;
 
 class GroupTextarea extends ArrayTextarea
 {
+    /**
+     * The default group name must contain a "%s" to set the group number.
+     *
+     *@var string
+     */
+    protected $defaultGroupName = '';
+
+    /**
+     * @param array $options
+     */
+    public function setOptions($options)
+    {
+        parent::setOptions($options);
+        if (array_key_exists('default_group_name', $this->options)) {
+            $this->setDefaultGroupName($this->options['default_group_name']);
+        }
+        return $this;
+    }
+
     public function arrayToString($array): string
     {
         if (is_string($array)) {
@@ -57,7 +76,9 @@ class GroupTextarea extends ArrayTextarea
             } elseif ($id === 0) {
                 ++$id;
                 // Set a default group name when missing.
-                $groupName = sprintf('Group %d', $id); // $translate
+                $groupName = strpos($this->defaultGroupName, '%s') === false
+                    ? (string) $id
+                    : sprintf($this->defaultGroupName, (string) $id);
             }
             if ($this->asKeyValue) {
                 if (strpos($cleanString, $this->keyValueSeparator) === false) {
@@ -72,5 +93,24 @@ class GroupTextarea extends ArrayTextarea
             }
         }
         return $groupsArray;
+    }
+
+    /**
+     * Set the option to indicate the default group name. It must contains "%s".
+     *
+     * @param string $defaultGroupName
+     */
+    public function setDefaultGroupName($defaultGroupName): self
+    {
+        $this->defaultGroupName = (string) $defaultGroupName;
+        return $this;
+    }
+
+    /**
+     * Set the option to indicate the default group name.
+     */
+    public function getDefaultGroupName(): string
+    {
+        return $this->defaultGroupName;
     }
 }
