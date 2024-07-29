@@ -39,6 +39,7 @@ use Laminas\I18n\Translator\TranslatorAwareTrait;
  *
  * @todo Set translator on construct.
  * @todo Move PsrMessage into core.
+ * @fixme When a translator is set to a message during upgrade, it cannot be displayed via messenger because it cannot be serialized in session: PHP Fatal error:  Uncaught Exception: Serialization of 'Closure' is not allowed in /vendor/laminas/laminas-session/src/SessionManager.php:240.
  *
  * @see \Omeka\Stdlib\Message
  */
@@ -198,8 +199,7 @@ class PsrMessage implements \JsonSerializable, PsrInterpolateInterface, Translat
     public function translate($textDomain = 'default', $locale = null): string
     {
         // Check isTranslatorEnabled here? No: the check should be done outside
-        // of translate. Anyway, the default value is true and is is never
-        // checked.
+        // of translate. Anyway, the default value is true and is never checked.
         if ($this->hasTranslator()) {
             return $this->isSprintf
                 ? (string) vsprintf($this->translator->translate($this->message, $textDomain, $locale), array_values($this->context))
