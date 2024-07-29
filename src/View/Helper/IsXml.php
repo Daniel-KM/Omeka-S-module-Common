@@ -61,7 +61,7 @@ class IsXml extends AbstractHelper
         libxml_use_internal_errors(true);
         libxml_clear_errors();
         $simpleXml = simplexml_load_string(
-            $string,
+            html_entity_decode($string, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401),
             'SimpleXMLElement',
             LIBXML_COMPACT | LIBXML_NONET | LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
         );
