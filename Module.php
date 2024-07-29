@@ -139,6 +139,13 @@ SQL;
         }
 
         try {
+            $connection->executeStatement('ALTER TABLE `resource` ADD INDEX `resource_type` (`resource_type`);');
+            $hasNewIndex = true;
+        } catch (\Exception $e) {
+            // Index exists.
+        }
+
+        try {
             $connection->executeStatement('ALTER TABLE `value` ADD INDEX `type` (`type`);');
             $hasNewIndex = true;
         } catch (\Exception $e) {
