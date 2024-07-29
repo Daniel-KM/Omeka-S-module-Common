@@ -15,7 +15,7 @@ use Laminas\InputFilter\InputProviderInterface;
  * @uses \Laminas\Config\Writer\Ini
  *
  * Warning: a few characters in keys are not supported.
- * Warning: the mode to get typed values from ini is not set by default.
+ * Warning: the mode to get typed values from ini is set by default.
  *
  * @todo Add an option to manage required keys by section.
  */
@@ -53,11 +53,27 @@ class IniTextarea extends Textarea implements InputProviderInterface
      * into true, false, null and integers. This option is used only for
      * parsing, not storing.
      *
+     * Unlike parse_ini_file and Laminas Ini Reader, the typed mode is set by
+     * default, because this is the way ini files are used most of the time.
+     *
      * @see https://www.php.net/parse_ini_file
      * @var bool
      */
-    protected $typedMode = false;
+    protected $typedMode = true;
 
+    /**
+     * Specific options:
+     *
+     * - ini_nest_separator (string): default is "."
+     * - ini_process_sections (bool): default is true
+     * - ini_render_without_sections (bool): default is false
+     * - ini_typed_mode (bool): default is true, so the strings without double
+     *   quotes "true", "on", "yes", "false", "off", "no", "none", "null" and
+     *   numeric strings are converted into true, false, null and integers.
+     *
+     * {@inheritDoc}
+     * @see \Laminas\Form\Element::setOptions()
+     */
     public function setOptions($options)
     {
         parent::setOptions($options);
@@ -255,6 +271,9 @@ class IniTextarea extends Textarea implements InputProviderInterface
      * "false", "off", "no", "none", "null" and numeric strings are converted
      * into true, false, null and integers. This option is used only for
      * parsing, not storing.
+     *
+     * Unlike parse_ini_file and Laminas Ini Reader, the typed mode is set by
+     * default, because this is the way ini files are used most of the time.
      *
      * @see https://www.php.net/parse_ini_file
      */
