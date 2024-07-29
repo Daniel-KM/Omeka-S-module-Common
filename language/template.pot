@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-01 00:00+0000\n"
+"POT-Creation-Date: 2024-07-29 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/Stdlib/PsrMessage.php:198
+#: src/Stdlib/PsrMessage.php:199
 msgid "default"
 msgstr ""
 
@@ -93,6 +93,18 @@ msgstr ""
 msgid "A message to translate should be stringable."
 msgstr ""
 
+#: src/Validator/Ini.php:28
+msgid "The string is not formatted as ini"
+msgstr ""
+
+#: src/Validator/Ini.php:29
+msgid "The string is incorrectly formatted"
+msgstr ""
+
+#: src/Validator/Ini.php:30
+msgid "Invalid type given. String expected"
+msgstr ""
+
 #: src/Validator/ReadableDirectory.php:21
 msgid "The path should not contain double dot or be hidden."
 msgstr ""
@@ -115,6 +127,10 @@ msgstr ""
 
 #: src/Form/Element/AbstractGroupBySiteSelect.php:151
 msgid "[No site]"
+msgstr ""
+
+#: src/Form/Element/IniTextarea.php:106
+msgid "Invalid ini string"
 msgstr ""
 
 #: src/File/Validator.php:29
