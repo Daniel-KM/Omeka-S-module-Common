@@ -53,6 +53,7 @@ return [
             Form\Element\ArrayText::class => Form\Element\ArrayText::class,
             Form\Element\DataTextarea::class => Form\Element\DataTextarea::class,
             Form\Element\GroupTextarea::class => Form\Element\GroupTextarea::class,
+            Form\Element\IniTextarea::class => Form\Element\IniTextarea::class,
             Form\Element\OptionalCheckbox::class => Form\Element\OptionalCheckbox::class,
             Form\Element\OptionalDate::class => Form\Element\OptionalDate::class,
             Form\Element\OptionalDateTime::class => Form\Element\OptionalDateTime::class,
@@ -61,7 +62,6 @@ return [
             Form\Element\OptionalRadio::class => Form\Element\OptionalRadio::class,
             Form\Element\OptionalSelect::class => Form\Element\OptionalSelect::class,
             Form\Element\OptionalUrl::class => Form\Element\OptionalUrl::class,
-            Form\Element\IniTextarea::class => Form\Element\IniTextarea::class,
             Form\Element\UrlQuery::class => Form\Element\UrlQuery::class,
         ],
         'factories' => [
@@ -104,6 +104,7 @@ return [
     ],
     'validators' => [
         'invokables' => [
+            'ini' => Validator\Ini::class,
             'readableDirectory' => Validator\ReadableDirectory::class,
         ],
     ],

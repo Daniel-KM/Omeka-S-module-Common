@@ -15,6 +15,9 @@ use Laminas\InputFilter\InputProviderInterface;
  * @uses \Laminas\Config\Writer\Ini
  *
  * Warning: a few characters in keys are not supported.
+ * Warning: the mode to get typed values from ini is not set by default.
+ *
+ * @todo Add an option to manage required keys by section.
  */
 class IniTextarea extends Textarea implements InputProviderInterface
 {
@@ -44,6 +47,11 @@ class IniTextarea extends Textarea implements InputProviderInterface
     /**
      * Flag which determines whether boolean, null, and integer values should be
      * returned as their proper types.
+     *
+     * Warning: when set, the strings without double quotes "true", "on", "yes",
+     * "false", "off", "no", "none", "null" and numeric strings are converted
+     * into true, false, null and integers. This option is used only for
+     * parsing, not storing.
      *
      * @see https://www.php.net/parse_ini_file
      * @var bool
@@ -84,7 +92,19 @@ class IniTextarea extends Textarea implements InputProviderInterface
                 [
                     'name' => \Laminas\Filter\Callback::class,
                     'options' => [
-                        'callback' => [$this, 'stringToArray'],
+                        'callback' => [$this, 'filterStringToArray'],
+                    ],
+                ],
+            ],
+            'validators' => [
+                [
+                    'name' => \Laminas\Validator\Callback::class,
+                    'options' => [
+                        'callback' => [$this, 'validateIni'],
+                        'callbackOptions' => [
+                            'context_key' => $this->getName(),
+                        ],
+                        'message' => 'Invalid ini string', // @translate
                     ],
                 ],
             ],
@@ -92,9 +112,20 @@ class IniTextarea extends Textarea implements InputProviderInterface
     }
 
     /**
+     * Convert a string formatted as "ini" into an array.
+     *
+     * If the value provided is not a a valid input, the value will remain
+     * unfiltered, as any laminas filter.
+     */
+    public function filterStringToArray($string)
+    {
+        return $this->stringToArray($string) ?? $string;
+    }
+
+    /**
      * Convert an array into a string formatted as "ini".
      */
-    public function arrayToString($array): string
+    public function arrayToString($array): ?string
     {
         if (is_string($array)) {
             return $array;
@@ -110,7 +141,7 @@ class IniTextarea extends Textarea implements InputProviderInterface
         try {
             $result = $writer->toString($array);
         } catch (Exception\InvalidArgumentException $e) {
-            return '';
+            return null;
         }
 
         return (string) $result;
@@ -119,7 +150,7 @@ class IniTextarea extends Textarea implements InputProviderInterface
     /**
      * Convert a string formatted as "ini" into an array.
      */
-    public function stringToArray($string): array
+    public function stringToArray($string): ?array
     {
         if (is_array($string)) {
             return $string;
@@ -136,11 +167,22 @@ class IniTextarea extends Textarea implements InputProviderInterface
         try {
             $result = $reader->fromString($string);
         } catch (Exception\RuntimeException $e) {
-            return [];
+            return null;
         }
 
         // Result may be boolean.
-        return is_array($result) ? $result : [];
+        return is_array($result)
+            ? $result
+            : null;
+    }
+
+    public function validateIni($value, ?array $context = null, ?string $contextKey = null): bool
+    {
+        if (!isset($context) || !isset($contextKey)) {
+            return (new \Common\Validator\Ini())->isValid($value);
+        }
+        return isset($context[$contextKey])
+            && (new \Common\Validator\Ini())->isValid($context[$contextKey]);
     }
 
     /**
@@ -208,6 +250,11 @@ class IniTextarea extends Textarea implements InputProviderInterface
     /**
      * Set whether boolean, null, and integer values should be returned as their proper types.
      * When set to false, all values will be returned as strings.
+     *
+     * Warning: when set, the strings without double quotes "true", "on", "yes",
+     * "false", "off", "no", "none", "null" and numeric strings are converted
+     * into true, false, null and integers. This option is used only for
+     * parsing, not storing.
      *
      * @see https://www.php.net/parse_ini_file
      */
