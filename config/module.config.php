@@ -5,7 +5,7 @@ namespace Common;
 return [
     'service_manager' => [
         'factories' => [
-            'EasyMeta' => Service\Stdlib\EasyMetaFactory::class,
+            'Common\EasyMeta' => Service\Stdlib\EasyMetaFactory::class,
             // TODO Use a delegator for file, dispatcher and logger factories? A direct factory is simpler for the same result for these services.
             'Omeka\File\TempFileFactory' => Service\File\TempFileFactoryFactory::class,
             'Omeka\File\Validator' => Service\File\ValidatorFactory::class,
@@ -18,6 +18,10 @@ return [
             'Laminas\I18n\Translator\TranslatorInterface' => [
                 __NAMESPACE__ => Service\Delegator\TranslatorDelegatorFactory::class,
             ],
+        ],
+        'aliases' => [
+            // Deprecated alias: use "Common\EasyMeta" instead.
+            'EasyMeta' => 'Common\EasyMeta',
         ],
     ],
     'view_manager' => [

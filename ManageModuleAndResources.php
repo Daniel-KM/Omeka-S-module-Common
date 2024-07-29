@@ -61,7 +61,7 @@ class ManageModuleAndResources
         $this->services = $services;
         // The api plugin allows to search one resource without throwing error.
         $this->api = $services->get('ControllerPluginManager')->get('api');
-        $this->easyMeta = $services->get('EasyMeta');
+        $this->easyMeta = $services->get('Common\EasyMeta');
     }
 
     /**

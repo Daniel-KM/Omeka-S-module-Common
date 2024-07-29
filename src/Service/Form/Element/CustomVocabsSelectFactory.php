@@ -15,6 +15,6 @@ class CustomVocabsSelectFactory implements FactoryInterface
         // And this request is already available through EasyMeta.
         $element = new CustomVocabsSelect(null, $options ?? []);
         return $element
-            ->setEasyMeta($services->get('EasyMeta'));
+            ->setEasyMeta($services->get('Common\EasyMeta'));
     }
 }
