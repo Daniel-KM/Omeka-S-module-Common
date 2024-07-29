@@ -618,11 +618,14 @@ class EasyMeta
         if (is_null(static::$propertyIdsByTermsAndIds)) {
             $this->initProperties();
         }
-        if (is_null($termsOrIds)) {
-            return static::$propertyIdsByTerms;
+        if (!$termsOrIds) {
+            return $termsOrIds === null
+                ? static::$propertyIdsByTerms
+                : [];
         }
         if (is_scalar($termsOrIds)) {
-            $termsOrIds = [$termsOrIds];
+            $result = static::$propertyIdsByTermsAndIds[$termsOrIds] ?? null;
+            return $result ? [$termsOrIds => $result] : [];
         }
         return array_intersect_key(static::$propertyIdsByTermsAndIds, array_flip($termsOrIds));
     }
@@ -640,11 +643,14 @@ class EasyMeta
         if (is_null(static::$propertyIdsByTermsAndIdsUsed)) {
             $this->initPropertiesUsed();
         }
-        if (is_null($termsOrIds)) {
-            return array_diff_key(static::$propertyIdsByTermsAndIdsUsed, array_flip(static::$propertyIdsByTermsAndIdsUsed));
+        if (!$termsOrIds) {
+            return $termsOrIds === null
+                ? array_diff_key(static::$propertyIdsByTermsAndIdsUsed, array_flip(static::$propertyIdsByTermsAndIdsUsed))
+                : [];
         }
         if (is_scalar($termsOrIds)) {
-            $termsOrIds = [$termsOrIds];
+            $result = static::$propertyIdsByTermsAndIdsUsed[$termsOrIds] ?? null;
+            return $result ? [$termsOrIds => $result] : [];
         }
         return array_intersect_key(static::$propertyIdsByTermsAndIdsUsed, array_flip($termsOrIds));
     }
@@ -681,8 +687,10 @@ class EasyMeta
         if (is_null(static::$propertyIdsByTermsAndIds)) {
             $this->initProperties();
         }
-        if (is_null($termsOrIds)) {
-            return array_flip(static::$propertyIdsByTerms);
+        if (!$termsOrIds) {
+            return $termsOrIds === null
+                ? array_flip(static::$propertyIdsByTerms)
+                : [];
         }
         if (is_scalar($termsOrIds)) {
             $termsOrIds = [$termsOrIds];
@@ -720,11 +728,14 @@ class EasyMeta
         if (is_null(static::$propertyLabelsByTerms)) {
             $this->initProperties();
         }
-        if (is_null($termsOrIds)) {
-            return static::$propertyLabelsByTerms;
+        if (!$termsOrIds) {
+            return $termsOrIds === null
+                ? static::$propertyLabelsByTerms
+                : [];
         }
         if (is_scalar($termsOrIds)) {
-            $termsOrIds = [$termsOrIds];
+            $result = static::$propertyLabelsByTermsAndIds[$termsOrIds] ?? null;
+            return $result ? [$termsOrIds => $result] : [];
         }
         return array_intersect_key(static::$propertyLabelsByTermsAndIds, array_flip($termsOrIds));
     }
@@ -756,11 +767,14 @@ class EasyMeta
         if (is_null(static::$resourceClassIdsByTermsAndIds)) {
             $this->initResourceClasses();
         }
-        if (is_null($termsOrIds)) {
-            return static::$resourceClassIdsByTerms;
+        if (!$termsOrIds) {
+            return $termsOrIds === null
+                ? static::$resourceClassIdsByTerms
+                : [];
         }
         if (is_scalar($termsOrIds)) {
-            $termsOrIds = [$termsOrIds];
+            $result = static::$resourceClassIdsByTermsAndIds[$termsOrIds] ?? null;
+            return $result ? [$termsOrIds => $result] : [];
         }
         return array_intersect_key(static::$resourceClassIdsByTermsAndIds, array_flip($termsOrIds));
     }
@@ -778,11 +792,14 @@ class EasyMeta
         if (is_null(static::$resourceClassIdsByTermsAndIdsUsed)) {
             $this->initResourceClassesUsed();
         }
-        if (is_null($termsOrIds)) {
-            return array_diff_key(static::$resourceClassIdsByTermsAndIdsUsed, array_flip(static::$resourceClassIdsByTermsAndIdsUsed));
+        if (!$termsOrIds) {
+            return $termsOrIds === null
+                ? array_diff_key(static::$resourceClassIdsByTermsAndIdsUsed, array_flip(static::$resourceClassIdsByTermsAndIdsUsed))
+                : [];
         }
         if (is_scalar($termsOrIds)) {
-            $termsOrIds = [$termsOrIds];
+            $result = static::$resourceClassIdsByTermsAndIdsUsed[$termsOrIds] ?? null;
+            return $result ? [$termsOrIds => $result] : [];
         }
         return array_intersect_key(static::$resourceClassIdsByTermsAndIdsUsed, array_flip($termsOrIds));
     }
@@ -818,8 +835,10 @@ class EasyMeta
         if (is_null(static::$resourceClassIdsByTermsAndIds)) {
             $this->initResourceClasses();
         }
-        if (is_null($termsOrIds)) {
-            return array_flip(static::$resourceClassIdsByTerms);
+        if (!$termsOrIds) {
+            return $termsOrIds === null
+                ? array_flip(static::$resourceClassIdsByTerms)
+                : [];
         }
         if (is_scalar($termsOrIds)) {
             $termsOrIds = [$termsOrIds];
@@ -857,11 +876,14 @@ class EasyMeta
         if (is_null(static::$resourceClassLabelsByTerms)) {
             $this->initResourceClasses();
         }
-        if (is_null($termsOrIds)) {
-            return static::$resourceClassLabelsByTerms;
+        if (!$termsOrIds) {
+            return $termsOrIds === null
+                ? static::$resourceClassLabelsByTerms
+                : [];
         }
         if (is_scalar($termsOrIds)) {
-            $termsOrIds = [$termsOrIds];
+            $result = static::$resourceClassLabelsByTermsAndIds[$termsOrIds] ?? null;
+            return $result ? [$termsOrIds => $result] : [];
         }
         $terms = $this->resourceClassTerms($termsOrIds);
         return array_intersect_key(static::$resourceClassLabelsByTermsAndIds, array_flip($terms));
@@ -894,11 +916,14 @@ class EasyMeta
         if (is_null(static::$resourceTemplateIdsByLabelsAndIds)) {
             $this->initResourceTemplates();
         }
-        if (is_null($labelsOrIds)) {
-            return static::$resourceTemplateByLabels;
+        if (!$labelsOrIds) {
+            return $labelsOrIds === null
+                ? static::$resourceTemplateIdsByLabels
+                : [];
         }
         if (is_scalar($labelsOrIds)) {
-            $labelsOrIds = [$labelsOrIds];
+            $result = static::$resourceTemplateIdsByLabelsAndIds[$labelsOrIds] ?? null;
+            return $result ? [$labelsOrIds => $result] : [];
         }
         return array_intersect_key(static::$resourceTemplateIdsByLabelsAndIds, array_flip($labelsOrIds));
     }
@@ -916,11 +941,14 @@ class EasyMeta
         if (is_null(static::$resourceTemplateIdsByLabelsAndIdsUsed)) {
             $this->initResourceTemplatesUsed();
         }
-        if (is_null($labelsOrIds)) {
-            return array_diff_key(static::$resourceTemplateIdsByLabelsAndIdsUsed, array_flip(static::$resourceTemplateIdsByLabelsAndIdsUsed));
+        if (!$labelsOrIds) {
+            return $labelsOrIds === null
+                ? array_diff_key(static::$resourceTemplateIdsByLabelsAndIdsUsed, array_flip(static::$resourceTemplateIdsByLabelsAndIdsUsed))
+                : [];
         }
         if (is_scalar($labelsOrIds)) {
-            $labelsOrIds = [$labelsOrIds];
+            $result = static::$resourceTemplateIdsByLabelsAndIdsUsed[$labelsOrIds] ?? null;
+            return $result ? [$labelsOrIds => $result] : [];
         }
         return array_intersect_key(static::$resourceTemplateIdsByLabelsAndIdsUsed, array_flip($labelsOrIds));
     }
@@ -952,11 +980,14 @@ class EasyMeta
         if (is_null(static::$resourceTemplateIdsByLabelsAndIds)) {
             $this->initResourceTemplates();
         }
-        if (is_null($labelsOrIds)) {
-            return array_flip(static::$resourceTemplateIdsByLabels);
+        if (!$labelsOrIds) {
+            return $labelsOrIds === null
+                ? array_flip(static::$resourceTemplateIdsByLabels)
+                : [];
         }
         if (is_scalar($labelsOrIds)) {
-            $labelsOrIds = [$labelsOrIds];
+            $result = static::$resourceTemplateIdsByLabelsAndIds[$labelsOrIds] ?? null;
+            return $result ? [$labelsOrIds => $result] : [];
         }
         // TODO Keep original order.
         return array_intersect_key(static::$resourceTemplateLabelsByLabelsAndIds, array_flip($labelsOrIds));
@@ -992,8 +1023,10 @@ class EasyMeta
         if (is_null(static::resourceTemplateClassesByIds)) {
             $this->initResourceTemplateClasses();
         }
-        if (is_null($labelsOrIds)) {
-            return static::resourceTemplateClassesByIds;
+        if (!$labelsOrIds) {
+            return $labelsOrIds === null
+                ? static::resourceTemplateClassesByIds
+                : [];
         }
         if (is_scalar($labelsOrIds)) {
             $labelsOrIds = [$labelsOrIds];
@@ -1034,8 +1067,10 @@ class EasyMeta
         if (is_null(static::$vocabularyIdsByPrefixesAndUrisAndIds)) {
             $this->initVocabularies();
         }
-        if (is_null($prefixesOrUrisOrIds)) {
-            return static::$vocabularyIdsByPrefixes;
+        if (!$prefixesOrUrisOrIds) {
+            return $prefixesOrUrisOrIds === null
+                ? static::$vocabularyIdsByPrefixes
+                : [];
         }
         if (is_scalar($prefixesOrUrisOrIds)) {
             $prefixesOrUrisOrIds = [$prefixesOrUrisOrIds];
@@ -1078,8 +1113,10 @@ class EasyMeta
         if (is_null(static::$vocabularyIdsByPrefixesAndUrisAndIds)) {
             $this->initVocabularies();
         }
-        if (is_null($prefixesOrUrisOrIds)) {
-            return array_flip(static::$vocabularyIdsByPrefixes);
+        if (!$prefixesOrUrisOrIds) {
+            return $prefixesOrUrisOrIds === null
+                ? array_flip(static::$vocabularyIdsByPrefixes)
+                : [];
         }
         if (is_scalar($prefixesOrUrisOrIds)) {
             $prefixesOrUrisOrIds = [$prefixesOrUrisOrIds];
@@ -1123,8 +1160,10 @@ class EasyMeta
         if (is_null(static::$vocabularyIdsByPrefixesAndUrisAndIds)) {
             $this->initVocabularies();
         }
-        if (is_null($prefixesOrUrisOrIds)) {
-            return array_combine(array_keys(static::$vocabularyIdsByPrefixes), array_keys(static::$vocabularyIdsByUris));
+        if (!$prefixesOrUrisOrIds) {
+            return $prefixesOrUrisOrIds === null
+                ? array_combine(array_keys(static::$vocabularyIdsByPrefixes), array_keys(static::$vocabularyIdsByUris))
+                : [];
         }
         if (is_scalar($prefixesOrUrisOrIds)) {
             $prefixesOrUrisOrIds = [$prefixesOrUrisOrIds];
@@ -1162,8 +1201,10 @@ class EasyMeta
         if (is_null(static::$vocabularyLabelsByPrefixesAndUrisAndIds)) {
             $this->initVocabularies();
         }
-        if (is_null($prefixesOrUrisOrIds)) {
-            return array_intersect_key(static::$vocabularyLabelsByPrefixesAndUrisAndIds, static::$vocabularyIdsByPrefixes);
+        if (!$prefixesOrUrisOrIds) {
+            return $prefixesOrUrisOrIds === null
+                ? array_intersect_key(static::$vocabularyLabelsByPrefixesAndUrisAndIds, static::$vocabularyIdsByPrefixes)
+                : [];
         }
         if (is_scalar($prefixesOrUrisOrIds)) {
             $prefixesOrUrisOrIds = [$prefixesOrUrisOrIds];
