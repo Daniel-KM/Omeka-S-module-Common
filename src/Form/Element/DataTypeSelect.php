@@ -43,7 +43,7 @@ class DataTypeSelect extends Select
                     'resource:item',
                     'resource:itemset',
                     'resource:media',
-                    'resource:annotation'
+                    'resource:annotation',
                 ])
                     ? 'options'
                     : 'optgroupOptions';

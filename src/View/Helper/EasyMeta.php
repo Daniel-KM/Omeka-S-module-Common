@@ -71,7 +71,7 @@ class EasyMeta extends AbstractHelper
      * @method string|null vocabularyLabel($prefixesOrUrisOrIds)
      * @method array vocabularyLabels($prefixesOrUrisOrIds = null)
      */
-    public function __call(string $name , array $arguments)
+    public function __call(string $name, array $arguments)
     {
         return $this->easyMeta->$name(...$arguments);
     }

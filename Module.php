@@ -28,14 +28,14 @@ class Module extends AbstractModule
         return require __DIR__ . '/config/module.config.php';
     }
 
-    public function install(ServiceLocatorInterface $services)
+    public function install(ServiceLocatorInterface $services): void
     {
         $this->setServiceLocator($services);
         $this->fixIndexes();
         $this->checkGeneric();
     }
 
-    public function upgrade($oldVersion, $newVersion, ServiceLocatorInterface $services)
+    public function upgrade($oldVersion, $newVersion, ServiceLocatorInterface $services): void
     {
         $this->setServiceLocator($services);
         $filepath = __DIR__ . '/data/scripts/upgrade.php';
@@ -47,7 +47,7 @@ class Module extends AbstractModule
      *
      * See migration 20240219000000_AddIndexMediaType.
      */
-    protected function fixIndexes()
+    protected function fixIndexes(): void
     {
         // Early fix media_type index and other common indexes.
         // See migration 20240219000000_AddIndexMediaType.
