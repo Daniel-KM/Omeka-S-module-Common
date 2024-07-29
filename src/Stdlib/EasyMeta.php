@@ -272,6 +272,11 @@ class EasyMeta
     /**
      * @var array
      */
+    protected static $propertyTermsByTermsAndIds;
+
+    /**
+     * @var array
+     */
     protected static $propertyLabelsByTerms;
 
     /**
@@ -293,6 +298,11 @@ class EasyMeta
      * @var array
      */
     protected static $resourceClassIdsByTermsAndIdsUsed;
+
+    /**
+     * @var array
+     */
+    protected static $resourceClassTermsByTermsAndIds;
 
     /**
      * @var array
@@ -611,7 +621,7 @@ class EasyMeta
      * @param array|int|string|null $termsOrIds One or multiple ids or terms.
      * @return int[] The property ids matching terms or ids, or all properties
      * by terms. When the input contains terms and ids matching the same
-     * properties, they are all returned.
+     * properties, they are all returned. Input order is kept.
      */
     public function propertyIds($termsOrIds = null): array
     {
@@ -627,7 +637,11 @@ class EasyMeta
             $result = static::$propertyIdsByTermsAndIds[$termsOrIds] ?? null;
             return $result ? [$termsOrIds => $result] : [];
         }
-        return array_intersect_key(static::$propertyIdsByTermsAndIds, array_flip($termsOrIds));
+        // Most of the times, only some terms are searched, so reorder them by
+        // default because it is very quick.
+        $searchKeys = array_flip($termsOrIds);
+        $result = array_intersect_key(static::$propertyIdsByTermsAndIds, $searchKeys);
+        return array_replace(array_intersect_key($searchKeys, $result), $result);
     }
 
     /**
@@ -636,7 +650,7 @@ class EasyMeta
      * @param array|int|string|null $termsOrIds One or multiple ids or terms.
      * @return int[] The used property ids matching terms or ids, or all
      * used properties by terms. When the input contains terms and ids matching
-     * the same properties, they are all returned.
+     * the same properties, they are all returned. Input order is kept.
      */
     public function propertyIdsUsed($termsOrIds = null): array
     {
@@ -652,7 +666,11 @@ class EasyMeta
             $result = static::$propertyIdsByTermsAndIdsUsed[$termsOrIds] ?? null;
             return $result ? [$termsOrIds => $result] : [];
         }
-        return array_intersect_key(static::$propertyIdsByTermsAndIdsUsed, array_flip($termsOrIds));
+        // Most of the times, only some terms are searched, so reorder them by
+        // default because it is very quick.
+        $searchKeys = array_flip($termsOrIds);
+        $result = array_intersect_key(static::$propertyIdsByTermsAndIdsUsed, $searchKeys);
+        return array_replace(array_intersect_key($searchKeys, $result), $result);
     }
 
     /**
@@ -680,7 +698,7 @@ class EasyMeta
      * @param array|int|string|null $termsOrIds One or multiple ids or terms.
      * @return string[] The property terms matching terms or ids, or all
      * properties by ids. When the input contains terms and ids matching the
-     * same properties, they are all returned.
+     * same properties, they are all returned. Input order is kept.
      */
     public function propertyTerms($termsOrIds = null): array
     {
@@ -692,11 +710,20 @@ class EasyMeta
                 ? array_flip(static::$propertyIdsByTerms)
                 : [];
         }
-        if (is_scalar($termsOrIds)) {
-            $termsOrIds = [$termsOrIds];
+        if (is_null(static::$propertyTermsByTermsAndIds)) {
+            $propertyTermsByIds = array_flip(static::$propertyIdsByTerms);
+            static::$propertyTermsByTermsAndIds = array_combine($propertyTermsByIds, $propertyTermsByIds)
+                + $propertyTermsByIds;
         }
-        // TODO Keep original order.
-        return array_intersect_key(static::$propertyIdsByTermsAndIds, array_flip($termsOrIds));
+        if (is_scalar($termsOrIds)) {
+            $result = static::$propertyTermsByTermsAndIds[$termsOrIds] ?? null;
+            return $result ? [$termsOrIds => $result] : [];
+        }
+        // Most of the times, only some terms are searched, so reorder them by
+        // default because it is very quick.
+        $searchKeys = array_flip($termsOrIds);
+        $result = array_intersect_key(static::$propertyTermsByTermsAndIds, $searchKeys);
+        return array_replace(array_intersect_key($searchKeys, $result), $result);
     }
 
     /**
@@ -737,6 +764,7 @@ class EasyMeta
             $result = static::$propertyLabelsByTermsAndIds[$termsOrIds] ?? null;
             return $result ? [$termsOrIds => $result] : [];
         }
+        // TODO Keep original order.
         return array_intersect_key(static::$propertyLabelsByTermsAndIds, array_flip($termsOrIds));
     }
 
@@ -760,7 +788,7 @@ class EasyMeta
      * @param array|int|string|null $termsOrIds One or multiple ids or terms.
      * @return int[] The resource class ids matching terms or ids, or all
      * resource classes by terms. When the input contains terms and ids matching
-     * the same resource classes, they are all returned.
+     * the same resource classes, they are all returned. Input order is kept.
      */
     public function resourceClassIds($termsOrIds = null): array
     {
@@ -776,7 +804,11 @@ class EasyMeta
             $result = static::$resourceClassIdsByTermsAndIds[$termsOrIds] ?? null;
             return $result ? [$termsOrIds => $result] : [];
         }
-        return array_intersect_key(static::$resourceClassIdsByTermsAndIds, array_flip($termsOrIds));
+        // Most of the times, only some terms are searched, so reorder them by
+        // default because it is very quick.
+        $searchKeys = array_flip($termsOrIds);
+        $result = array_intersect_key(static::$resourceClassIdsByTermsAndIds, $searchKeys);
+        return array_replace(array_intersect_key($searchKeys, $result), $result);
     }
 
     /**
@@ -785,7 +817,8 @@ class EasyMeta
      * @param array|int|string|null $termsOrIds One or multiple ids or terms.
      * @return int[] The used resource class ids matching terms or ids, or all
      * used resource classes by terms. When the input contains terms and ids
-     * matching the same resource classes, they are all returned.
+     * matching the same resource classes, they are all returned. Input order is
+     * kept.
      */
     public function resourceClassIdsUsed($termsOrIds = null): array
     {
@@ -801,7 +834,11 @@ class EasyMeta
             $result = static::$resourceClassIdsByTermsAndIdsUsed[$termsOrIds] ?? null;
             return $result ? [$termsOrIds => $result] : [];
         }
-        return array_intersect_key(static::$resourceClassIdsByTermsAndIdsUsed, array_flip($termsOrIds));
+        // Most of the times, only some terms are searched, so reorder them by
+        // default because it is very quick.
+        $searchKeys = array_flip($termsOrIds);
+        $result = array_intersect_key(static::$resourceClassIdsByTermsAndIdsUsed, $searchKeys);
+        return array_replace(array_intersect_key($searchKeys, $result), $result);
     }
 
     /**
@@ -828,7 +865,8 @@ class EasyMeta
      *
      * @param array|int|string|null $termsOrIds One or multiple ids or terms.
      * @return string[] The resource class terms matching terms or ids, or all
-     * resource classes by ids.
+     * resource classes by ids. When the input contains terms and ids matching
+     * the same resource classes, they are all returned. Input order is kept.
      */
     public function resourceClassTerms($termsOrIds = null): array
     {
@@ -840,11 +878,20 @@ class EasyMeta
                 ? array_flip(static::$resourceClassIdsByTerms)
                 : [];
         }
-        if (is_scalar($termsOrIds)) {
-            $termsOrIds = [$termsOrIds];
+        if (is_null(static::$resourceClassTermsByTermsAndIds)) {
+            $resourceClassTermsByIds = array_flip(static::$resourceClassIdsByTerms);
+            static::$resourceClassTermsByTermsAndIds = array_combine($resourceClassTermsByIds, $resourceClassTermsByIds)
+                + $resourceClassTermsByIds;
         }
-        // TODO Keep original order.
-        return array_intersect_key(static::$resourceClassIdsByTermsAndIds, array_flip($termsOrIds));
+        if (is_scalar($termsOrIds)) {
+            $result = static::$resourceClassTermsByTermsAndIds[$termsOrIds] ?? null;
+            return $result ? [$termsOrIds => $result] : [];
+        }
+        // Most of the times, only some terms are searched, so reorder them by
+        // default because it is very quick.
+        $searchKeys = array_flip($termsOrIds);
+        $result = array_intersect_key(static::$resourceClassTermsByTermsAndIds, $searchKeys);
+        return array_replace(array_intersect_key($searchKeys, $result), $result);
     }
 
     /**
@@ -885,8 +932,8 @@ class EasyMeta
             $result = static::$resourceClassLabelsByTermsAndIds[$termsOrIds] ?? null;
             return $result ? [$termsOrIds => $result] : [];
         }
-        $terms = $this->resourceClassTerms($termsOrIds);
-        return array_intersect_key(static::$resourceClassLabelsByTermsAndIds, array_flip($terms));
+        // TODO Keep original order.
+        return array_intersect_key(static::$resourceClassLabelsByTermsAndIds, array_flip($termsOrIds));
     }
 
     /**
@@ -909,7 +956,7 @@ class EasyMeta
      * @param array|int|string|null $labelsOrIds One or multiple ids or labels.
      * @return string[] The resource template ids matching labels or ids, or all
      * resource templates by labels. When the input contains labels and ids
-     * matching the same templates, they are all returned.
+     * matching the same templates, they are all returned. Input order is kept.
      */
     public function resourceTemplateIds($labelsOrIds = null): array
     {
@@ -925,7 +972,11 @@ class EasyMeta
             $result = static::$resourceTemplateIdsByLabelsAndIds[$labelsOrIds] ?? null;
             return $result ? [$labelsOrIds => $result] : [];
         }
-        return array_intersect_key(static::$resourceTemplateIdsByLabelsAndIds, array_flip($labelsOrIds));
+        // Most of the times, only some values are searched, so reorder them by
+        // default because it is very quick.
+        $searchKeys = array_flip($labelsOrIds);
+        $result = array_intersect_key(static::$resourceTemplateIdsByLabelsAndIds, $searchKeys);
+        return array_replace(array_intersect_key($searchKeys, $result), $result);
     }
 
     /**
@@ -934,7 +985,8 @@ class EasyMeta
      * @param array|int|string|null $labelsOrIds One or multiple ids or labels.
      * @return string[] The used resource template ids matching labels or ids,
      * or all used resource templates by labels. When the input contains labels
-     * and ids matching the same templates, they are all returned.
+     * and ids matching the same templates, they are all returned. Input order
+     * is kept.
      */
     public function resourceTemplateIdsUsed($labelsOrIds = null): array
     {
@@ -950,7 +1002,11 @@ class EasyMeta
             $result = static::$resourceTemplateIdsByLabelsAndIdsUsed[$labelsOrIds] ?? null;
             return $result ? [$labelsOrIds => $result] : [];
         }
-        return array_intersect_key(static::$resourceTemplateIdsByLabelsAndIdsUsed, array_flip($labelsOrIds));
+        // Most of the times, only some values are searched, so reorder them by
+        // default because it is very quick.
+        $searchKeys = array_flip($labelsOrIds);
+        $result = array_intersect_key(static::$resourceTemplateIdsByLabelsAndIdsUsed, $searchKeys);
+        return array_replace(array_intersect_key($searchKeys, $result), $result);
     }
 
     /**
