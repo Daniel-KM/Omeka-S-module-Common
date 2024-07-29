@@ -434,6 +434,29 @@ class EasyMeta
     }
 
     /**
+     * Get the resource api names from any class, type or name or all of them.
+     *
+     * @param array|string|null $names
+     * @return array The resource names if any, or all resource names as
+     * associative array.
+     */
+    public function resourceNames($names = null): array
+    {
+        if (is_null($names)) {
+            $result = array_unique(static::RESOURCE_NAMES);
+            return array_combine($result, $result);
+        }
+        if (is_scalar($names)) {
+            $names = [$names];
+        }
+        // Most of the times, only some names are searched, so reorder them by
+        // default because it is very quick.
+        $searchKeys = array_flip($names);
+        $result = array_intersect_key(static::RESOURCE_NAMES, $searchKeys);
+        return array_replace(array_intersect_key($searchKeys, $result), $result);
+    }
+
+    /**
      * Get the resource label from any common resource name.
      *
      * @return string|null The singular label if any, not translated.
