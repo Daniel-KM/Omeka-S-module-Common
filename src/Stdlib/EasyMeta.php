@@ -477,6 +477,22 @@ class EasyMeta
     }
 
     /**
+     * Get the resource label singular or plural from any common resource name.
+     *
+     * The plugin translatePlural() does not manage multiple placeholders.
+     *
+     * @return string|null The singular or plural label if any, not translated.
+     */
+    public function resourceLabelCount($name, int $count = 0): ?string
+    {
+        if ($count <= 1) {
+            return static::RESOURCE_LABELS[static::RESOURCE_NAMES[$name] ?? null] ?? null;
+        } else {
+            return static::RESOURCE_LABELS_PLURAL[static::RESOURCE_NAMES[$name] ?? null] ?? null;
+        }
+    }
+
+    /**
      * Get a data type name by name.
      *
      * @param string|null $name A name.
