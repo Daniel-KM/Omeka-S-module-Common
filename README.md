@@ -25,6 +25,8 @@ copy-paste common code between modules.
   - Custom Vocabs Select
   - Data Textarea
   - Data Type Select
+  - Group Textarea
+  - Ini Textarea
   - Media Ingester Select
   - Media Renderer Select
   - Media Type Select
@@ -258,9 +260,10 @@ be used in such a case.
 
 ### Installing resources
 
-To install resources, you need to include the file `InstallResources.php`. The
-files that contains vocabs, custom vocabs, and templates inside `data/` will be
-automatically imported.
+To install resources, the class `ManageModuleAndResources.php` can be used. It
+is callable via the module `$this->getManageModuleAndResources()`. It contains
+tools to manage and update vocabs, custom vocabs, and templates via files
+located inside `data/`, that will be automatically imported.
 
 
 TODO
