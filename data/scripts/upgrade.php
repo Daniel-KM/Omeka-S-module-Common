@@ -31,7 +31,10 @@ if (version_compare((string) $oldVersion, '3.4.53', '<')) {
 }
 
 if (version_compare((string) $oldVersion, '3.4.57', '<')) {
-    // In the case there was an issue in previous fix.
+    $this->fixIndexes();
+}
+
+if (version_compare((string) $oldVersion, '3.4.62', '<')) {
     $this->fixIndexes();
 }
 
