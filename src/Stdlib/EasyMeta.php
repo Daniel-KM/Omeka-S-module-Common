@@ -385,12 +385,41 @@ class EasyMeta
     /**
      * Get the entity class from any class, type or name.
      *
+     * For now, only entity classes for resources are output.
+     *
      * @param string $name
      * @return string|null The entity class if any.
      */
     public function entityClass($name): ?string
     {
         return static::RESOURCE_CLASSES[static::RESOURCE_NAMES[$name] ?? null] ?? null;
+    }
+
+    /**
+     * Get the entity resource class from any class, type or name.
+     *
+     * @param string $name
+     * @return string|null The entity class if any.
+     */
+    public function entityResourceClass($name): ?string
+    {
+        return static::RESOURCE_CLASSES[static::RESOURCE_NAMES[$name] ?? null] ?? null;
+    }
+
+    /**
+     * Get the entity resource classes from any class, type or name or all.
+     *
+     * @param array|string|null $names
+     * @return array The entity classes if any, or all entity classes for
+     * resources.
+     */
+    public function entityResourceClasses($names = null): array
+    {
+        if ($names === null) {
+            return static::RESOURCE_CLASSES;
+        }
+        $result = $this->resourceNames($names);
+        return array_map(fn($v) => static::RESOURCE_CLASSES[$v], $result);
     }
 
     /**
