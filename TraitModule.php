@@ -138,6 +138,10 @@ trait TraitModule
             $this->initTranslations();
             require_once $filepath;
         }
+
+        // To clear cache after upgrade avoids some mysterious issues, in
+        // particular when a doctrine entity is modified.
+        $this->getManageModuleAndResources()->clearCaches();
     }
 
     public function getManageModuleAndResources(): \Common\ManageModuleAndResources

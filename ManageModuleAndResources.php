@@ -1088,4 +1088,21 @@ SQL;
 
         return $result;
     }
+
+    /**
+     * Clear php caches.
+     *
+     * This method may be used when updating the schema of an entity, in which
+     * case the cache may need to be refreshed.
+     */
+    public function clearCaches(): void
+    {
+        if (function_exists('opcache_reset')) {
+            opcache_reset();
+        }
+        if (function_exists('apcu_clear_cache')) {
+            apcu_clear_cache();
+        }
+        @clearstatcache(true);
+    }
 }
