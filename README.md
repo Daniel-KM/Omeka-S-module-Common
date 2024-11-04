@@ -236,7 +236,7 @@ class Module extends AbstractModule
 }
 ```
 
-Or extend the abstract class:
+Or extend the abstract class (not recommended):
 
 ```php
 if (!class_exists(\Common\AbstractModule::class)) {
