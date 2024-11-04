@@ -1065,7 +1065,7 @@ SQL;
 
         $isStrings = is_array($stringsOrRegex);
 
-        $paths = glob($globPath);
+        $paths = glob($globPath, GLOB_BRACE);
         foreach ($paths as $filepath) {
             if (!is_file($filepath) || !is_readable($filepath) || !filesize($filepath)) {
                 continue;
