@@ -130,11 +130,12 @@ trait TraitModule
 
     public function upgrade($oldVersion, $newVersion, ServiceLocatorInterface $services): void
     {
+        $serviceLocator = $services;
+        $this->setServiceLocator($serviceLocator);
+
         $filepath = $this->modulePath() . '/data/scripts/upgrade.php';
         if (file_exists($filepath) && filesize($filepath) && is_readable($filepath)) {
             // For compatibility with old upgrade files.
-            $serviceLocator = $services;
-            $this->setServiceLocator($serviceLocator);
             $this->initTranslations();
             require_once $filepath;
         }
