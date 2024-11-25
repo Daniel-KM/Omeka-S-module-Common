@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-29 00:00+0000\n"
-"PO-Revision-Date: 2024-07-29 00:00+0000\n"
+"POT-Creation-Date: 2024-11-25 00:00+0000\n"
+"PO-Revision-Date: 2024-11-25 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -21,54 +21,12 @@ msgstr ""
 msgid "default"
 msgstr "défaut"
 
-#: TraitModule.php:78 TraitModule.php:921
-#, php-format
-msgid "This module requires the module \"%s\"."
-msgstr "Ce module requiert le module « %s »."
-
-#: TraitModule.php:83
-#, php-format
-msgid "This module requires modules \"%s\"."
-msgstr "Ce module requiert les modules \"%s\"."
-
-#: TraitModule.php:92
-msgid "This module has resources that cannot be installed."
-msgstr "Ce module a des ressources qui ne peuvent pas être installées."
-
-#: TraitModule.php:100
-msgid ""
-"This module cannot install its tables, because they exist already. Try to "
-"remove them first."
-msgstr ""
-"Ce module ne peut pas installer ses tables car elles existent déjà. Essayez "
-"de les supprimer manuellement."
-
-#: TraitModule.php:406
-#, php-format
-msgid "The module removed tables \"%s\" from a previous broken install."
-msgstr ""
-"Le module a supprimé les tables « %s » depuis une installation échouée."
-
-#: TraitModule.php:916
-#, php-format
-msgid "This module requires the module \"%1$s\", version %2$s or above."
-msgstr "Ce module requiert le module « %1$s », version %2$s ou supérieure."
-
-#: TraitModule.php:1033
-#, php-format
-msgid ""
-"The module \"%s\" was automatically deactivated because the dependencies are "
-"unavailable."
-msgstr ""
-"Le module « %s » a été automatiquement désactivé car ses dépendances ne sont "
-"plus disponibles."
-
-#: Module.php:157
+#: Module.php:164
 msgid "Some indexes were added to tables to improve performance."
 msgstr ""
 "Certains index ont été ajoutés aux tables pour améliorer la performance."
 
-#: Module.php:177
+#: Module.php:184
 msgid "The module Generic is no longer needed and can be removed."
 msgstr "Le module Generic n’est plus nécessaire et peux être supprimé."
 
@@ -143,7 +101,7 @@ msgstr "Le chemin n’est pas à l’intérieur du chemin prévu"
 msgid "[No site]"
 msgstr "[Aucun site]"
 
-#: src/Form/Element/IniTextarea.php:106
+#: src/Form/Element/IniTextarea.php:127
 msgid "Invalid ini string"
 msgstr "Chaîne ini incorrecte"
 
@@ -331,11 +289,50 @@ msgstr ""
 msgid "A vocabulary must have a namespace uri and a prefix."
 msgstr "Un vocabulaire doit avoir une uri pour l’espace de nom et un préfixe."
 
-#: TraitModule.php:1055
+#: TraitModule.php:78 TraitModule.php:923
+msgid "This module requires the module \"{module}\"."
+msgstr "Ce module requiert le module « {module} »."
+
+#: TraitModule.php:83
+msgid "This module requires modules \"{modules}\"."
+msgstr "Ce module requiert les modules « {modules} »."
+
+#: TraitModule.php:92
+msgid "This module has resources that cannot be installed."
+msgstr "Ce module a des ressources qui ne peuvent pas être installées."
+
+#: TraitModule.php:100
+msgid ""
+"This module cannot install its tables, because they exist already. Try to "
+"remove them first."
+msgstr ""
+"Ce module ne peut pas installer ses tables car elles existent déjà. Essayez "
+"de les supprimer manuellement."
+
+#: TraitModule.php:410
+msgid "The module removed tables \"{tables}\" from a previous broken install."
+msgstr ""
+"Le module a supprimé les tables \"{tables}\" depuis une installation échouée."
+
+#: TraitModule.php:918
+msgid ""
+"This module requires the module \"{module}\", version {version} or above."
+msgstr ""
+"Ce module requiert le module « {module} », version {version} ou supérieure."
+
+#: TraitModule.php:1035
+msgid ""
+"The module \"{module}\" was automatically deactivated because the "
+"dependencies are unavailable."
+msgstr ""
+"Le module « {module} » a été automatiquement désactivé car ses dépendances "
+"ne sont plus disponibles."
+
+#: TraitModule.php:1057
 msgid "The directory \"{path}\" is not writeable."
 msgstr "Le dossier « {path} » n’est pas inscriptible."
 
-#: TraitModule.php:1066
+#: TraitModule.php:1068
 msgid "The directory \"{path}\" is not writeable: {error}."
 msgstr "Le dossier « {path} » n’est pas inscriptible : {error}"
 

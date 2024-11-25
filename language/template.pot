@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-29 00:00+0000\n"
+"POT-Creation-Date: 2024-11-25 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,48 +21,11 @@ msgstr ""
 msgid "default"
 msgstr ""
 
-#: TraitModule.php:78 TraitModule.php:921
-#, php-format
-msgid "This module requires the module \"%s\"."
-msgstr ""
-
-#: TraitModule.php:83
-#, php-format
-msgid "This module requires modules \"%s\"."
-msgstr ""
-
-#: TraitModule.php:92
-msgid "This module has resources that cannot be installed."
-msgstr ""
-
-#: TraitModule.php:100
-msgid ""
-"This module cannot install its tables, because they exist already. Try to "
-"remove them first."
-msgstr ""
-
-#: TraitModule.php:406
-#, php-format
-msgid "The module removed tables \"%s\" from a previous broken install."
-msgstr ""
-
-#: TraitModule.php:916
-#, php-format
-msgid "This module requires the module \"%1$s\", version %2$s or above."
-msgstr ""
-
-#: TraitModule.php:1033
-#, php-format
-msgid ""
-"The module \"%s\" was automatically deactivated because the dependencies are "
-"unavailable."
-msgstr ""
-
-#: Module.php:157
+#: Module.php:164
 msgid "Some indexes were added to tables to improve performance."
 msgstr ""
 
-#: Module.php:177
+#: Module.php:184
 msgid "The module Generic is no longer needed and can be removed."
 msgstr ""
 
@@ -129,7 +92,7 @@ msgstr ""
 msgid "[No site]"
 msgstr ""
 
-#: src/Form/Element/IniTextarea.php:106
+#: src/Form/Element/IniTextarea.php:127
 msgid "Invalid ini string"
 msgstr ""
 
@@ -290,10 +253,43 @@ msgstr ""
 msgid "A vocabulary must have a namespace uri and a prefix."
 msgstr ""
 
-#: TraitModule.php:1055
+#: TraitModule.php:78 TraitModule.php:923
+msgid "This module requires the module \"{module}\"."
+msgstr ""
+
+#: TraitModule.php:83
+msgid "This module requires modules \"{modules}\"."
+msgstr ""
+
+#: TraitModule.php:92
+msgid "This module has resources that cannot be installed."
+msgstr ""
+
+#: TraitModule.php:100
+msgid ""
+"This module cannot install its tables, because they exist already. Try to "
+"remove them first."
+msgstr ""
+
+#: TraitModule.php:410
+msgid "The module removed tables \"{tables}\" from a previous broken install."
+msgstr ""
+
+#: TraitModule.php:918
+msgid ""
+"This module requires the module \"{module}\", version {version} or above."
+msgstr ""
+
+#: TraitModule.php:1035
+msgid ""
+"The module \"{module}\" was automatically deactivated because the "
+"dependencies are unavailable."
+msgstr ""
+
+#: TraitModule.php:1057
 msgid "The directory \"{path}\" is not writeable."
 msgstr ""
 
-#: TraitModule.php:1066
+#: TraitModule.php:1068
 msgid "The directory \"{path}\" is not writeable: {error}."
 msgstr ""
