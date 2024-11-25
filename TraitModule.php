@@ -28,6 +28,7 @@
 
 namespace Common;
 
+use Common\Stdlib\PsrMessage;
 use Laminas\EventManager\Event;
 use Laminas\Mvc\Controller\AbstractController;
 use Laminas\ServiceManager\ServiceLocatorInterface;
@@ -35,7 +36,6 @@ use Laminas\View\Renderer\PhpRenderer;
 use Omeka\Module\Exception\ModuleCannotInstallException;
 use Omeka\Module\Manager as ModuleManager;
 use Omeka\Settings\SettingsInterface;
-use Omeka\Stdlib\Message;
 
 /**
  * This trait allows to manage all methods that should run only once and that
@@ -74,32 +74,32 @@ trait TraitModule
         $this->preInstall();
         if (!$this->checkDependencies()) {
             if (count($this->dependencies) === 1) {
-                $message = new Message(
-                    $translator->translate('This module requires the module "%s".'), // @translate
-                    reset($this->dependencies)
+                $message = new PsrMessage(
+                    'This module requires the module "{module}".', // @translate
+                    ['module' => reset($this->dependencies)]
                 );
             } else {
-                $message = new Message(
-                    $translator->translate('This module requires modules "%s".'), // @translate
-                    implode('", "', $this->dependencies)
+                $message = new PsrMessage(
+                    'This module requires modules "{modules}".', // @translate
+                    ['modules' => implode('", "', $this->dependencies)]
                 );
             }
-            throw new ModuleCannotInstallException((string) $message);
+            throw new ModuleCannotInstallException((string) $message->setTranslator($translator));
         }
 
         if (!$this->checkAllResourcesToInstall()) {
-            $message = new Message(
-                $translator->translate('This module has resources that cannot be installed.') // @translate
+            $message = new PsrMessage(
+                'This module has resources that cannot be installed.' // @translate
             );
-            throw new ModuleCannotInstallException((string) $message);
+            throw new ModuleCannotInstallException((string) $message->setTranslator($translator));
         }
 
         $sqlFile = $this->modulePath() . '/data/install/schema.sql';
         if (!$this->checkNewTablesFromFile($sqlFile)) {
-            $message = new Message(
-                $translator->translate('This module cannot install its tables, because they exist already. Try to remove them first.') // @translate
+            $message = new PsrMessage(
+                'This module cannot install its tables, because they exist already. Try to remove them first.' // @translate
             );
-            throw new ModuleCannotInstallException((string) $message);
+            throw new ModuleCannotInstallException((string) $message->setTranslator($translator));
         }
 
         $this->execSqlFromFile($sqlFile);
@@ -406,10 +406,9 @@ trait TraitModule
                 $connection->executeStatement("SET FOREIGN_KEY_CHECKS=0; DROP TABLE `$table`;");
             }
 
-            $translator = $services->get('MvcTranslator');
-            $message = new Message(
-                $translator->translate('The module removed tables "%s" from a previous broken install.'), // @translate
-                implode('", "', $dropTables)
+            $message = new PsrMessage(
+                'The module removed tables "{tables}" from a previous broken install.', // @translate
+                ['tables' => implode('", "', $dropTables)]
             );
             $messenger = $services->get('ControllerPluginManager')->get('messenger');
             $messenger->addWarning($message);
@@ -915,17 +914,17 @@ trait TraitModule
         }
         $translator = $services->get('MvcTranslator');
         if ($version) {
-            $message = new Message(
-                $translator->translate('This module requires the module "%1$s", version %2$s or above.'), // @translate
-                $moduleName, $version
+            $message = new PsrMessage(
+                'This module requires the module "{module}", version {version} or above.', // @translate
+                ['module' => $moduleName, 'version' => $version]
             );
         } else {
-            $message = new Message(
-                $translator->translate('This module requires the module "%s".'), // @translate
-                $moduleName
+            $message = new PsrMessage(
+                'This module requires the module "{module}".', // @translate
+                ['module' => $moduleName]
             );
         }
-        throw new ModuleCannotInstallException((string) $message);
+        throw new ModuleCannotInstallException((string) $message->setTranslator($translator));
     }
 
     /**
@@ -1032,15 +1031,15 @@ trait TraitModule
         $moduleManager->deactivate($managedModule);
 
         $translator = $services->get('MvcTranslator');
-        $message = new Message(
-            $translator->translate('The module "%s" was automatically deactivated because the dependencies are unavailable.'), // @translate
-            $module
+        $message = new PsrMessage(
+            'The module "{module}" was automatically deactivated because the dependencies are unavailable.', // @translate
+            ['module' => $module]
         );
         $messenger = $services->get('ControllerPluginManager')->get('messenger');
         $messenger->addWarning($message);
 
         $logger = $services->get('Omeka\Logger');
-        $logger->warn($message);
+        $logger->warn($message->getMessage(), $message->getContext());
         return true;
     }
 
