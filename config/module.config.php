@@ -61,6 +61,7 @@ return [
             Form\Element\OptionalCheckbox::class => Form\Element\OptionalCheckbox::class,
             Form\Element\OptionalDate::class => Form\Element\OptionalDate::class,
             Form\Element\OptionalDateTime::class => Form\Element\OptionalDateTime::class,
+            Form\Element\OptionalEmail::class => Form\Element\OptionalEmail::class,
             Form\Element\OptionalMultiCheckbox::class => Form\Element\OptionalMultiCheckbox::class,
             Form\Element\OptionalNumber::class => Form\Element\OptionalNumber::class,
             Form\Element\OptionalRadio::class => Form\Element\OptionalRadio::class,
