@@ -872,12 +872,30 @@ trait TraitModule
     /**
      * Check if a setting is translatable.
      *
-     * The method can be overridden with to matching settings names.
+     * The method can be overridden to match settings names.
      */
     protected function isSettingTranslatable(string $settingsType, string $name): bool
     {
         return false;
     }
+
+    /**
+     * Check if the current process is a background one.
+     *
+     * The library to get status manages only admin, site or api requests.
+     * A background process is none of them.
+     */
+    protected function isBackgroundProcess(): bool
+    {
+        // Warning: there is a matched route ("site") for backend processes.
+        /** @var \Omeka\Mvc\Status $status */
+        $status = $this->getServiceLocator()->get('Omeka\Status');
+        return !$status->isSiteRequest()
+            && !$status->isAdminRequest()
+            && !$status->isApiRequest()
+            && (!method_exists($status, 'isKeyauthRequest') || !$status->isKeyauthRequest());
+    }
+
 
     /**
      * Check if the module has dependencies.
