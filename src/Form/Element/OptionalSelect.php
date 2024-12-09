@@ -7,4 +7,5 @@ use Laminas\Form\Element\Select;
 class OptionalSelect extends Select
 {
     use TraitOptionalElement;
+    use TraitPrependAndGetValuesOptions;
 }

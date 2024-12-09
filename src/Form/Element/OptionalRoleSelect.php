@@ -4,5 +4,5 @@ namespace Common\Form\Element;
 
 class OptionalRoleSelect extends OptionalSelect
 {
-    use TraitPrependValuesOptions;
+    use TraitPrependAndGetValuesOptions;
 }

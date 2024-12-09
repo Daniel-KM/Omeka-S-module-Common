@@ -4,10 +4,12 @@ namespace Common\Form\Element;
 
 trait TraitPrependValuesOptions
 {
-    public function getValueOptions(): array
+    /**
+     * Prepend configured value options.
+     */
+    protected function prependValuesOptions(array $valueOptions): array
     {
         $prependValueOptions = $this->getOption('prepend_value_options');
-        $valueOptions = $this->valueOptions;
         if (is_array($prependValueOptions)) {
             $valueOptions = $prependValueOptions + $valueOptions;
         }

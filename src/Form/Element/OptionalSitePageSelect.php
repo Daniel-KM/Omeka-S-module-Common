@@ -7,4 +7,10 @@ use Omeka\Form\Element\SitePageSelect;
 class OptionalSitePageSelect extends SitePageSelect
 {
     use TraitOptionalElement;
+    use TraitPrependAndGetValuesOptions;
+
+    public function getValueOptions(): array
+    {
+        return $this->prependValuesOptions(parent::getValueOptions());
+    }
 }

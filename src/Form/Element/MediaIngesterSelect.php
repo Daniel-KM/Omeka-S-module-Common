@@ -7,5 +7,5 @@ use Laminas\Form\Element\Select;
 class MediaIngesterSelect extends Select
 {
     use TraitOptionalElement;
-    use TraitPrependValuesOptions;
+    use TraitPrependAndGetValuesOptions;
 }

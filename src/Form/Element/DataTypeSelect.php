@@ -8,6 +8,7 @@ use Omeka\DataType\Manager as DataTypeManager;
 class DataTypeSelect extends Select
 {
     use TraitOptionalElement;
+    use TraitPrependValuesOptions;
 
     protected $attributes = [
         'type' => 'select',
@@ -62,12 +63,7 @@ class DataTypeSelect extends Select
         // types organized within option groups.
         $valueOptions = array_merge($options, $optgroupOptions);
 
-        $prependValueOptions = $this->getOption('prepend_value_options');
-        if (is_array($prependValueOptions)) {
-            $valueOptions = array_merge($prependValueOptions, $valueOptions);
-        }
-
-        return $valueOptions;
+        return $this->prependValuesOptions($valueOptions);
     }
 
     public function setDataTypeManager(DataTypeManager $dataTypeManager): self

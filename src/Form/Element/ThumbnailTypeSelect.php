@@ -6,4 +6,5 @@ use Laminas\Form\Element\Select;
 
 class ThumbnailTypeSelect extends Select
 {
+    use TraitPrependAndGetValuesOptions;
 }

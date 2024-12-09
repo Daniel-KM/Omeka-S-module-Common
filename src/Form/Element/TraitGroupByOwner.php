@@ -6,6 +6,8 @@ use Omeka\Api\Representation\UserRepresentation;
 
 trait TraitGroupByOwner
 {
+    use TraitPrependValuesOptions;
+
     /**
      * Fix prepending value "0" and owner without resource.
      *
@@ -65,10 +67,7 @@ trait TraitGroupByOwner
                 $valueOptions[$index] = ['label' => $label, 'options' => $options];
             }
         }
-        $prependValueOptions = $this->getOption('prepend_value_options');
-        if (is_array($prependValueOptions)) {
-            $valueOptions = $prependValueOptions + $valueOptions;
-        }
-        return $valueOptions;
+
+        return $this->prependValuesOptions($valueOptions);
     }
 }

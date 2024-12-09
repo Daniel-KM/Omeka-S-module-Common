@@ -10,6 +10,7 @@ use Omeka\Api\Representation\SiteRepresentation;
 abstract class AbstractGroupBySiteSelect extends Select
 {
     use TraitOptionalElement;
+    use TraitPrependValuesOptions;
 
     /**
      * @var SiteRepresentation
@@ -154,11 +155,7 @@ abstract class AbstractGroupBySiteSelect extends Select
             }
         }
 
-        $prependValueOptions = $this->getOption('prepend_value_options');
-        if (is_array($prependValueOptions)) {
-            $valueOptions = $prependValueOptions + $valueOptions;
-        }
-        return $valueOptions;
+        return $this->prependValuesOptions($valueOptions);
     }
 
     /**

@@ -8,6 +8,7 @@ use Laminas\Form\Element\Select;
 class CustomVocabsSelect extends Select
 {
     use TraitOptionalElement;
+    use TraitPrependValuesOptions;
 
     protected $attributes = [
         'type' => 'select',
@@ -27,12 +28,7 @@ class CustomVocabsSelect extends Select
             ? $this->easyMeta->dataTypeLabels(array_keys($customVocabTypes, $customVocabType))
             : $this->easyMeta->dataTypeLabels(array_keys($customVocabTypes));
 
-        $prependValueOptions = $this->getOption('prepend_value_options');
-        if (is_array($prependValueOptions)) {
-            $valueOptions = array_merge($prependValueOptions, $valueOptions);
-        }
-
-        return $valueOptions;
+        return $this->prependValuesOptions($valueOptions);
     }
 
     public function setEasyMeta(EasyMeta $easyMeta): self
