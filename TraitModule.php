@@ -155,15 +155,10 @@ trait TraitModule
 
     public function upgrade($oldVersion, $newVersion, ServiceLocatorInterface $services): void
     {
-        $serviceLocator = $services;
-        $this->setServiceLocator($serviceLocator);
+        $this->setServiceLocator($services);
 
-        $filepath = $this->modulePath() . '/data/scripts/upgrade.php';
-        if (file_exists($filepath) && filesize($filepath) && is_readable($filepath)) {
-            // For compatibility with old upgrade files.
-            $this->initTranslations();
-            require_once $filepath;
-        }
+        $this->preUpgrade($oldVersion, $newVersion);
+        $this->postUpgrade($oldVersion, $newVersion);
 
         // To clear cache after upgrade avoids some mysterious issues, in
         // particular when a doctrine entity is modified.
@@ -339,10 +334,35 @@ trait TraitModule
 
     protected function postUninstallAuto(): void
     {
-        $services = $this->getServiceLocator();
         $filepath = $this->modulePath() . '/data/scripts/uninstall.php';
         if (file_exists($filepath) && filesize($filepath) && is_readable($filepath)) {
-            $this->setServiceLocator($services);
+            // Required for the file uninstall.
+            /** @var \Laminas\ServiceManager\ServiceLocatorInterface $services */
+            $services = $this->getServiceLocator();
+            require_once $filepath;
+        }
+    }
+
+    protected function preUpgrade(?string $oldVersion, ?string $newVersion): void
+    {
+        // To be overridden. Automatically run on upgrade.
+    }
+
+    protected function postUpgrade(?string $oldVersion, ?string $newVersion): void
+    {
+        // To be overridden. Automatically run on upgrade.
+        $this->postUpgradeAuto($oldVersion, $newVersion);
+    }
+
+    protected function postUpgradeAuto(?string $oldVersion, ?string $newVersion): void
+    {
+        $filepath = $this->modulePath() . '/data/scripts/upgrade.php';
+        if (file_exists($filepath) && filesize($filepath) && is_readable($filepath)) {
+            // Required for the file upgrade.
+            /** @var \Laminas\ServiceManager\ServiceLocatorInterface $services */
+            $services = $this->getServiceLocator();
+            // For compatibility with old upgrade files.
+            $this->initTranslations();
             require_once $filepath;
         }
     }
