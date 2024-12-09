@@ -62,6 +62,31 @@ trait TraitModule
         return include $this->modulePath() . '/config/module.config.php';
     }
 
+    /**
+     * Get the settings of the current module.
+     *
+     * The settings are the default config of config, settings, site settings,
+     * user settings, block settings, etc.
+     *
+     * The config of the module is not merged with Omeka main config for
+     * services before the end of install. So it is locally cached to avoid to
+     * reload and reprocess the file. It is used to manage the forms too.
+     */
+    protected function getModuleConfig(?string $settingsType = null): ?array
+    {
+        static $localConfig;
+
+        if (!isset($localConfig)) {
+            $space = strtolower(static::NAMESPACE);
+            $localConfig = $this->getConfig();
+            $localConfig = $localConfig[$space] ?? false;
+        }
+
+        return $localConfig === false
+            ? null
+            : ($localConfig[$settingsType] ?? []);
+    }
+
     public function install(ServiceLocatorInterface $services): void
     {
         $this->setServiceLocator($services);
@@ -218,9 +243,8 @@ trait TraitModule
 
     protected function handleConfigFormAuto(AbstractController $controller): bool
     {
-        $config = $this->getConfig();
-        $space = strtolower(static::NAMESPACE);
-        if (empty($config[$space]['config'])) {
+        $defaultSettings = $this->getModuleConfig('config');
+        if (!$defaultSettings) {
             return true;
         }
 
@@ -244,7 +268,6 @@ trait TraitModule
         $params = $form->getData();
 
         $settings = $services->get('Omeka\Settings');
-        $defaultSettings = $config[$space]['config'];
         $params = array_intersect_key($params, $defaultSettings);
         foreach ($params as $name => $value) {
             $settings->set($name, $value);
@@ -501,9 +524,8 @@ trait TraitModule
     protected function manageSiteSettings(string $process, array $values = []): self
     {
         $settingsType = 'site_settings';
-        $config = $this->getConfig();
-        $space = strtolower(static::NAMESPACE);
-        if (empty($config[$space][$settingsType])) {
+        $defaultSettings = $this->getModuleConfig($settingsType);
+        if (!$defaultSettings) {
             return $this;
         }
         $services = $this->getServiceLocator();
@@ -534,9 +556,8 @@ trait TraitModule
     protected function manageUserSettings(string $process, array $values = []): self
     {
         $settingsType = 'user_settings';
-        $config = $this->getConfig();
-        $space = strtolower(static::NAMESPACE);
-        if (empty($config[$space][$settingsType])) {
+        $defaultSettings = $this->getModuleConfig($settingsType);
+        if (!$defaultSettings) {
             return $this;
         }
         $services = $this->getServiceLocator();
@@ -568,15 +589,13 @@ trait TraitModule
      */
     protected function manageAnySettings(SettingsInterface $settings, string $settingsType, string $process, array $values = []): self
     {
-        $config = $this->getConfig();
-        $space = strtolower(static::NAMESPACE);
-        if (empty($config[$space][$settingsType])) {
+        $defaultSettings = $this->getModuleConfig($settingsType);
+        if (!$defaultSettings) {
             return $this;
         }
 
         $translator = $this->getServiceLocator()->get('MvcTranslator');
 
-        $defaultSettings = $config[$space][$settingsType];
         foreach ($defaultSettings as $name => $value) {
             switch ($process) {
                 case 'install':
@@ -795,9 +814,8 @@ trait TraitModule
             return false;
         }
 
-        $config = $this->getConfig();
-        $space = strtolower(static::NAMESPACE);
-        if (empty($config[$space][$settingsType])) {
+        $defaultSettings = $this->getModuleConfig($settingsType);
+        if (!$defaultSettings) {
             return false;
         }
 
@@ -818,7 +836,6 @@ trait TraitModule
         $translator = $services->get('MvcTranslator');
 
         $currentSettings = $stmt->fetchAllKeyValue();
-        $defaultSettings = $config[$space][$settingsType];
         // Skip settings that are arrays, because the fields "multi-checkbox"
         // and "multi-select" are removed when no value are selected, so it's
         // not possible to determine if it's a new setting or an old empty
@@ -851,15 +868,13 @@ trait TraitModule
      */
     protected function prepareDataToPopulate(SettingsInterface $settings, string $settingsType): ?array
     {
-        $config = $this->getConfig();
-        $space = strtolower(static::NAMESPACE);
+        // TODO Explain this feature.
         // Use isset() instead of empty() to give the possibility to display a
         // specific form.
-        if (!isset($config[$space][$settingsType])) {
+        $defaultSettings = $this->getModuleConfig($settingsType);
+        if ($defaultSettings === null) {
             return null;
         }
-
-        $defaultSettings = $config[$space][$settingsType];
 
         $data = [];
         foreach ($defaultSettings as $name => $value) {
