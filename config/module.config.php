@@ -88,6 +88,7 @@ return [
             Form\Element\OptionalResourceClassSelect::class => Service\Form\Element\OptionalResourceClassSelectFactory::class,
             Form\Element\OptionalResourceTemplateSelect::class => Service\Form\Element\OptionalResourceTemplateSelectFactory::class,
             Form\Element\OptionalRoleSelect::class => Service\Form\Element\OptionalRoleSelectFactory::class,
+            Form\Element\OptionalSitePageSelect::class => Service\Form\Element\OptionalSitePageSelectFactory::class,
             Form\Element\OptionalSiteSelect::class => Service\Form\Element\OptionalSiteSelectFactory::class,
             Form\Element\OptionalUserSelect::class => Service\Form\Element\OptionalUserSelectFactory::class,
         ],
