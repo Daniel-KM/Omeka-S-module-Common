@@ -160,9 +160,10 @@ class IniTextarea extends Textarea implements InputProviderInterface
 
         try {
             $result = $writer->toString($array);
-        } catch (Exception\InvalidArgumentException $e) {
+        } catch (Exception\ExceptionInterface $e) {
             return null;
         }
+
 
         return (string) $result;
     }
@@ -186,7 +187,7 @@ class IniTextarea extends Textarea implements InputProviderInterface
 
         try {
             $result = $reader->fromString($string);
-        } catch (Exception\RuntimeException $e) {
+        } catch (Exception\ExceptionInterface $e) {
             return null;
         }
 
