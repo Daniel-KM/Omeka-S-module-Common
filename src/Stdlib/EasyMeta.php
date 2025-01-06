@@ -55,6 +55,9 @@ class EasyMeta
         'media' => \Omeka\Entity\Media::class,
         'resources' => \Omeka\Entity\Resource::class,
         'value_annotations' => \Omeka\Entity\ValueAnnotation::class,
+        // Common resources that are not base resources.
+        'sites' => \Omeka\Entity\Site::class,
+        'site_pages' => \Omeka\Entity\SitePage::class,
     ];
 
     const RESOURCE_LABELS = [
@@ -68,6 +71,8 @@ class EasyMeta
         'resource_classes' => 'resource class', // @translate
         'resource_templates' => 'resource template', // @translate
         'vocabularies' => 'vocabulary', // @translate
+        'sites' => 'site', // @translate
+        'site_pages' => 'page', // @translate
     ];
 
     const RESOURCE_LABELS_PLURAL = [
@@ -81,6 +86,8 @@ class EasyMeta
         'resource_classes' => 'resource classes', // @translate
         'resource_templates' => 'resource templates', // @translate
         'vocabularies' => 'vocabularies', // @translate
+        'sites' => 'sites', // @translate
+        'site_pages' => 'pages', // @translate
     ];
 
     const RESOURCE_NAMES = [
@@ -92,6 +99,8 @@ class EasyMeta
         'media' => 'media',
         'resources' => 'resources',
         'value_annotations' => 'value_annotations',
+        'sites' => 'sites',
+        'site_pages' => 'site_pages',
         // Json-ld type.
         'oa:Annotation' => 'annotations',
         'o:Asset' => 'assets',
@@ -100,6 +109,8 @@ class EasyMeta
         'o:Media' => 'media',
         'o:Resource' => 'resources',
         'o:ValueAnnotation' => 'value_annotations',
+        'o:Site' => 'sites',
+        'o:SitePage' => 'site_pages',
         // Keys in json-ld representation.
         'oa:annotation' => 'annotations',
         'o:asset' => 'assets',
@@ -109,6 +120,8 @@ class EasyMeta
         'o:site_item_set' => 'item_sets',
         'o:media' => 'media',
         '@annotations' => 'value_annotations',
+        'o:site' => 'sites',
+        'o:page' => 'site_pages',
         // Controllers and singular.
         'annotation' => 'annotations',
         'asset' => 'assets',
@@ -123,6 +136,9 @@ class EasyMeta
         'resource:item' => 'items',
         'resource:itemset' => 'item_sets',
         'resource:media' => 'media',
+        'site' => 'sites',
+        'page' => 'site_pages',
+        'site-page' => 'site_pages',
         // Representation class.
         \Annotate\Api\Representation\AnnotationRepresentation::class => 'annotations',
         \Omeka\Api\Representation\AssetRepresentation::class => 'assets',
@@ -131,6 +147,8 @@ class EasyMeta
         \Omeka\Api\Representation\MediaRepresentation::class => 'media',
         \Omeka\Api\Representation\ResourceReference::class => 'resources',
         \Omeka\Api\Representation\ValueAnnotationRepresentation::class => 'value_annotations',
+        \Omeka\Api\Representation\SiteRepresentation::class => 'sites',
+        \Omeka\Api\Representation\SitePageRepresentation::class => 'site_pages',
         // Entity class.
         \Annotate\Entity\Annotation::class => 'annotations',
         \Omeka\Entity\Asset::class => 'assets',
@@ -139,6 +157,8 @@ class EasyMeta
         \Omeka\Entity\Media::class => 'media',
         \Omeka\Entity\Resource::class => 'resources',
         \Omeka\Entity\ValueAnnotation::class => 'value_annotations',
+        \Omeka\Entity\Site::class => 'sites',
+        \Omeka\Entity\SitePage::class => 'site_pages',
         // Doctrine entity class (when using get_class() and not getResourceId().
         \DoctrineProxies\__CG__\Annotate\Entity\Annotation::class => 'annotations',
         \DoctrineProxies\__CG__\Omeka\Entity\Asset::class => 'assets',
@@ -147,6 +167,8 @@ class EasyMeta
         \DoctrineProxies\__CG__\Omeka\Entity\Media::class => 'media',
         // \DoctrineProxies\__CG__\Omeka\Entity\Resource::class => 'resources',
         \DoctrineProxies\__CG__\Omeka\Entity\ValueAnnotation::class => 'value_annotations',
+        \DoctrineProxies\__CG__\Omeka\Entity\Site::class => 'sites',
+        \DoctrineProxies\__CG__\Omeka\Entity\SitePage::class => 'site_pages',
         // Controllers, in particular in routes.
         'Annotate\Controller\Admin\Annotation' => 'annotations',
         'Annotate\Controller\Admin\AnnotationController' => 'annotations',
@@ -158,6 +180,10 @@ class EasyMeta
         'Omeka\Controller\Admin\MediaController' => 'media',
         'Omeka\Controller\Admin\ValueAnnotation' => 'value_annotations',
         'Omeka\Controller\Admin\ValueAnnotationController' => 'value_annotations',
+        'Omeka\Controller\SiteAdmin\Index' => 'sites',
+        'Omeka\Controller\SiteAdmin\IndexController' => 'sites',
+        'Omeka\Controller\SiteAdmin\Page' => 'site_pages',
+        'Omeka\Controller\SiteAdmin\PageController' => 'site_pages',
         'Annotate\Controller\Site\Annotation' => 'annotations',
         'Annotate\Controller\Site\AnnotationController' => 'annotations',
         'Omeka\Controller\Site\Item' => 'items',
@@ -168,6 +194,10 @@ class EasyMeta
         'Omeka\Controller\Site\MediaController' => 'media',
         'Omeka\Controller\Site\ValueAnnotation' => 'value_annotations',
         'Omeka\Controller\Site\ValueAnnotationController' => 'value_annotations',
+        'Omeka\Controller\Site\Index' => 'sites',
+        'Omeka\Controller\Site\IndexController' => 'sites',
+        'Omeka\Controller\Site\SitePage' => 'sites_pages',
+        'Omeka\Controller\Site\SitePageController' => 'site_pages',
         // Capitalized name found in route __controller__.
         'Annotation' => 'annotations',
         'Item' => 'items',
@@ -175,12 +205,16 @@ class EasyMeta
         'Media' => 'media',
         'Resource' => 'resources',
         'ValueAnnotation' => 'value_annotations',
+        'Site' => 'sites',
+        'SitePage' => 'site_pages',
         'AnnotationController' => 'annotations',
         'ItemController' => 'items',
         'ItemSetController' => 'item_sets',
         'MediaController' => 'media',
         'ResourceController' => 'resources',
         'ValueAnnotationController' => 'value_annotations',
+        'SiteController' => 'sites',
+        'SitePageController' => 'site_pages',
         // Other deprecated, future or badly written names.
         'o:annotation' => 'annotations',
         'o:Annotation' => 'annotations',
@@ -222,6 +256,10 @@ class EasyMeta
         'resource:value-annotations' => 'value_annotations',
         'resource:value_annotation' => 'value_annotations',
         'resource:value_annotations' => 'value_annotations',
+        'site' => 'site_pages',
+        'sites' => 'sites',
+        'page' => 'site_pages',
+        'pages' => 'site_pages',
     ];
 
     const RESOURCE_TYPES = [
@@ -232,6 +270,8 @@ class EasyMeta
         'media' => 'media',
         'resources' => 'resource',
         'value_annotations' => 'value-annotation',
+        'sites' => 'site',
+        'site_pages' => 'site-page',
     ];
 
     /**
