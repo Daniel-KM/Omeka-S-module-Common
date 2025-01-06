@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-25 00:00+0000\n"
+"POT-Creation-Date: 2025-01-06 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,14 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: src/Mvc/Controller/Plugin/JSend.php:55
+msgid "Check your input for invalid data."
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/JSend.php:74
+msgid "An internal error has occurred."
+msgstr ""
 
 #: src/Stdlib/PsrMessage.php:199
 msgid "default"
@@ -45,6 +53,11 @@ msgstr ""
 msgid ""
 "Warning: some files contain invalid unicode characters and cannot be "
 "processed directly."
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/JSend.php:89
+#, php-format
+msgid "The status \"%s\" is not supported by jSend."
 msgstr ""
 
 #: src/View/Helper/MediaTypeSelect.php:40
@@ -88,7 +101,7 @@ msgstr ""
 msgid "The path is not inside the restricted path"
 msgstr ""
 
-#: src/Form/Element/AbstractGroupBySiteSelect.php:151
+#: src/Form/Element/AbstractGroupBySiteSelect.php:152
 msgid "[No site]"
 msgstr ""
 
@@ -116,56 +129,60 @@ msgstr ""
 msgid "Select media renderers…"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:61
+#: src/Stdlib/EasyMeta.php:73
 msgid "annotation"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:66
+#: src/Stdlib/EasyMeta.php:78
 msgid "resource"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:67
+#: src/Stdlib/EasyMeta.php:79
 msgid "property"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:68
+#: src/Stdlib/EasyMeta.php:80
 msgid "resource class"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:74
+#: src/Stdlib/EasyMeta.php:88
 msgid "annotations"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:75
+#: src/Stdlib/EasyMeta.php:89
 msgid "assets"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:76
+#: src/Stdlib/EasyMeta.php:90
 msgid "items"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:77
+#: src/Stdlib/EasyMeta.php:91
 msgid "item sets"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:79
+#: src/Stdlib/EasyMeta.php:93
 msgid "resources"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:80
+#: src/Stdlib/EasyMeta.php:94
 msgid "properties"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:81
+#: src/Stdlib/EasyMeta.php:95
 msgid "resource classes"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:82
+#: src/Stdlib/EasyMeta.php:96
 msgid "resource templates"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:83
+#: src/Stdlib/EasyMeta.php:97
 msgid "vocabularies"
+msgstr ""
+
+#: src/Stdlib/EasyMeta.php:98
+msgid "sites"
 msgstr ""
 
 #: ManageModuleAndResources.php:93
@@ -253,43 +270,43 @@ msgstr ""
 msgid "A vocabulary must have a namespace uri and a prefix."
 msgstr ""
 
-#: TraitModule.php:78 TraitModule.php:923
+#: TraitModule.php:103 TraitModule.php:975
 msgid "This module requires the module \"{module}\"."
 msgstr ""
 
-#: TraitModule.php:83
+#: TraitModule.php:108
 msgid "This module requires modules \"{modules}\"."
 msgstr ""
 
-#: TraitModule.php:92
+#: TraitModule.php:117
 msgid "This module has resources that cannot be installed."
 msgstr ""
 
-#: TraitModule.php:100
+#: TraitModule.php:125
 msgid ""
 "This module cannot install its tables, because they exist already. Try to "
 "remove them first."
 msgstr ""
 
-#: TraitModule.php:410
+#: TraitModule.php:453
 msgid "The module removed tables \"{tables}\" from a previous broken install."
 msgstr ""
 
-#: TraitModule.php:918
+#: TraitModule.php:970
 msgid ""
 "This module requires the module \"{module}\", version {version} or above."
 msgstr ""
 
-#: TraitModule.php:1035
+#: TraitModule.php:1087
 msgid ""
 "The module \"{module}\" was automatically deactivated because the "
 "dependencies are unavailable."
 msgstr ""
 
-#: TraitModule.php:1057
+#: TraitModule.php:1109
 msgid "The directory \"{path}\" is not writeable."
 msgstr ""
 
-#: TraitModule.php:1068
+#: TraitModule.php:1120
 msgid "The directory \"{path}\" is not writeable: {error}."
 msgstr ""

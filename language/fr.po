@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-25 00:00+0000\n"
-"PO-Revision-Date: 2024-11-25 00:00+0000\n"
+"POT-Creation-Date: 2025-01-06 00:00+0000\n"
+"PO-Revision-Date: 2025-01-06 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -16,6 +16,14 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.2.2\n"
+
+#: src/Mvc/Controller/Plugin/JSend.php:55
+msgid "Check your input for invalid data."
+msgstr "Vérifiez votre saisie ou des données incorrectes."
+
+#: src/Mvc/Controller/Plugin/JSend.php:74
+msgid "An internal error has occurred."
+msgstr "Une erreur interne s’est produite."
 
 #: src/Stdlib/PsrMessage.php:199
 msgid "default"
@@ -54,6 +62,11 @@ msgid ""
 msgstr ""
 "Attention : certains fichiers contiennent des caractères unicode incorrects "
 "et ne peuvent pas être traités directement."
+
+#: src/Mvc/Controller/Plugin/JSend.php:89
+#, php-format
+msgid "The status \"%s\" is not supported by jSend."
+msgstr "Le statut « %s » n’est pas pris en charge par jSend."
 
 #: src/View/Helper/MediaTypeSelect.php:40
 #: src/Service/Form/Element/MediaTypeSelectFactory.php:28
@@ -97,7 +110,7 @@ msgstr "Le chemin n’est pas lisible"
 msgid "The path is not inside the restricted path"
 msgstr "Le chemin n’est pas à l’intérieur du chemin prévu"
 
-#: src/Form/Element/AbstractGroupBySiteSelect.php:151
+#: src/Form/Element/AbstractGroupBySiteSelect.php:152
 msgid "[No site]"
 msgstr "[Aucun site]"
 
@@ -129,57 +142,61 @@ msgstr "Choisir un ingéreur de média…"
 msgid "Select media renderers…"
 msgstr "Choisir un rendu pour le média…"
 
-#: src/Stdlib/EasyMeta.php:61
+#: src/Stdlib/EasyMeta.php:73
 msgid "annotation"
 msgstr "annotation"
 
-#: src/Stdlib/EasyMeta.php:66
+#: src/Stdlib/EasyMeta.php:78
 msgid "resource"
 msgstr "ressource"
 
-#: src/Stdlib/EasyMeta.php:67
+#: src/Stdlib/EasyMeta.php:79
 msgid "property"
 msgstr "propriété"
 
-#: src/Stdlib/EasyMeta.php:68
+#: src/Stdlib/EasyMeta.php:80
 msgid "resource class"
 msgstr "classe de ressource"
 
-#: src/Stdlib/EasyMeta.php:74
+#: src/Stdlib/EasyMeta.php:88
 msgid "annotations"
 msgstr "annotations"
 
-#: src/Stdlib/EasyMeta.php:75
+#: src/Stdlib/EasyMeta.php:89
 msgid "assets"
 msgstr "fichiers"
 
-#: src/Stdlib/EasyMeta.php:76
+#: src/Stdlib/EasyMeta.php:90
 msgid "items"
 msgstr "contenus"
 
-#: src/Stdlib/EasyMeta.php:77
+#: src/Stdlib/EasyMeta.php:91
 msgid "item sets"
 msgstr "collections"
 
-#: src/Stdlib/EasyMeta.php:79
+#: src/Stdlib/EasyMeta.php:93
 msgid "resources"
 msgstr "ressources"
 
-#: src/Stdlib/EasyMeta.php:80
+#: src/Stdlib/EasyMeta.php:94
 msgid "properties"
 msgstr "propriétés"
 
-#: src/Stdlib/EasyMeta.php:81
+#: src/Stdlib/EasyMeta.php:95
 msgid "resource classes"
 msgstr "classes de ressource"
 
-#: src/Stdlib/EasyMeta.php:82
+#: src/Stdlib/EasyMeta.php:96
 msgid "resource templates"
 msgstr "modèles de ressource"
 
-#: src/Stdlib/EasyMeta.php:83
+#: src/Stdlib/EasyMeta.php:97
 msgid "vocabularies"
 msgstr "vocabulaires"
+
+#: src/Stdlib/EasyMeta.php:98
+msgid "sites"
+msgstr "sites"
 
 #: ManageModuleAndResources.php:93
 msgid ""
@@ -289,19 +306,19 @@ msgstr ""
 msgid "A vocabulary must have a namespace uri and a prefix."
 msgstr "Un vocabulaire doit avoir une uri pour l’espace de nom et un préfixe."
 
-#: TraitModule.php:78 TraitModule.php:923
+#: TraitModule.php:103 TraitModule.php:975
 msgid "This module requires the module \"{module}\"."
 msgstr "Ce module requiert le module « {module} »."
 
-#: TraitModule.php:83
+#: TraitModule.php:108
 msgid "This module requires modules \"{modules}\"."
 msgstr "Ce module requiert les modules « {modules} »."
 
-#: TraitModule.php:92
+#: TraitModule.php:117
 msgid "This module has resources that cannot be installed."
 msgstr "Ce module a des ressources qui ne peuvent pas être installées."
 
-#: TraitModule.php:100
+#: TraitModule.php:125
 msgid ""
 "This module cannot install its tables, because they exist already. Try to "
 "remove them first."
@@ -309,18 +326,18 @@ msgstr ""
 "Ce module ne peut pas installer ses tables car elles existent déjà. Essayez "
 "de les supprimer manuellement."
 
-#: TraitModule.php:410
+#: TraitModule.php:453
 msgid "The module removed tables \"{tables}\" from a previous broken install."
 msgstr ""
 "Le module a supprimé les tables \"{tables}\" depuis une installation échouée."
 
-#: TraitModule.php:918
+#: TraitModule.php:970
 msgid ""
 "This module requires the module \"{module}\", version {version} or above."
 msgstr ""
 "Ce module requiert le module « {module} », version {version} ou supérieure."
 
-#: TraitModule.php:1035
+#: TraitModule.php:1087
 msgid ""
 "The module \"{module}\" was automatically deactivated because the "
 "dependencies are unavailable."
@@ -328,11 +345,11 @@ msgstr ""
 "Le module « {module} » a été automatiquement désactivé car ses dépendances "
 "ne sont plus disponibles."
 
-#: TraitModule.php:1057
+#: TraitModule.php:1109
 msgid "The directory \"{path}\" is not writeable."
 msgstr "Le dossier « {path} » n’est pas inscriptible."
 
-#: TraitModule.php:1068
+#: TraitModule.php:1120
 msgid "The directory \"{path}\" is not writeable: {error}."
 msgstr "Le dossier « {path} » n’est pas inscriptible : {error}"
 
