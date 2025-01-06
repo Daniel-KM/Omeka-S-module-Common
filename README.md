@@ -332,7 +332,7 @@ altered, and that no provisions are either added or removed herefrom.
 Copyright
 ---------
 
-* Copyright Daniel Berthereau, 2017-2024 (see [Daniel-KM] on GitLab)
+* Copyright Daniel Berthereau, 2017-2025 (see [Daniel-KM] on GitLab)
 
 
 [Common module]: https://gitlab.com/Daniel-KM/Omeka-S-module-Common

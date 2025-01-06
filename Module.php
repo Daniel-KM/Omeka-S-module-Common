@@ -18,7 +18,7 @@ use Omeka\Module\AbstractModule;
  * This module is useless alone: it is designed to be used by other module.
  * See readme.
  *
- * @copyright Daniel Berthereau, 2018-2024
+ * @copyright Daniel Berthereau, 2018-2025
  * @license http://www.cecill.info/licences/Licence_CeCILL_V2.1-en.txt
  */
 class Module extends AbstractModule
