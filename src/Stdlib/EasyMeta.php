@@ -60,6 +60,15 @@ class EasyMeta
         'site_pages' => \Omeka\Entity\SitePage::class,
     ];
 
+    const RESOURCE_RESOURCE_CLASSES = [
+        'annotations' => \Annotate\Entity\Annotation::class,
+        'items' => \Omeka\Entity\Item::class,
+        'item_sets' => \Omeka\Entity\ItemSet::class,
+        'media' => \Omeka\Entity\Media::class,
+        'resources' => \Omeka\Entity\Resource::class,
+        'value_annotations' => \Omeka\Entity\ValueAnnotation::class,
+    ];
+
     const RESOURCE_LABELS = [
         'annotations' => 'annotation', // @translate
         'assets' => 'asset', // @translate
@@ -435,7 +444,7 @@ class EasyMeta
     /**
      * Get the entity class from any class, type or name.
      *
-     * For now, only entity classes for resources are output.
+     * For now, only entity classes for resources, asset, site and pages are output.
      *
      * @param string $name
      * @return string|null The entity class if any.
@@ -449,11 +458,11 @@ class EasyMeta
      * Get the entity resource class from any class, type or name.
      *
      * @param string $name
-     * @return string|null The entity class if any.
+     * @return string|null The entity class of a resource if any.
      */
     public function entityResourceClass($name): ?string
     {
-        return static::RESOURCE_CLASSES[static::RESOURCE_NAMES[$name] ?? null] ?? null;
+        return static::RESOURCE_RESOURCE_CLASSES[static::RESOURCE_NAMES[$name] ?? null] ?? null;
     }
 
     /**
@@ -466,10 +475,10 @@ class EasyMeta
     public function entityResourceClasses($names = null): array
     {
         if ($names === null) {
-            return static::RESOURCE_CLASSES;
+            return static::RESOURCE_RESOURCE_CLASSES;
         }
         $result = $this->resourceNames($names);
-        return array_map(fn($v) => static::RESOURCE_CLASSES[$v], $result);
+        return array_filter(array_map(fn ($v) => static::RESOURCE_RESOURCE_CLASSES[$v] ?? null, $result));
     }
 
     /**
