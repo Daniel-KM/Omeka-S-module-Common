@@ -99,6 +99,7 @@ return [
     ],
     'controller_plugins' => [
         'invokables' => [
+            'jSend' => Mvc\Controller\Plugin\JSend::class,
             'messenger' => Mvc\Controller\Plugin\Messenger::class,
             'sendFile' => Mvc\Controller\Plugin\SendFile::class,
         ],
