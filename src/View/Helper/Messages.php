@@ -32,6 +32,45 @@ class Messages extends AbstractHelper
     }
 
     /**
+     * Get all messages translated and clear them from the session.
+     *
+     * This function may be used for example to output messages for json.
+     *
+     * @return array
+     */
+    public function getTranslatedMessages(): array
+    {
+        $allMessages = $this->get();
+        if (!count($allMessages)) {
+            return [];
+        }
+
+        $view = $this->getView();
+        $translate = $view->plugin('translate');
+        $translator = $translate->getTranslator();
+
+        $typesToClasses = [
+            Messenger::ERROR => 'error',
+            Messenger::SUCCESS => 'success',
+            Messenger::WARNING => 'warning',
+            Messenger::NOTICE => 'notice',
+        ];
+
+        // Most of the time, the messages are a unique and simple string.
+        $output = [];
+        foreach ($allMessages as $type => $messages) {
+            $class = $typesToClasses[$type] ?? 'notice';
+            foreach ($messages as $message) {
+                $output[$class][] = $message instanceof TranslatorAwareInterface
+                    ? $message->setTranslator($translator)->translate()
+                    : $translate($message);
+            }
+        }
+
+        return $output;
+    }
+
+    /**
      * Render the messages.
      *
      * @return string
@@ -39,7 +78,7 @@ class Messages extends AbstractHelper
     public function __invoke()
     {
         $allMessages = $this->get();
-        if (!$allMessages) {
+        if (!count($allMessages)) {
             return '';
         }
 
@@ -47,48 +86,41 @@ class Messages extends AbstractHelper
         $escape = $view->plugin('escapeHtml');
         $translate = $view->plugin('translate');
         $translator = $translate->getTranslator();
-        $output = '<ul class="messages">';
-        $typeToClass = [
+
+        $typesToClasses = [
             Messenger::ERROR => 'error',
             Messenger::SUCCESS => 'success',
             Messenger::WARNING => 'warning',
             Messenger::NOTICE => 'notice',
         ];
 
-        // When the form has multiple sub-fieldsets, messages can be nested.
-        $append = null;
-        $append = function ($message, $class) use (&$append, &$output, $escape, $translate, $translator): void {
-            if (is_array($message)) {
-                foreach ($message as $msg) {
-                    $append($msg, $class);
-                }
-                return;
-            }
-            $escapeHtml = true; // escape HTML by default
-            // "instanceof PsrMessage" cannot be used, since it can be
-            // another object (PsrMessage from Log or Guest, etc.), as long
-            // as it's not in the core or in a specific module.
-            if ($message instanceof TranslatorAwareInterface) {
-                $escapeHtml = $message->getEscapeHtml();
-                $message = $message->setTranslator($translator)->translate();
-            } elseif ($message instanceof Message) {
-                $escapeHtml = $message->escapeHtml();
-                $message = $translate($message);
-            } else {
-                $message = $translate($message);
-            }
-            if ($escapeHtml) {
-                $message = $escape($message);
-            }
-            $output .= sprintf('<li class="%s">%s</li>', $class, $message);
-        };
-
         // Most of the time, the messages are a unique and simple string.
+        $output = '<ul class="messages">';
         foreach ($allMessages as $type => $messages) {
-            $class = $typeToClass[$type] ?? 'notice';
-            $append($messages, $class);
+            $class = $typesToClasses[$type] ?? 'notice';
+            foreach ($messages as $message) {
+                // Escape string by default.
+                // "instanceof PsrMessage" cannot be used, since it can be another
+                // object (Common PsrMessage or old modules), as long as it's not
+                // in the core.
+                if ($message instanceof TranslatorAwareInterface) {
+                    $escapeHtml = $message->getEscapeHtml();
+                    $message = $message->setTranslator($translator)->translate();
+                } elseif ($message instanceof Message) {
+                    $escapeHtml = $message->escapeHtml();
+                    $message = $translate($message);
+                } else {
+                    $escapeHtml = true;
+                    $message = $translate($message);
+                }
+                if ($escapeHtml) {
+                    $message = $escape($message);
+                }
+                $output .= sprintf('<li class="%s">%s</li>', $class, $message);
+            }
         }
         $output .= '</ul>';
+
         return $output;
     }
 }
