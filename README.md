@@ -162,6 +162,24 @@ echo $message;
 echo $message->setTranslator($translator);
 ```
 
+- Messages
+
+The method `getTranslatedMessages()` allows to get all translated messages as
+array. It can be used for a json output.
+
+The method `log()` allows to convert all messages into logs, for example to
+manage background jobs and keep track of front-end messages of errors of some
+modules.
+
+- Messenger
+
+A form with any level of sub-messages can be managed.
+
+- Plugin jSend
+
+The plugin jSend() allows to output a JsonModel formatted as [jSend] to simplify
+exchanges with a third party.
+
 ### Translator
 
 The translator to set in PsrMessage() is available through `$this->translator()`
