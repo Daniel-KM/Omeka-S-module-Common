@@ -32,7 +32,7 @@ class Messages extends AbstractHelper
     }
 
     /**
-     * Get all messages translated and clear them from the session.
+     * Get all messages translated and escaped and clear them from the session.
      *
      * This function may be used for example to output messages for json.
      *
@@ -46,6 +46,7 @@ class Messages extends AbstractHelper
         }
 
         $view = $this->getView();
+        $escape = $view->plugin('escapeHtml');
         $translate = $view->plugin('translate');
         $translator = $translate->getTranslator();
 
@@ -61,9 +62,20 @@ class Messages extends AbstractHelper
         foreach ($allMessages as $type => $messages) {
             $class = $typesToClasses[$type] ?? 'notice';
             foreach ($messages as $message) {
-                $output[$class][] = $message instanceof TranslatorAwareInterface
-                    ? $message->setTranslator($translator)->translate()
-                    : $translate($message);
+                if ($message instanceof TranslatorAwareInterface) {
+                    $escapeHtml = $message->getEscapeHtml();
+                    $message = $message->setTranslator($translator)->translate();
+                } elseif ($message instanceof Message) {
+                    $escapeHtml = $message->escapeHtml();
+                    $message = $translate($message);
+                } else {
+                    $escapeHtml = true;
+                    $message = $translate($message);
+                }
+                if ($escapeHtml) {
+                    $message = $escape($message);
+                }
+                $output[$class][] = $message;
             }
         }
 
