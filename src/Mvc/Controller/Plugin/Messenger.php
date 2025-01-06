@@ -29,4 +29,25 @@ class Messenger extends \Omeka\Mvc\Controller\Plugin\Messenger
             }
         }
     }
+
+    /**
+     * Get all messages flatted by type.
+     *
+     * To flat is needed because messages aren't checked early and may be array.
+     */
+    public function get(): array
+    {
+        if (!isset($this->container->messages)) {
+            return [];
+        }
+
+        $output = [];
+        foreach ($this->container->messages as $type => $messages) {
+            array_walk_recursive($messages, function ($msg) use (&$output, $type): void {
+                $output[$type][] = $msg;
+            });
+        }
+
+        return $this->container->messages = $output;
+    }
 }
