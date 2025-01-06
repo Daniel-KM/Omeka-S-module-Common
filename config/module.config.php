@@ -99,11 +99,11 @@ return [
     ],
     'controller_plugins' => [
         'invokables' => [
+            'messenger' => Mvc\Controller\Plugin\Messenger::class,
             'sendFile' => Mvc\Controller\Plugin\SendFile::class,
         ],
         'factories' => [
             'easyMeta' => Service\ControllerPlugin\EasyMetaFactory::class,
-            'messenger' => Mvc\Controller\Plugin\Messenger::class,
             'specifyMediaType' => Service\ControllerPlugin\SpecifyMediaTypeFactory::class,
             'translator' => Service\ControllerPlugin\TranslatorFactory::class,
         ],

@@ -7,7 +7,7 @@ use Laminas\Form\Fieldset;
 class Messenger extends \Omeka\Mvc\Controller\Plugin\Messenger
 {
     /**
-     * Fixed messenger for forms with one level of element Collection.
+     * Fixed messenger for forms with any levels of element Collection.
      *
      * @link https://github.com/omeka/omeka-s/pull/1626
      *
@@ -20,17 +20,12 @@ class Messenger extends \Omeka\Mvc\Controller\Plugin\Messenger
             if ($elementOrFieldset instanceof Fieldset) {
                 $this->addFormErrors($elementOrFieldset);
             } else {
+                // Sub-names are not kept here, only main label.
                 $label = $this->getController()->translate($elementOrFieldset->getLabel());
-                foreach ($elementOrFieldset->getMessages() as $message) {
-                    // Manage form with one level of Laminas Collection.
-                    if (is_array($message)) {
-                        foreach ($message as $msg) {
-                            $this->addError(sprintf('%s: %s', $label, $msg));
-                        }
-                    } else {
-                        $this->addError(sprintf('%s: %s', $label, $message));
-                    }
-                }
+                $fieldsetMessages = $elementOrFieldset->getMessages();
+                array_walk_recursive($fieldsetMessages, function ($msg) use ($label): void {
+                    $this->addError(sprintf('%1$s: %2$s', $label, $msg));
+                });
             }
         }
     }
