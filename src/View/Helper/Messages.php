@@ -36,9 +36,9 @@ class Messages extends AbstractHelper
      *
      * This function may be used for example to output messages for json.
      *
-     * @return array
+     * @param string|int|null $type
      */
-    public function getTranslatedMessages(): array
+    public function getTranslatedMessages($type = null): array
     {
         $allMessages = $this->get();
         if (!count($allMessages)) {
@@ -55,7 +55,23 @@ class Messages extends AbstractHelper
             Messenger::SUCCESS => 'success',
             Messenger::WARNING => 'warning',
             Messenger::NOTICE => 'notice',
+            'error' => 'error',
+            'success' => 'success',
+            'warning' => 'warning',
+            'notice' => 'notice',
         ];
+
+        if ($type !== null) {
+            $type = $typesToClasses[$type] ?? null;
+            if (!$type) {
+                return [];
+            }
+            $numericType = array_search($type, $typesToClasses);
+            if (!isset($allMessages[$numericType])) {
+                return [];
+            }
+            $allMessages = [$numericType => $allMessages[$numericType]];
+        }
 
         // Most of the time, the messages are a unique and simple string.
         $output = [];
