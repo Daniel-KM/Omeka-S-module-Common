@@ -931,7 +931,6 @@ trait TraitModule
             && (!method_exists($status, 'isKeyauthRequest') || !$status->isKeyauthRequest());
     }
 
-
     /**
      * Check if the module has dependencies.
      *

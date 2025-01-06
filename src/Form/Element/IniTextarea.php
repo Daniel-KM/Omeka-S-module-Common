@@ -164,7 +164,6 @@ class IniTextarea extends Textarea implements InputProviderInterface
             return null;
         }
 
-
         return (string) $result;
     }
 

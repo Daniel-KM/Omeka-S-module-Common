@@ -20,13 +20,11 @@ class Messages extends AbstractHelper
 {
     /**
      * Get all messages and clear them from the session.
-     *
-     * @return array
      */
-    public function get()
+    public function get(): array
     {
         // Messenger can be used directly, it is used only to get messages.
-        $messenger = new Messenger;
+        $messenger = new Messenger();
         $messages = $messenger->get();
         $messenger->clear();
         return $messages;
@@ -134,10 +132,8 @@ class Messages extends AbstractHelper
 
     /**
      * Render the messages.
-     *
-     * @return string
      */
-    public function __invoke()
+    public function __invoke(): string
     {
         $allMessages = $this->get();
         if (!count($allMessages)) {

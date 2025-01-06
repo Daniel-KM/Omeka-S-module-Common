@@ -1405,7 +1405,7 @@ class EasyMeta
      * @param array|int|string|null $prefixesOrUrisOrIds One or multiple ids,
      * uris or prefixes.
      * @return string[] The vocabulary labels matching ids, uris or prefixes, or
-     * all vocabulary uris by prefixes. When the input contains uris, prefixes
+     * all vocabulary labels by prefixes. When the input contains uris, prefixes
      * and ids matching the same vocabularies, they are all returned.
      */
     public function vocabularyLabels($prefixesOrUrisOrIds = null): array
