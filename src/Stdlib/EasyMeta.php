@@ -224,6 +224,16 @@ class EasyMeta
         'resource:value_annotations' => 'value_annotations',
     ];
 
+    const RESOURCE_TYPES = [
+        'annotations' => 'annotation',
+        'assets' => 'asset',
+        'items' => 'item',
+        'item_sets' => 'item-set',
+        'media' => 'media',
+        'resources' => 'resource',
+        'value_annotations' => 'value-annotation',
+    ];
+
     /**
      * @var \Doctrine\DBAL\Connection
      */
@@ -454,6 +464,35 @@ class EasyMeta
         $searchKeys = array_flip($names);
         $result = array_intersect_key(static::RESOURCE_NAMES, $searchKeys);
         return array_replace(array_intersect_key($searchKeys, $result), $result);
+    }
+
+    /**
+     * Get the resource controller or class name from any class, type or name.
+     *
+     * @param string $name
+     * @return string|null The resource controller or class name if any.
+     */
+    public function resourceType($name): ?string
+    {
+        return static::RESOURCE_TYPES[static::RESOURCE_NAMES[$name] ?? null] ?? null;
+    }
+
+    /**
+     * Get the resource controller or class names from any class, type or name
+     * or all of them.
+     *
+     * @param array|string|null $names
+     * @return array The resource controller or class name if any, or all
+     * controller or class names as associative array with resource api names
+     * as key.
+     */
+    public function resourceTypes($names = null): array
+    {
+        if (is_null($names)) {
+            return static::RESOURCE_TYPES;
+        }
+        $result = $this->resourceNames($names);
+        return array_map(fn ($v) => static::RESOURCE_TYPES[$v], $result);
     }
 
     /**
