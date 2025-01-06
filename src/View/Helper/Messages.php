@@ -3,6 +3,7 @@
 namespace Common\View\Helper;
 
 use Laminas\I18n\Translator\TranslatorAwareInterface;
+use Laminas\Log\Logger;
 use Laminas\View\Helper\AbstractHelper;
 use Omeka\Mvc\Controller\Plugin\Messenger;
 use Omeka\Stdlib\Message;
@@ -29,6 +30,39 @@ class Messages extends AbstractHelper
         $messages = $messenger->get();
         $messenger->clear();
         return $messages;
+    }
+
+    /**
+     * Log all messages and clear them from the session.
+     */
+    public function log(): array
+    {
+        $allMessages = $this->get();
+        if (!count($allMessages)) {
+            return [];
+        }
+
+        $typesToLogPriorities = [
+            Messenger::ERROR => Logger::ERR,
+            Messenger::SUCCESS => Logger::NOTICE,
+            Messenger::WARNING => Logger::WARN,
+            Messenger::NOTICE => Logger::INFO,
+        ];
+
+        $logger = $this->getView()->plugin('logger');
+
+        foreach ($allMessages as $type => $messages) {
+            foreach ($messages as $message) {
+                $priority = $typesToLogPriorities[$type] ?? Logger::NOTICE;
+                if ($message instanceof TranslatorAwareInterface) {
+                    $logger->log($priority, $message->getMessage(), $message->getContext());
+                } else {
+                    $logger->log($priority, (string) $message);
+                }
+            }
+        }
+
+        return $allMessages;
     }
 
     /**
