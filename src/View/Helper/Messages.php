@@ -47,6 +47,7 @@ class Messages extends AbstractHelper
             Messenger::NOTICE => Logger::INFO,
         ];
 
+        /** @var \Omeka\View\Helper\Logger $logger */
         $logger = $this->getView()->plugin('logger');
 
         foreach ($allMessages as $type => $messages) {
