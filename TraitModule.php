@@ -89,6 +89,12 @@ trait TraitModule
 
     public function install(ServiceLocatorInterface $services): void
     {
+        // This method allows to use this trait like a parent.
+        $this->installAuto($services);
+    }
+
+    protected function installAuto(ServiceLocatorInterface $services): void
+    {
         $this->setServiceLocator($services);
 
         $this->initTranslations();
