@@ -3,6 +3,7 @@
 namespace Common\Service\ViewHelper;
 
 use Common\View\Helper\DataType;
+use Common\View\Helper\DataTypeBefore420;
 use Interop\Container\ContainerInterface;
 use Laminas\EventManager\Event;
 use Laminas\ServiceManager\Factory\FactoryInterface;
@@ -27,6 +28,15 @@ class DataTypeFactory implements FactoryInterface
         $eventManager = $services->get('EventManager');
         $args = $eventManager->prepareArgs(['data_types' => $config['data_types']['value_annotating']]);
         $eventManager->triggerEvent(new Event('data_types.value_annotating', null, $args));
+
+        if (version_compare(\Omeka\Module::VERSION, '4.2.0', '<')) {
+            return new DataTypeBefore420(
+                $services->get('Omeka\DataTypeManager'),
+                $args['data_types'],
+                $services->get('FormElementManager')
+            );
+        }
+
         return new DataType(
             $services->get('Omeka\DataTypeManager'),
             $args['data_types'],
