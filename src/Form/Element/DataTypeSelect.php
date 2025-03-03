@@ -24,20 +24,27 @@ class DataTypeSelect extends Select
     /**
      * @var array
      */
-    protected $dataTypes = [];
+    protected $dataDataTypes = [];
 
     public function getValueOptions(): array
     {
+        // Set a flag to fix recursive methods when a validator is set or to use
+        // the select when present inside a fieldset.
+        /** @see \Laminas\Form\Element\Select::setValueOptions() */
+        static $flag = false;
+
+        if ($flag) {
+            return $this->valueOptions;
+        }
+
         /** @see \Omeka\View\Helper\DataType::getSelect() */
         $options = [];
         $optgroupOptions = [];
-        foreach ($this->dataTypes as $dataTypeName) {
-            $dataType = $this->dataTypeManager->get($dataTypeName);
-            $label = $dataType->getLabel();
-            if ($optgroupLabel = $dataType->getOptgroupLabel()) {
+        foreach ($this->dataDataTypes as $dataTypeName => $dataDataType) {
+            if ($dataDataType['opt_group_label']) {
                 // Hash the optgroup key to avoid collisions when merging with
                 // data types without an optgroup.
-                $optgroupKey = md5($optgroupLabel);
+                $optgroupKey = md5($dataDataType['opt_group_label']);
                 // Put resource data types before ones added by modules.
                 $optionsVal = in_array($dataTypeName, [
                     'resource',
@@ -50,26 +57,50 @@ class DataTypeSelect extends Select
                     : 'optgroupOptions';
                 if (!isset(${$optionsVal}[$optgroupKey])) {
                     ${$optionsVal}[$optgroupKey] = [
-                        'label' => $optgroupLabel,
+                        'label' => $dataDataType['opt_group_label'],
                         'options' => [],
                     ];
                 }
-                ${$optionsVal}[$optgroupKey]['options'][$dataTypeName] = $label;
+                ${$optionsVal}[$optgroupKey]['options'][$dataTypeName] = $dataDataType['label'];
             } else {
-                $options[$dataTypeName] = $label;
+                $options[$dataTypeName] = $dataDataType['label'];
             }
         }
         // Always put data types not organized in option groups before data
         // types organized within option groups.
         $valueOptions = array_merge($options, $optgroupOptions);
 
-        return $this->prependValuesOptions($valueOptions);
+        $valueOptions = $this->prependValuesOptions($valueOptions);
+
+        $flag = true;
+        $this->setValueOptions($valueOptions);
+        $flag = false;
+
+        return $valueOptions;
     }
 
     public function setDataTypeManager(DataTypeManager $dataTypeManager): self
     {
         $this->dataTypeManager = $dataTypeManager;
-        $this->dataTypes = $dataTypeManager->getRegisteredNames();
+        $this->prepareDataDataTypes();
+        return $this;
+    }
+
+    /**
+     * Create the list of data types one time early.
+     */
+    protected function prepareDataDataTypes(): self
+    {
+        $this->dataDataTypes = [];
+        foreach ($this->dataTypeManager->getRegisteredNames() as $dataTypeName) {
+            /** @var \Omeka\DataType\DataTypeInterface $dataType */
+            $dataType = $this->dataTypeManager->get($dataTypeName);
+            $this->dataDataTypes[$dataTypeName] = [
+                'name' => $dataTypeName,
+                'label' => $dataType->getLabel(),
+                'opt_group_label' => $dataType->getOptgroupLabel(),
+            ];
+        }
         return $this;
     }
 }
