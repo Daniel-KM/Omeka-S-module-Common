@@ -158,6 +158,13 @@ SQL;
             // Index exists.
         }
 
+        try {
+            $connection->executeStatement('ALTER TABLE `session` ADD INDEX `modified` (`modified`);');
+            $hasNewIndex = true;
+        } catch (\Exception $e) {
+            // Index exists.
+        }
+
         if ($hasNewIndex) {
             // Don't use a PsrMessage during install.
             $message = new \Omeka\Stdlib\Message(
