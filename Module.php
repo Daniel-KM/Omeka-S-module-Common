@@ -49,11 +49,16 @@ class Module extends AbstractModule
      */
     protected function fixIndexes(): void
     {
-        // Early fix media_type index and other common indexes.
-        // See migration 20240219000000_AddIndexMediaType.
+        /**
+         * @var \Doctrine\DBAL\Connection $connection
+         * @var \Omeka\Mvc\Controller\Plugin\Messenger $messenger
+         */
         $services = $this->getServiceLocator();
         $connection = $services->get('Omeka\Connection');
+        $messenger = $services->get('ControllerPluginManager')->get('messenger');
 
+        // Early fix media_type index and other common indexes.
+        // See migration 20240219000000_AddIndexMediaType.
         $sqls = <<<'SQL'
 ALTER TABLE `asset`
 CHANGE `media_type` `media_type` varchar(190) COLLATE 'utf8mb4_unicode_ci' NOT NULL AFTER `name`,
@@ -92,6 +97,8 @@ SQL;
             }
         }
 
+        // Don't use a PsrMessage during install.
+
         if (version_compare(\Omeka\Module::VERSION, '4.1', '>=')) {
             $sql = <<<'SQL'
 ALTER TABLE `site_page`
@@ -104,74 +111,62 @@ SQL;
             }
         }
 
-        $hasNewIndex = false;
+        // Add indices to speed up omeka.
 
-        try {
-            $connection->executeStatement('ALTER TABLE `fulltext_search` ADD INDEX `is_public` (`is_public`);');
-            $hasNewIndex = true;
-        } catch (\Exception $e) {
-            // Index exists.
-        }
+        $tableColumns = [
+            ['fulltext_search' => 'is_public'],
+            ['media' => 'ingester'],
+            ['media' => 'renderer'],
+            ['media' => 'media_type'],
+            ['media' => 'extension'],
+            ['resource' => 'resource_type'],
+            ['value' => 'type'],
+            ['value' => 'lang'],
+            // Keep session last, because it may fail on big base.
+            ['session' => 'modified'],
+        ];
 
-        try {
-            $connection->executeStatement('ALTER TABLE `media` ADD INDEX `ingester` (`ingester`);');
-            $hasNewIndex = true;
-        } catch (\Exception $e) {
-            // Index exists.
-        }
-        try {
-            $connection->executeStatement('ALTER TABLE `media` ADD INDEX `renderer` (`renderer`);');
-            $hasNewIndex = true;
-        } catch (\Exception $e) {
-            // Index exists.
-        }
-        try {
-            $connection->executeStatement('ALTER TABLE `media` ADD INDEX `media_type` (`media_type`);');
-            $hasNewIndex = true;
-        } catch (\Exception $e) {
-            // Index exists.
-        }
-        try {
-            $connection->executeStatement('ALTER TABLE `media` ADD INDEX `extension` (`extension`);');
-            $hasNewIndex = true;
-        } catch (\Exception $e) {
-            // Index exists.
+        $newIndices = [];
+        foreach ($tableColumns as $key => $tableColumn) {
+            $table = key($tableColumn);
+            $column = reset($tableColumn);
+            $result = $connection->executeQuery("SHOW INDEX FROM `$table` WHERE `column_name` = '$column';");
+            if ($result->fetchOne()) {
+                unset($tableColumns[$key]);
+            } else {
+                $newIndices[] = "$table/$column";
+            }
         }
 
-        try {
-            $connection->executeStatement('ALTER TABLE `resource` ADD INDEX `resource_type` (`resource_type`);');
-            $hasNewIndex = true;
-        } catch (\Exception $e) {
-            // Index exists.
-        }
-
-        try {
-            $connection->executeStatement('ALTER TABLE `value` ADD INDEX `type` (`type`);');
-            $hasNewIndex = true;
-        } catch (\Exception $e) {
-            // Index exists.
-        }
-        try {
-            $connection->executeStatement('ALTER TABLE `value` ADD INDEX `lang` (`lang`);');
-            $hasNewIndex = true;
-        } catch (\Exception $e) {
-            // Index exists.
-        }
-
-        try {
-            $connection->executeStatement('ALTER TABLE `session` ADD INDEX `modified` (`modified`);');
-            $hasNewIndex = true;
-        } catch (\Exception $e) {
-            // Index exists.
-        }
-
-        if ($hasNewIndex) {
-            // Don't use a PsrMessage during install.
+        if ($newIndices) {
             $message = new \Omeka\Stdlib\Message(
-                'Some indexes were added to tables to improve performance.' // @translate
+                'Some indexes will be added to tables to improve performance: {list}.', // @translate
+                ['list' => implode(', ', $newIndices)]
             );
-            $messenger = $services->get('ControllerPluginManager')->get('messenger');
-            $messenger->addSuccess($message);
+            $messenger->addWarning($message);
+            $newIndices = [];
+            foreach ($tableColumns as $key => $tableColumn) {
+                $table = key($tableColumn);
+                $column = reset($tableColumn);
+                try {
+                    $connection->executeStatement("ALTER TABLE `$table` ADD INDEX `$column` (`$column`);");
+                    $newIndices[] = "$table/$column";
+                } catch (\Exception $e) {
+                    $message = new \Omeka\Stdlib\Message(
+                        'Unable to add index "%1$s" in table "%2$s" to improve performance: %3$s', // @translate
+                        $column, $table, $e->getMessage()
+                    );
+                    $messenger->addError($message);
+                }
+            }
+            if ($newIndices) {
+                // Don't use a PsrMessage during install.
+                $message = new \Omeka\Stdlib\Message(
+                    'Some indexes were added to tables to improve performance: {list}.', // @translate
+                    ['list' => implode(', ', $newIndices)]
+                );
+                $messenger->addSuccess($message);
+            }
         }
     }
 
@@ -184,7 +179,7 @@ SQL;
 
         $services = $this->getServiceLocator();
         $connection = $services->get('Omeka\Connection');
-        $connection->executeStatement('DELETE FROM module WHERE ID = "Generic";');
+        $connection->executeStatement('DELETE FROM module WHERE id = "Generic";');
 
         // Don't use a PsrMessage during install.
         $message = new \Omeka\Stdlib\Message(
