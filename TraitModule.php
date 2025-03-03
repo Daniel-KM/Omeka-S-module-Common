@@ -1109,8 +1109,11 @@ trait TraitModule
      */
     protected function checkDestinationDir(string $dirPath): ?string
     {
+ùf();
         if (file_exists($dirPath)) {
+ùf();
             if (!is_dir($dirPath) || !is_readable($dirPath) || !is_writeable($dirPath)) {
+ùf();
                 $this->getServiceLocator()->get('Omeka\Logger')->err(
                     'The directory "{path}" is not writeable.', // @translate
                     ['path' => $dirPath]
@@ -1119,15 +1122,22 @@ trait TraitModule
             }
             return $dirPath;
         }
+ùf();
 
         $result = @mkdir($dirPath, 0775, true);
         if (!$result) {
+ùf($dirPath);
+ùf(new PsrMessage(
+    'The directory "{path}" is not writeable: {error}.', // @translate
+    ['path' => $dirPath, 'error' => error_get_last()['message']]
+));
             $this->getServiceLocator()->get('Omeka\Logger')->err(
                 'The directory "{path}" is not writeable: {error}.', // @translate
                 ['path' => $dirPath, 'error' => error_get_last()['message']]
             );
             return null;
         }
+ùf();
         return $dirPath;
     }
 

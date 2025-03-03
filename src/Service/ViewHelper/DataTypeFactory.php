@@ -29,7 +29,7 @@ class DataTypeFactory implements FactoryInterface
         $args = $eventManager->prepareArgs(['data_types' => $config['data_types']['value_annotating']]);
         $eventManager->triggerEvent(new Event('data_types.value_annotating', null, $args));
 
-        if (version_compare(\Omeka\Module::VERSION, '4.2.0', '<')) {
+        if (version_compare(strtok(\Omeka\Module::VERSION, '-'), '4.2.0', '<')) {
             return new DataTypeBefore420(
                 $services->get('Omeka\DataTypeManager'),
                 $args['data_types'],
