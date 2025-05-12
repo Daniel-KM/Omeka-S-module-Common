@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-06 00:00+0000\n"
+"POT-Creation-Date: 2025-05-12 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,11 +29,21 @@ msgstr ""
 msgid "default"
 msgstr ""
 
-#: Module.php:164
-msgid "Some indexes were added to tables to improve performance."
+#: Module.php:143
+msgid "Some indexes will be added to tables to improve performance: {list}."
 msgstr ""
 
-#: Module.php:184
+#: Module.php:156
+#, php-format
+msgid ""
+"Unable to add index \"%1$s\" in table \"%2$s\" to improve performance: %3$s"
+msgstr ""
+
+#: Module.php:165
+msgid "Some indexes were added to tables to improve performance: {list}."
+msgstr ""
+
+#: Module.php:186
 msgid "The module Generic is no longer needed and can be removed."
 msgstr ""
 
@@ -69,15 +79,19 @@ msgstr ""
 msgid "A message to translate should be stringable."
 msgstr ""
 
-#: src/Validator/Ini.php:28
+#: src/Validator/Ini.php:32
 msgid "The string is not formatted as ini"
 msgstr ""
 
-#: src/Validator/Ini.php:29
+#: src/Validator/Ini.php:33
 msgid "The string is incorrectly formatted"
 msgstr ""
 
-#: src/Validator/Ini.php:30
+#: src/Validator/Ini.php:34
+msgid "The string contains double quotes or invalid characters"
+msgstr ""
+
+#: src/Validator/Ini.php:35
 msgid "Invalid type given. String expected"
 msgstr ""
 
@@ -106,7 +120,11 @@ msgid "[No site]"
 msgstr ""
 
 #: src/Form/Element/IniTextarea.php:127
-msgid "Invalid ini string"
+msgid "Invalid ini string or values with double quotes"
+msgstr ""
+
+#: src/Form/Element/IniTextarea.php:169
+msgid "The field {label} has an issue: {msg}"
 msgstr ""
 
 #: src/File/Validator.php:29
@@ -185,128 +203,128 @@ msgstr ""
 msgid "sites"
 msgstr ""
 
-#: ManageModuleAndResources.php:93
+#: ManageModuleAndResources.php:95
 msgid ""
 "An error occured when loading vocabulary \"{vocabulary}\": file has no json "
 "content."
 msgstr ""
 
-#: ManageModuleAndResources.php:100
+#: ManageModuleAndResources.php:102
 msgid ""
 "An error occured when adding the prefix \"{prefix}\": another vocabulary "
 "exists. Resolve the conflict before installing this module."
 msgstr ""
 
-#: ManageModuleAndResources.php:112
+#: ManageModuleAndResources.php:114
 msgid ""
 "A custom vocab exists for \"{name}\". Remove it or rename it before "
 "installing this module."
 msgstr ""
 
-#: ManageModuleAndResources.php:123
+#: ManageModuleAndResources.php:125
 msgid ""
 "A resource template exists for {template}. Rename it or remove it before "
 "installing this module."
 msgstr ""
 
-#: ManageModuleAndResources.php:328
+#: ManageModuleAndResources.php:329
 msgid "The vocabulary \"{vocabulary}\" was already installed and was kept."
 msgstr ""
 
-#: ManageModuleAndResources.php:338
+#: ManageModuleAndResources.php:339
 msgid ""
 "An error occured when adding the prefix \"{prefix}\": another vocabulary "
 "exists with the same prefix. Resolve the conflict before installing this "
 "module."
 msgstr ""
 
-#: ManageModuleAndResources.php:350
+#: ManageModuleAndResources.php:351
 msgid ""
 "An error occured when adding the prefix \"{prefix}\" and the associated "
 "properties: {message}"
 msgstr ""
 
-#: ManageModuleAndResources.php:429 ManageModuleAndResources.php:438
+#: ManageModuleAndResources.php:430 ManageModuleAndResources.php:439
 msgid ""
 "An error occured when updating vocabulary \"{prefix}\" and the associated "
 "properties: {message}"
 msgstr ""
 
-#: ManageModuleAndResources.php:532
+#: ManageModuleAndResources.php:534
 msgid ""
 "The following \"{name}\" of the vocabulary \"{label}\" were replaced: "
 "{members}"
 msgstr ""
 
-#: ManageModuleAndResources.php:542
+#: ManageModuleAndResources.php:544
 msgid ""
 "Resources, values and templates were updated, but you may check settings "
 "where the old ones were used."
 msgstr ""
 
-#: ManageModuleAndResources.php:569
+#: ManageModuleAndResources.php:571
 msgid ""
 "The resource template named \"{template}\" is already available and is "
 "skipped."
 msgstr ""
 
-#: ManageModuleAndResources.php:773
+#: ManageModuleAndResources.php:775
 msgid "The custom vocab named \"{custom_vocab}\" is not available."
 msgstr ""
 
-#: ManageModuleAndResources.php:961
+#: ManageModuleAndResources.php:967
 msgid "No file or url set for the vocabulary."
 msgstr ""
 
-#: ManageModuleAndResources.php:971
+#: ManageModuleAndResources.php:977
 msgid "The file \"{file}\" cannot be read. Check the url."
 msgstr ""
 
-#: ManageModuleAndResources.php:981
+#: ManageModuleAndResources.php:987
 msgid "The file \"{file}\" cannot be read. Check the file."
 msgstr ""
 
-#: ManageModuleAndResources.php:1002
+#: ManageModuleAndResources.php:1008
 msgid "A vocabulary must have a namespace uri and a prefix."
 msgstr ""
 
-#: TraitModule.php:103 TraitModule.php:975
+#: TraitModule.php:113 TraitModule.php:987
 msgid "This module requires the module \"{module}\"."
 msgstr ""
 
-#: TraitModule.php:108
+#: TraitModule.php:118
 msgid "This module requires modules \"{modules}\"."
 msgstr ""
 
-#: TraitModule.php:117
+#: TraitModule.php:127
 msgid "This module has resources that cannot be installed."
 msgstr ""
 
-#: TraitModule.php:125
+#: TraitModule.php:135
 msgid ""
 "This module cannot install its tables, because they exist already. Try to "
 "remove them first."
 msgstr ""
 
-#: TraitModule.php:453
+#: TraitModule.php:463
 msgid "The module removed tables \"{tables}\" from a previous broken install."
 msgstr ""
 
-#: TraitModule.php:970
+#: TraitModule.php:982
 msgid ""
 "This module requires the module \"{module}\", version {version} or above."
 msgstr ""
 
-#: TraitModule.php:1087
+#: TraitModule.php:1099
 msgid ""
 "The module \"{module}\" was automatically deactivated because the "
 "dependencies are unavailable."
 msgstr ""
 
-#: TraitModule.php:1109
+#: TraitModule.php:1121
 msgid "The directory \"{path}\" is not writeable."
 msgstr ""
 
-#: TraitModule.php:1120
+#: TraitModule.php:1132
 msgid "The directory \"{path}\" is not writeable: {error}."
 msgstr ""
