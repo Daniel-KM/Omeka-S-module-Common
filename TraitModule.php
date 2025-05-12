@@ -82,9 +82,13 @@ trait TraitModule
             $localConfig = $localConfig[$space] ?? false;
         }
 
-        return $localConfig === false
-            ? null
-            : ($localConfig[$settingsType] ?? []);
+        if ($localConfig === false) {
+            return null;
+        }
+
+        return $settingsType
+            ? $localConfig[$settingsType] ?? []
+            : $localConfig;
     }
 
     public function install(ServiceLocatorInterface $services): void
