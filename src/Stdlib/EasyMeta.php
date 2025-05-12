@@ -1453,7 +1453,7 @@ class EasyMeta
 
     protected function initDataTypesMainCustomVocabs(): void
     {
-        $hasCustomVocab = class_exists('CustomVocab\Module');
+        $hasCustomVocab = class_exists('CustomVocab\Module', false);
         if ($hasCustomVocab) {
             /*
             $sql = <<<'SQL'
@@ -1466,16 +1466,16 @@ class EasyMeta
             $customVocabsByType = $site->get('Omeka\Connection')->executeQuery($sql)->fetchAssociative() ?: ['literal' => '', 'resource' => '', 'uri' => ''];
              */
             $sql = <<<'SQL'
-SELECT
-    CONCAT('customvocab:', `id`) AS "customvocab",
-    CASE
-        WHEN `uris` != "" THEN "uri"
-        WHEN `item_set_id` IS NOT NULL THEN "resource"
-        ELSE "literal"
-    END AS "type"
-FROM `custom_vocab`
-ORDER BY `id` ASC;
-SQL;
+                SELECT
+                    CONCAT('customvocab:', `id`) AS "customvocab",
+                    CASE
+                        WHEN `uris` != "" THEN "uri"
+                        WHEN `item_set_id` IS NOT NULL THEN "resource"
+                        ELSE "literal"
+                    END AS "type"
+                FROM `custom_vocab`
+                ORDER BY `id` ASC;
+                SQL;
             static::$dataTypesMainCustomVocabs = $this->connection->executeQuery($sql)->fetchAllKeyValue() ?: [];
         } else {
             static::$dataTypesMainCustomVocabs = [];

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 /*
- * Copyright Daniel Berthereau, 2018-2024
+ * Copyright Daniel Berthereau, 2018-2025
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -317,7 +317,7 @@ trait TraitModule
 
     protected function postInstall(): void
     {
-        // To be overridden. Automatically run on uninstall.
+        // To be overridden. Automatically run on install.
         $this->postInstallAuto();
     }
 
@@ -917,7 +917,9 @@ trait TraitModule
     /**
      * Check if a setting is translatable.
      *
-     * The method can be overridden to match settings names.
+     * The method should be overridden to match settings names.
+     *
+     * @todo Manage the comment "// @translate" in config automatically.
      */
     protected function isSettingTranslatable(string $settingsType, string $name): bool
     {
@@ -1108,8 +1110,8 @@ trait TraitModule
     /**
      * Check or create the destination folder.
      *
-     * @param string $dirPath Absolute path.
-     * @return string|null
+     * @param string $dirPath Absolute path of the directory to check.
+     * @return string|null The dirpath if valid, else null.
      */
     protected function checkDestinationDir(string $dirPath): ?string
     {

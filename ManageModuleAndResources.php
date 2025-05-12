@@ -497,32 +497,32 @@ class ManageModuleAndResources
                 // remove the old member.
                 if ($name === 'resource_classes') {
                     $sqls = <<<SQL
-UPDATE `resource`
-SET `resource_class_id` = $newMemberId
-WHERE `resource_class_id` = $oldMemberId;
-
-UPDATE `resource_template`
-SET `resource_class_id` = $newMemberId
-WHERE `resource_class_id` = $oldMemberId;
-
-DELETE FROM `resource_class`
-WHERE `id` = $oldMemberId;
-
-SQL;
+                        UPDATE `resource`
+                        SET `resource_class_id` = $newMemberId
+                        WHERE `resource_class_id` = $oldMemberId
+                        ;
+                        UPDATE `resource_template`
+                        SET `resource_class_id` = $newMemberId
+                        WHERE `resource_class_id` = $oldMemberId
+                        ;
+                        DELETE FROM `resource_class`
+                        WHERE `id` = $oldMemberId
+                        ;
+                        SQL;
                 } else {
-                    $sqls = <<<SQL
-UPDATE `value`
-SET `property_id` = $newMemberId
-WHERE `property_id` = $oldMemberId;
-
-UPDATE `resource_template_property`
-SET `property_id` = $newMemberId
-WHERE `property_id` = $oldMemberId;
-
-DELETE FROM `property`
-WHERE `id` = $oldMemberId;
-
-SQL;
+                    $sqls = PHP_EOL . <<<SQL
+                        UPDATE `value`
+                        SET `property_id` = $newMemberId
+                        WHERE `property_id` = $oldMemberId
+                        ;
+                        UPDATE `resource_template_property`
+                        SET `property_id` = $newMemberId
+                        WHERE `property_id` = $oldMemberId
+                        ;
+                        DELETE FROM `property`
+                        WHERE `id` = $oldMemberId
+                        ;
+                        SQL;
                 }
                 foreach (array_filter(explode(";\n", $sqls)) as $sql) {
                     $connection->executeStatement($sql);

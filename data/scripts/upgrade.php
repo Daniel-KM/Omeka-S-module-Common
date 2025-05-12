@@ -26,16 +26,5 @@ $connection = $services->get('Omeka\Connection');
 $messenger = $plugins->get('messenger');
 // $entityManager = $services->get('Omeka\EntityManager');
 
-if (version_compare((string) $oldVersion, '3.4.53', '<')) {
-    $this->fixIndexes();
-}
-
-if (version_compare((string) $oldVersion, '3.4.57', '<')) {
-    $this->fixIndexes();
-}
-
-if (version_compare((string) $oldVersion, '3.4.62', '<')) {
-    $this->fixIndexes();
-}
-
+$this->fixIndexes();
 $this->checkGeneric();

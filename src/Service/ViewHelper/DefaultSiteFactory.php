@@ -26,9 +26,10 @@ class DefaultSiteFactory implements FactoryInterface
                 $site = $api->read('sites', ['id' => $defaultSiteId])->getContent();
             } catch (\Exception $e) {
                 // Nothing.
+                // The site may be private to the user.
             }
         }
-        // Fix issues after Omeka install without public site, so very rarely.
+        // Fix issues after Omeka install without public site.
         if (empty($site)) {
             // Search first public site first.
             $sites = $api->search('sites', ['is_public' => true, 'limit' => 1])->getContent();
