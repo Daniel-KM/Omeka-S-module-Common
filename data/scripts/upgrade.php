@@ -18,7 +18,8 @@ namespace Common;
  */
 $plugins = $services->get('ControllerPluginManager');
 $url = $plugins->get('url');
-$api = $plugins->get('api');
+// Api is not available when upgrading with module AdvancedSearch.
+// $api = $plugins->get('api');
 // $config = require dirname(__DIR__, 2) . '/config/module.config.php';
 // $settings = $services->get('Omeka\Settings');
 // $translate = $plugins->get('translate');
