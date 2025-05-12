@@ -383,7 +383,7 @@ trait TraitModule
         // Include translations early for translatable settings and messages.
         $conf = $this->getConfig();
         if (!isset($conf['translator']['translation_file_patterns'])
-            || is_array($conf['translator']['translation_file_patterns'])
+            || !is_array($conf['translator']['translation_file_patterns'])
         ) {
             return $this;
         }
