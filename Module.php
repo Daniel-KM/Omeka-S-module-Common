@@ -97,7 +97,10 @@ class Module extends AbstractModule
             }
         }
 
-        // Don't use a PsrMessage during install.
+        // PsrMessage may not exist during install.
+        require_once __DIR__ . '/src/Stdlib/PsrInterpolateInterface.php';
+        require_once __DIR__ . '/src/Stdlib/PsrInterpolateTrait.php';
+        require_once __DIR__ . '/src/Stdlib/PsrMessage.php';
 
         if (version_compare(\Omeka\Module::VERSION, '4.1', '>=')) {
             $sql = <<<'SQL'
@@ -139,7 +142,7 @@ class Module extends AbstractModule
         }
 
         if ($newIndices) {
-            $message = new \Omeka\Stdlib\Message(
+            $message = new \Common\Stdlib\PsrMessage(
                 'Some indexes will be added to tables to improve performance: {list}.', // @translate
                 ['list' => implode(', ', $newIndices)]
             );
@@ -152,16 +155,15 @@ class Module extends AbstractModule
                     $connection->executeStatement("ALTER TABLE `$table` ADD INDEX `$column` (`$column`);");
                     $newIndices[] = "$table/$column";
                 } catch (\Exception $e) {
-                    $message = new \Omeka\Stdlib\Message(
-                        'Unable to add index "%1$s" in table "%2$s" to improve performance: %3$s', // @translate
-                        $column, $table, $e->getMessage()
+                    $message = new \Common\Stdlib\PsrMessage(
+                        'Unable to add index "{index}" in table "{table}" to improve performance: {message}', // @translate
+                        ['index' => $column, 'table' => $table, 'message' => $e->getMessage()]
                     );
                     $messenger->addError($message);
                 }
             }
             if ($newIndices) {
-                // Don't use a PsrMessage during install.
-                $message = new \Omeka\Stdlib\Message(
+                $message = new \Common\Stdlib\PsrMessage(
                     'Some indexes were added to tables to improve performance: {list}.', // @translate
                     ['list' => implode(', ', $newIndices)]
                 );
@@ -181,8 +183,12 @@ class Module extends AbstractModule
         $connection = $services->get('Omeka\Connection');
         $connection->executeStatement('DELETE FROM `module` WHERE `id` = "Generic";');
 
-        // Don't use a PsrMessage during install.
-        $message = new \Omeka\Stdlib\Message(
+        // PsrMessage may not exist during install.
+        require_once __DIR__ . '/src/Stdlib/PsrInterpolateInterface.php';
+        require_once __DIR__ . '/src/Stdlib/PsrInterpolateTrait.php';
+        require_once __DIR__ . '/src/Stdlib/PsrMessage.php';
+
+        $message = new \Common\Stdlib\PsrMessage(
             'The module Generic is no longer needed and can be removed.' // @translate
         );
         $messenger = $services->get('ControllerPluginManager')->get('messenger');
