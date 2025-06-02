@@ -186,14 +186,14 @@ class ManageModuleAndResources
 
         $namespaceUri = $vocabularyData['vocabulary']['o:namespace_uri'];
         /** @var \Omeka\Api\Representation\VocabularyRepresentation $vocabularyRepresentation */
-        $vocabularyRepresentation = $this->apiRead('vocabularies', ['namespaceUri' => $namespaceUri])->getContent();
+        $vocabularyRepresentation = $this->apiRead('vocabularies', ['namespaceUri' => $namespaceUri]);
         if ($vocabularyRepresentation) {
             return true;
         }
 
         // Check if the vocabulary have been already imported.
         $prefix = $vocabularyData['vocabulary']['o:prefix'];
-        $vocabularyRepresentation = $this->apiRead('vocabularies', ['prefix' => $prefix])->getContent();
+        $vocabularyRepresentation = $this->apiRead('vocabularies', ['prefix' => $prefix]);
         if (!$vocabularyRepresentation) {
             return false;
         }
@@ -224,7 +224,7 @@ class ManageModuleAndResources
             return false;
         }
 
-        $template = $this->apiRead('resource_templates', ['label' => $data['label']])->getContent();
+        $template = $this->apiRead('resource_templates', ['label' => $data['label']]);
         return !empty($template);
     }
 
@@ -248,7 +248,7 @@ class ManageModuleAndResources
         try {
             // Custom vocab cannot be searched.
             /** @var \CustomVocab\Api\Representation\CustomVocabRepresentation $customVocab */
-            $customVocab = $this->apiRead('custom_vocabs', ['label' => $label])->getContent();
+            $customVocab = $this->apiRead('custom_vocabs', ['label' => $label]);
         } catch (NotFoundException $e) {
             return false;
         } catch (\Omeka\Api\Exception\BadRequestException $e) {
@@ -317,7 +317,7 @@ class ManageModuleAndResources
         // Check if the vocabulary have been already imported.
         $prefix = $vocabularyData['vocabulary']['o:prefix'];
         /** @var \Omeka\Api\Representation\VocabularyRepresentation $vocabularyRepresentation */
-        $vocabularyRepresentation = $this->apiRead('vocabularies', ['prefix' => $prefix])->getContent();
+        $vocabularyRepresentation = $this->apiRead('vocabularies', ['prefix' => $prefix]);
 
         if ($vocabularyRepresentation) {
             // Check if it is the same vocabulary.
@@ -368,12 +368,12 @@ class ManageModuleAndResources
 
         if ($oldNameSpaceUri) {
             /** @var \Omeka\Entity\Vocabulary $vocabulary */
-            $vocabulary = $this->apiRead('vocabularies', ['namespaceUri' => $oldNameSpaceUri], ['responseContent' => 'resource'])->getContent();
+            $vocabulary = $this->apiRead('vocabularies', ['namespaceUri' => $oldNameSpaceUri], ['responseContent' => 'resource']);
         }
         // The old vocabulary may have been already updated.
         if (empty($vocabulary)) {
-            $vocabulary = $this->apiRead('vocabularies', ['namespaceUri' => $namespaceUri], ['responseContent' => 'resource'])->getContent()
-                ?: $this->apiRead('vocabularies', ['prefix' => $prefix], ['responseContent' => 'resource'])->getContent();
+            $vocabulary = $this->apiRead('vocabularies', ['namespaceUri' => $namespaceUri], ['responseContent' => 'resource'])
+                ?: $this->apiRead('vocabularies', ['prefix' => $prefix], ['responseContent' => 'resource']);
         }
         if (!$vocabulary) {
             return $this->createVocabulary($vocabularyData, $module);
@@ -401,14 +401,14 @@ class ManageModuleAndResources
                 $old = $this->apiRead($name, [
                     'vocabulary' => $vocabulary->getId(),
                     'localName' => $oldLocalName,
-                ], ['responseContent' => 'resource'])->getContent();
+                ], ['responseContent' => 'resource']);
                 if (!$old) {
                     continue;
                 }
                 $new = $this->apiRead($name, [
                     'vocabulary' => $vocabulary->getId(),
                     'localName' => $newLocalName,
-                ], ['responseContent' => 'resource'])->getContent();
+                ], ['responseContent' => 'resource']);
                 if ($new) {
                     $vocabularyData['replace'][$name][$oldLocalName] = $newLocalName;
                     continue;
@@ -565,7 +565,7 @@ class ManageModuleAndResources
         // Check if the resource template exists, so it is not replaced.
         $label = $data['o:label'] ?? '';
 
-        $resourceTemplate = $this->apiRead('resource_templates', ['label' => $label])->getContent();
+        $resourceTemplate = $this->apiRead('resource_templates', ['label' => $label]);
         if ($resourceTemplate) {
             $message = new PsrMessage(
                 'The resource template named "{template}" is already available and is skipped.', // @translate
@@ -768,7 +768,7 @@ class ManageModuleAndResources
         $label = $data['o:label'];
         try {
             /** @var \CustomVocab\Api\Representation\CustomVocabRepresentation $customVocab */
-            $customVocab = $this->apiRead('custom_vocabs', ['label' => $label])->getContent();
+            $customVocab = $this->apiRead('custom_vocabs', ['label' => $label]);
         } catch (NotFoundException $e) {
             throw new RuntimeException(
                 (string) new PsrMessage(
@@ -875,7 +875,7 @@ class ManageModuleAndResources
     public function removeVocabulary(string $prefix): self
     {
         // The vocabulary may have been removed manually before.
-        $resource = $this->apiRead('vocabularies', ['prefix' => $prefix])->getContent();
+        $resource = $this->apiRead('vocabularies', ['prefix' => $prefix]);
         if ($resource) {
             try {
                 $this->api->delete('vocabularies', $resource->id());
@@ -894,7 +894,7 @@ class ManageModuleAndResources
     public function removeResourceTemplate(string $label): self
     {
         // The resource template may be renamed or removed manually before.
-        $resource = $this->apiRead('resource_templates', ['label' => $label])->getContent();
+        $resource = $this->apiRead('resource_templates', ['label' => $label]);
         if ($resource) {
             try {
                 $this->api->delete('resource_templates', $resource->id());
@@ -913,7 +913,7 @@ class ManageModuleAndResources
     public function removeCustomVocab(string $label): self
     {
         // The custom vocab may be renamed or removed manually before.
-        $resource = $this->apiRead('custom_vocabs', ['label' => $label])->getContent();
+        $resource = $this->apiRead('custom_vocabs', ['label' => $label]);
         if ($resource) {
             try {
                 $this->api->delete('custom_vocabs', $resource->id());
