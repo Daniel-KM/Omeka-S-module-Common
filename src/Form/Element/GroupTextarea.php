@@ -61,7 +61,7 @@ class GroupTextarea extends ArrayTextarea
 
         // Clean the text area from end of lines.
         // Fixes Windows and Apple issues for copy/paste.
-        $string = str_replace(["\r\n", "\n\r", "\r"], ["\n", "\n", "\n"], (string) $string);
+        $string = strtr((string) $string, ["\r\n" => "\n", "\n\r" => "\n", "\r" => "\n"]);
         $array = array_filter(array_map('trim', explode("\n", $string)), 'strlen');
 
         $groupsArray = [];

@@ -42,7 +42,7 @@ class PsrLogSimple extends Simple implements PsrInterpolateInterface
                 // Don't print an empty array
                 $value = '';
             }
-            $output = str_replace("%$name%", (string) $value, $output);
+            $output = strtr($output, ["%$name%" => (string) $value]);
         }
 
         if (isset($event['extra']) && empty($event['extra'])

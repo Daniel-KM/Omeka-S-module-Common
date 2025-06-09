@@ -99,19 +99,27 @@ class IsHomePage extends AbstractHelper
     protected function isCurrentUrl($url): bool
     {
         $view = $this->getView();
+        $plugins = $view->getHelperPluginManager();
+        $serverUrl = $plugins->get('serverUrl')->__invoke();
+        $basePath = $plugins->get('basePath')->__invoke();
         $currentUrl = $this->currentUrl();
-        $serverUrl = $view->serverUrl();
-        $baseUrl = $view->basePath();
 
         // Strip out the protocol, host, base URL, and rightmost slash before
-        // comparing the URL to the current one
-        $stripOut = [$serverUrl . $baseUrl, @$_SERVER['HTTP_HOST'], $baseUrl];
-        $currentUrl = rtrim(str_replace($stripOut, '', $currentUrl), '/');
-        $url = rtrim(str_replace($stripOut, '', $url), '/');
+        // comparing the URL to the current one.
+        $remove = [$serverUrl . $basePath => ''];
+        if (@$_SERVER['HTTP_HOST']) {
+            $remove[$_SERVER['HTTP_HOST']] = '';
+        }
+        if (strlen($basePath)) {
+            $remove[$basePath] = '';
+        }
+        $currentUrl = rtrim(strtr($currentUrl, $remove), '/');
+        $url = rtrim(strtr($url, $remove), '/');
 
         if (strlen($url) === 0) {
             return strlen($currentUrl) === 0;
         }
+
         // Don't check if the url is part of the current url.
         return $url === $currentUrl;
     }
