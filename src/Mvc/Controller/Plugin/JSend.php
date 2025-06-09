@@ -53,7 +53,7 @@ class JSend extends AbstractPlugin
                     $message = $message
                         ?: $controller->viewHelpers()->get('messages')->getTranslatedMessages('error')
                         ?: $controller->translate('Check your input for invalid data.'); // @translate
-                    $data = ['fail' => $message];
+                    $data = ['message' => $message];
                 }
                 $json = [
                     'status' => self::FAIL,
