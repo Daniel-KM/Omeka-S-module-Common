@@ -12,11 +12,19 @@ class UrlQuery extends Text implements InputProviderInterface
      */
     protected $removeArgumentsPageAndSort = false;
 
+    /**
+     * @var bool
+     */
+    protected $removeArgumentsUseless = false;
+
     public function setOptions($options)
     {
         parent::setOptions($options);
         if (array_key_exists('remove_arguments_page_and_sort', $this->options)) {
             $this->setRemoveArgumentsPageAndSort($this->options['remove_arguments_page_and_sort']);
+        }
+        if (array_key_exists('remove_arguments_useless', $this->options)) {
+            $this->setRemoveArgumentsUseless($this->options['remove_arguments_useless']);
         }
         return $this;
     }
@@ -68,6 +76,10 @@ class UrlQuery extends Text implements InputProviderInterface
             $query = $this->removeArgumentsPageAndSort($query);
         }
 
+        if ($this->removeArgumentsUseless) {
+            $query = $this->arrayFilterRecursiveEmpty($query);
+        }
+
         return $query;
     }
 
@@ -94,6 +106,28 @@ class UrlQuery extends Text implements InputProviderInterface
         return $query;
     }
 
+    /**
+     * Clean an array recursively, removing empty values ("", null and []).
+     *
+     * "0" is a valid value, and the same for 0 and false.
+     * It is mainly used to clean a url query.
+     *
+     * @param array $array The array is passed by reference.
+     * @return array
+     */
+    public function arrayFilterRecursiveEmpty(array &$array): array
+    {
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $array[$key] = $this->arrayFilterRecursiveEmpty($value);
+            }
+            if (in_array($array[$key], ['', null, []], true)) {
+                unset($array[$key]);
+            }
+        }
+        return $array;
+    }
+
     public function setRemoveArgumentsPageAndSort($removeArgumentsPageAndSort): self
     {
         $this->removeArgumentsPageAndSort = (bool) $removeArgumentsPageAndSort;
@@ -103,5 +137,16 @@ class UrlQuery extends Text implements InputProviderInterface
     public function getRemoveArgumentsPageAndSort(): bool
     {
         return $this->removeArgumentsPageAndSort;
+    }
+
+    public function setRemoveArgumentsUseless($removeArgumentsUseless): self
+    {
+        $this->removeArgumentsUseless = (bool) $removeArgumentsUseless;
+        return $this;
+    }
+
+    public function getRemoveArgumentsUseless(): bool
+    {
+        return $this->removeArgumentsUseless;
     }
 }
