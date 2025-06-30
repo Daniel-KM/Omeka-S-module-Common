@@ -1122,8 +1122,10 @@ class ManageModuleAndResources
      *
      * Warning: the data keys should be the ones set in the entity, not the
      * query keys used to search and mapped in each adapter.
+     *
+     * @return \Omeka\Api\Representation\AbstractEntityRepresentation|\Omeka\Entity\AbstractEntity|null
      */
-    protected function apiRead(string $resourceName, array $criteria, array $options = []): ?AbstractEntityRepresentation
+    protected function apiRead(string $resourceName, array $criteria, array $options = [])
     {
         try {
             return $this->api->read($resourceName, $criteria, [], $options)->getContent();
