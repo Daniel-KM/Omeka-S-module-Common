@@ -245,13 +245,11 @@ class ManageModuleAndResources
         }
 
         $label = $data['o:label'];
-        try {
-            // Custom vocab cannot be searched.
-            /** @var \CustomVocab\Api\Representation\CustomVocabRepresentation $customVocab */
-            $customVocab = $this->apiRead('custom_vocabs', ['label' => $label]);
-        } catch (NotFoundException $e) {
-            return false;
-        } catch (\Omeka\Api\Exception\BadRequestException $e) {
+
+        // Custom vocab cannot be searched.
+        /** @var \CustomVocab\Api\Representation\CustomVocabRepresentation $customVocab */
+        $customVocab = $this->apiRead('custom_vocabs', ['label' => $label]);
+        if (!$customVocab) {
             return false;
         }
 
@@ -766,10 +764,9 @@ class ManageModuleAndResources
         $data = json_decode(file_get_contents($filepath), true);
 
         $label = $data['o:label'];
-        try {
-            /** @var \CustomVocab\Api\Representation\CustomVocabRepresentation $customVocab */
-            $customVocab = $this->apiRead('custom_vocabs', ['label' => $label]);
-        } catch (NotFoundException $e) {
+        /** @var \CustomVocab\Api\Representation\CustomVocabRepresentation $customVocab */
+        $customVocab = $this->apiRead('custom_vocabs', ['label' => $label]);
+        if (!$customVocab) {
             throw new RuntimeException(
                 (string) new PsrMessage(
                     'The custom vocab named "{custom_vocab}" is not available.', // @translate
