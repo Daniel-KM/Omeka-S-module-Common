@@ -54,8 +54,11 @@ class UrlQuery extends Text implements InputProviderInterface
 
     public function arrayToQuery($array): string
     {
-        return is_string($array)
-            ? $array
+        if (is_string($array)) {
+            return $array;
+        }
+        return empty($array)
+            ? ''
             : http_build_query($array, '', '&', PHP_QUERY_RFC3986);
     }
 
@@ -65,7 +68,7 @@ class UrlQuery extends Text implements InputProviderInterface
             return $string;
         }
 
-        if (!strlen($string)) {
+        if (!strlen((string) $string)) {
             return [];
         }
 
