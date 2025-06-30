@@ -54,6 +54,7 @@ return [
     // The elements of the module Advanced Search that add features are not included.
     'form_elements' => [
         'invokables' => [
+            Form\Element\ArrayQueriesTextarea::class => Form\Element\ArrayQueriesTextarea::class,
             Form\Element\ArrayText::class => Form\Element\ArrayText::class,
             Form\Element\DataTextarea::class => Form\Element\DataTextarea::class,
             Form\Element\GroupTextarea::class => Form\Element\GroupTextarea::class,
