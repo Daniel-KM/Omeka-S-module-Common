@@ -183,6 +183,10 @@ class Module extends AbstractModule
         $connection = $services->get('Omeka\Connection');
         $connection->executeStatement('DELETE FROM `module` WHERE `id` = "Generic";');
 
+        if (!file_exists(OMEKA_PATH . '/modules/Generic/AbstractModule.php')) {
+            return;
+        }
+
         // PsrMessage may not exist during install.
         require_once __DIR__ . '/src/Stdlib/PsrInterpolateInterface.php';
         require_once __DIR__ . '/src/Stdlib/PsrInterpolateTrait.php';
