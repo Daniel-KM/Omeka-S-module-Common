@@ -295,6 +295,7 @@ trait TraitModule
         $services = $this->getServiceLocator();
         /** @var \Omeka\Mvc\Status $status */
         $status = $services->get('Omeka\Status');
+        // Does not manage the public user form of module Guest.
         if ($status->isAdminRequest()) {
             /** @var \Laminas\Router\Http\RouteMatch $routeMatch */
             $routeMatch = $status->getRouteMatch();
@@ -1095,6 +1096,7 @@ trait TraitModule
         $moduleManager->deactivate($managedModule);
 
         $translator = $services->get('MvcTranslator');
+        $this->ensurePsrMessage();
         $message = new PsrMessage(
             'The module "{module}" was automatically deactivated because the dependencies are unavailable.', // @translate
             ['module' => $module]
@@ -1161,5 +1163,18 @@ trait TraitModule
             }
         }
         return rmdir($dirPath);
+    }
+
+    /**
+     * PsrMessage may not exist during install or update.
+     */
+    protected function ensurePsrMessage(): self
+    {
+        if (!class_exists('Common\Stdlib\PsrMessage', false)) {
+            require_once __DIR__ . '/src/Stdlib/PsrInterpolateInterface.php';
+            require_once __DIR__ . '/src/Stdlib/PsrInterpolateTrait.php';
+            require_once __DIR__ . '/src/Stdlib/PsrMessage.php';
+        }
+        return $this;
     }
 }
