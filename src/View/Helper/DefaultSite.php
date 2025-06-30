@@ -42,12 +42,12 @@ class DefaultSite extends AbstractHelper
             return $this->defaultSiteId;
         } elseif ($metadata === 'id_slug') {
             return $this->defaultSiteId
-            ? [$this->defaultSiteId => $this->defaultSiteSlug]
-            : [];
+                ? [$this->defaultSiteId => $this->defaultSiteSlug]
+                : [];
         } elseif ($metadata === 'slug_id') {
             return $this->defaultSiteId
-            ? [$this->defaultSiteSlug => $this->defaultSiteId]
-            : [];
+                ? [$this->defaultSiteSlug => $this->defaultSiteId]
+                : [];
         } else {
             return $this->defaultSite;
         }

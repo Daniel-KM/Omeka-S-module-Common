@@ -516,7 +516,7 @@ class EasyMeta
     }
 
     /**
-     * Get the resource controller or class name from any class, type or name.
+     * Get the resource controller name from any class, type or name.
      *
      * @param string $name
      * @return string|null The resource controller or class name if any.
@@ -527,8 +527,8 @@ class EasyMeta
     }
 
     /**
-     * Get the resource controller or class names from any class, type or name
-     * or all of them.
+     * Get the resource controller names from any class, type or name or all of
+     * them.
      *
      * @param array|string|null $names
      * @return array The resource controller or class name if any, or all
