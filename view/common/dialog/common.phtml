@@ -1,0 +1,64 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Omeka\Api\Representation\AbstractEntityRepresentation|null $resource
+ * @var string|null $dialogId A id to add to the dialog.
+ * @var string|null $dialogClass A main class to add to the dialog.
+ * @var string|null $heading Heading is a raw string.
+ * @var string|null $body Body is html.
+ * @var \Laminas\Form\Form|null $form
+ * @var \Common\Stdlib\PsrMessage|string|null $message Message to the user, in particular for ajax.
+ * @var string|null $status "success", "notice", "warning", "error" or anything else.
+ */
+
+// To style empty/not empty part, use css pseudo-element ":empty", so remove all whitespaces.
+// It allows to keep div for dynamic filling and to avoids to add js to fix css when a part is missing.
+
+// For form, css grid / flex can be used to quick adapt it and reorder fields.
+
+$plugins = $this->getHelperPluginManager();
+$escape = $plugins->get('escapeHtml');
+$translate = $plugins->get('translate');
+$escapeAttr = $plugins->get('escapeHtmlAttr');
+
+// Prepare hierarchical names when plugin form() is not used (not here).
+if (isset($form)) $form->prepare();
+$hideForm = !isset($form) || ($status ?? null) === 'success';
+?>
+
+<dialog<?= empty($dialogId) ? '' :  sprintf(' id="%s"', $escapeAttr($dialogId)) ?> class="dialog-common<?= empty($dialogClass) ? '' : ' ' . $escapeAttr($dialogClass) ?>"<?= empty($resource) ? '' : sprintf(' data-id="%s"', $resource->id()) ?>>
+    <div class="dialog-background">
+        <div class="dialog-panel">
+            <div class="dialog-header">
+                <button type="button" class="dialog-header-close-button" title="<?= $translate('Close') ?>" autofocus="autofocus">
+                    <span class="dialog-close">🗙</span>
+                </button>
+            </div>
+            <div class="dialog-contents">
+                <?php if (empty($heading)): ?>
+                <div class="dialog-heading"></div>
+                <?php else: ?>
+                <div class="dialog-heading">
+                    <h4><?= $escape($heading) ?></h4>
+                </div>
+                <?php endif; ?>
+                <?php if (empty($message)): ?>
+                <div class="dialog-message"></div>
+                <?php else: ?>
+                <div class="dialog-message<?= $status ? ' ' . $escapeAttr($status) : '' ?>">
+                    <?= is_object($message) && !$message->getEscapeHtml() ? $message : $escape($message) ?>
+                </div>
+                <?php endif; ?>
+                <?php if (empty($body) && $hideForm): ?>
+                <div class="dialog-body"></div>
+                <?php else: ?>
+                <div class="dialog-body">
+                     <?= $body ?? '' ?>
+                     <?= $hideForm ? '' : $this->form($form) ?>
+                </div>
+                <?php endif; ?>
+            </div>
+            <div class="dialog-footer"></div>
+        </div>
+    </div>
+</dialog>

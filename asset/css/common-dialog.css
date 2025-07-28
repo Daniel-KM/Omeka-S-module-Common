@@ -1,0 +1,105 @@
+/**
+ * Manage dialog and messages.
+ *
+ * Some parts are adapted from omeka css.
+ */
+
+@media all {
+
+    [hidden],
+    .hidden {
+        display: none;
+    }
+
+    /** Messages. */
+
+    div[role="main"] > .messages {
+        margin-bottom: 12px;
+
+        & li {
+            margin: 0 0 6px;
+        }
+        & .error {
+            background-color: #f4b4b4
+        }
+        & .success {
+            background-color: #cdffcd
+        }
+        & .warning {
+            background-color: #fff6e6
+        }
+        & a {
+            text-decoration: underline;
+        }
+    }
+
+    .messages {
+        padding: 0;
+        margin: 0;
+        clear: both;
+
+        & li {
+            background-color: rgba(255,255,255,.5);
+            border-radius: 3px;
+            padding: 6px 10px;
+            margin-top: 6px;
+            display: block;
+            width: 100%;
+        }
+    }
+
+    .field .messages {
+        width: 70%;
+        color: lighten(#a91919, 45%);
+        margin-left: auto;
+
+        & li {
+            box-shadow: 0 0 0 1px inset;
+        }
+    }
+
+    .error,
+    .error a {
+        color: lighten(#a91919, 45%);;
+    }
+    .success,
+    .success a {
+        color: green;
+    }
+    .warning,
+    .warning a {
+        color: orange;
+    }
+
+    /** Dialog. */
+
+    #content dialog {
+        margin: auto;
+    }
+    dialog .dialog-header-close-button {
+       float: right;
+    }
+    dialog form input,
+    dialog form select,
+    dialog form textarea {
+       width: 100%;
+    }
+    dialog form textarea {
+       height: 240px;
+    }
+
+    a .spinner,
+    input .spinner,
+    button .spinner {
+        margin-left: 1em;
+    }
+
+}
+
+@media screen and (max-width:640px) {
+
+    div[role="main"] > .messages {
+        margin-top: 24px;
+    }
+
+}
