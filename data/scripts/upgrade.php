@@ -2,8 +2,6 @@
 
 namespace Common;
 
-// Don't use a PsrMessage during install.
-
 /**
  * @var Module $this
  * @var \Laminas\ServiceManager\ServiceLocatorInterface $services
@@ -27,5 +25,6 @@ $connection = $services->get('Omeka\Connection');
 $messenger = $plugins->get('messenger');
 // $entityManager = $services->get('Omeka\EntityManager');
 
+$this->preparePsrMessage();
 $this->fixIndexes();
 $this->checkGeneric();

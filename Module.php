@@ -31,6 +31,7 @@ class Module extends AbstractModule
     public function install(ServiceLocatorInterface $services): void
     {
         $this->setServiceLocator($services);
+        $this->preparePsrMessage();
         $this->fixIndexes();
         $this->checkGeneric();
     }
@@ -40,6 +41,16 @@ class Module extends AbstractModule
         $this->setServiceLocator($services);
         $filepath = __DIR__ . '/data/scripts/upgrade.php';
         require_once $filepath;
+    }
+
+    /**
+     * Load files required to use PsrMessage.
+     */
+    protected function preparePsrMessage(): void
+    {
+        require_once __DIR__ . '/src/Stdlib/PsrInterpolateInterface.php';
+        require_once __DIR__ . '/src/Stdlib/PsrInterpolateTrait.php';
+        require_once __DIR__ . '/src/Stdlib/PsrMessage.php';
     }
 
     /**
@@ -96,11 +107,6 @@ class Module extends AbstractModule
                 // Already done.
             }
         }
-
-        // PsrMessage may not exist during install.
-        require_once __DIR__ . '/src/Stdlib/PsrInterpolateInterface.php';
-        require_once __DIR__ . '/src/Stdlib/PsrInterpolateTrait.php';
-        require_once __DIR__ . '/src/Stdlib/PsrMessage.php';
 
         if (version_compare(\Omeka\Module::VERSION, '4.1', '>=')) {
             $sql = <<<'SQL'
@@ -186,11 +192,6 @@ class Module extends AbstractModule
         if (!file_exists(OMEKA_PATH . '/modules/Generic/AbstractModule.php')) {
             return;
         }
-
-        // PsrMessage may not exist during install.
-        require_once __DIR__ . '/src/Stdlib/PsrInterpolateInterface.php';
-        require_once __DIR__ . '/src/Stdlib/PsrInterpolateTrait.php';
-        require_once __DIR__ . '/src/Stdlib/PsrMessage.php';
 
         $message = new \Common\Stdlib\PsrMessage(
             'The module Generic is no longer needed and can be removed.' // @translate
