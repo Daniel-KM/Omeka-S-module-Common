@@ -39,6 +39,10 @@ use Laminas\I18n\Translator\TranslatorAwareTrait;
  * logs), and as long as \Omeka\I18n\Translator doesn't manage PSR-3, the
  * message is interpolated directly, with translation if possible.
  *
+ * Warning: When used with messenger, a PsrMessage must not contain another
+ * PsrMessage as context. because messages are stored in the session that does
+ * not support closures.
+ *
  * @todo Set translator on construct.
  * @todo Move PsrMessage into core.
  * @fixme When a translator is set to a message during upgrade, it cannot be displayed via messenger because it cannot be serialized in session: PHP Fatal error:  Uncaught Exception: Serialization of 'Closure' is not allowed in /vendor/laminas/laminas-session/src/SessionManager.php:240.

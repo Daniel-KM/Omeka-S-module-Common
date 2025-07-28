@@ -22,7 +22,7 @@ class Translator extends \Omeka\I18n\Translator
         }
 
         if (is_object($message)) {
-            // Check PsrMessage first because it is more standard.
+            // Check PsrMessage first because it is more standard and complete.
             if ($message instanceof PsrMessage) {
                 // Process translation here to avoid useless sub-call.
                 $translation = $this->translator->translate($message->getMessage(), $textDomain, $locale);
@@ -32,17 +32,12 @@ class Translator extends \Omeka\I18n\Translator
                         : $message->interpolate($translation, $message->getContext());
                 }
                 return $translation;
-            }
-
-            if ($message instanceof Message) {
+            } elseif ($message instanceof Message) {
                 $translation = $this->translator->translate($message->getMessage(), $textDomain, $locale);
-                if ($message->hasArgs()) {
-                    $translation = sprintf($translation, ...$message->getArgs());
-                }
-                return $translation;
-            }
-
-            if (method_exists($message, '__toString')) {
+                return $message->hasArgs()
+                    ? sprintf($translation, ...$message->getArgs())
+                    : $translation;
+            } elseif (method_exists($message, '__toString')) {
                 return $this->translator->translate((string) $message, $textDomain, $locale);
             }
         }

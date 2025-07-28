@@ -559,7 +559,7 @@ class EasyMeta
      * Get the resource controller name from any class, type or name.
      *
      * @param string $name
-     * @return string|null The resource controller or class name if any.
+     * @return string|null The resource controller name if any.
      */
     public function resourceType($name): ?string
     {
@@ -571,9 +571,8 @@ class EasyMeta
      * them.
      *
      * @param array|string|null $names
-     * @return array The resource controller or class name if any, or all
-     * controller or class names as associative array with resource api names
-     * as key.
+     * @return array The resource controller name if any, or all controllers
+     * names as associative array with resource api names as key.
      */
     public function resourceTypes($names = null): array
     {

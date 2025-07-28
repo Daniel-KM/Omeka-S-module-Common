@@ -61,7 +61,7 @@ class Module extends AbstractModule
             $services = $this->getServiceLocator();
             $messenger = $services->get('ControllerPluginManager')->get('messenger');
             $messenger->addWarning(
-                'The php extension "intl" is not available. It is recommended to install it to translate dates.' // @translate
+                'The php extension "intl" is not available. It is recommended to install it to manage diacritics and non-latin characters and to translate dates, numbers and more.' // @translate
             );
         }
     }
