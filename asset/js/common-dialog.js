@@ -64,43 +64,61 @@ var CommonDialog = (function() {
     };
 
     /**
-     * Post a form and managed it as jSend.
+     * Send data via jSend from a form or a single button and display a message if any.
+     *
+     * The response may be a fail when http error codes are not used (not 2xx).
+     * The dialog is displayed only if a message exists or in case of a failure.
      */
     self.jSend = function (event) {
         event.preventDefault();
-        const dialog = event.target.closest('dialog');
-        const button = event.submitter;
-        const form = button.closest('form');
-        const url = form.action;
+        const target = event.target;
+        const isForm = target.tagName === 'FORM';
+        const isButton = target.tagName === 'BUTTON';
+
+        let url, formData, formQuery;
         // TODO Clean status for icon on submission.
         // const status = '';
-        const formData = new FormData(form);
-        // Include button name and value when exist (not included by default).
-        if (button.name && button.value) {
-            formData.append(button.name, button.value);
+
+        if (isForm) {
+            const button = event.submitter;
+            url = target.action;
+            formData = new FormData(target);
+            // Include button name and value when exist (not included by default).
+            if (button.name && button.value) {
+                formData.append(button.name, button.value);
+            }
+            formQuery = new URLSearchParams(formData).toString();
+        } else if (isButton) {
+            url = target.dataset.action;
+            const payload = target.dataset.payload ? JSON.parse(target.dataset.payload) : {};
+            formQuery = new URLSearchParams(payload).toString();
+        } else {
+            console.error('Unsupported target for jSend:', target);
+            return null;
         }
-        const formQuery = new URLSearchParams(formData).toString();
-        self.spinnerEnable(button);
-        fetch(url, {
+
+        self.spinnerEnable(target);
+
+        return fetch(url, {
             method: 'POST',
             body: formQuery,
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         })
         .then(response => response.json())
-        .then(data => self.jSendSuccess(data))
+        .then(data => self.jSendResponse(data))
         .catch(error => self.jSendFail(error))
-        .finally(() => self.spinnerDisable(button));
+        .finally(() => self.spinnerDisable(target));
     };
 
     /**
-     * Manage ajax success via jSend.
+     * Manage ajax response via jSend.
      *
-     * A success may be a fail if the endpoint returns a http code 2xx.
+     * The response may be a fail when http error codes are not used (not 2xx).
+     * The dialog is displayed only if a message exists or in case of a failure.
      */
-    self.jSendSuccess = function(data) {
+    self.jSendResponse = function(data) {
         if (!data.status || data.status !== 'success') {
             self.jSendFail(data);
-            document.dispatchEvent(new CustomEvent('o:jsend-fail', { detail: data }));
         } else {
             const dialog = document.querySelector('dialog.dialog-common');
             dialog.close();
