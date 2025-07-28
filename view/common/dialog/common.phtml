@@ -1,9 +1,7 @@
 <?php
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
- * @var \Omeka\Api\Representation\AbstractEntityRepresentation|null $resource
- * @var string|null $dialogId A id to add to the dialog.
- * @var string|null $dialogClass A main class to add to the dialog.
+ * @var array $attributes Attributes for the dialog. The class "dialog-common" is set by default.
  * @var string|null $heading Heading is a raw string.
  * @var string|null $body Body is html.
  * @var \Laminas\Form\Form|null $form
@@ -20,13 +18,17 @@ $plugins = $this->getHelperPluginManager();
 $escape = $plugins->get('escapeHtml');
 $translate = $plugins->get('translate');
 $escapeAttr = $plugins->get('escapeHtmlAttr');
+$htmlAttributes = fn ($key, $value) => is_bool($value) ? ($value ? sprintf('%s="%s"', $escapeAttr($key), $escapeAttr($key)) : '') : sprintf('%s="%s"', $escapeAttr($key), $escapeAttr($value));
+
+$attributes ??= [];
+$attributes['class'] = trim('dialog-common ' . ($attributes['class'] ?? ''));
 
 // Prepare hierarchical names when plugin form() is not used (not here).
 if (isset($form)) $form->prepare();
 $hideForm = !isset($form) || ($status ?? null) === 'success';
 ?>
 
-<dialog<?= empty($dialogId) ? '' :  sprintf(' id="%s"', $escapeAttr($dialogId)) ?> class="dialog-common<?= empty($dialogClass) ? '' : ' ' . $escapeAttr($dialogClass) ?>"<?= empty($resource) ? '' : sprintf(' data-id="%s"', $resource->id()) ?>>
+<dialog <?= implode(' ', array_map($htmlAttributes, array_keys($attributes), array_values($attributes))) ?>>
     <div class="dialog-background">
         <div class="dialog-panel">
             <div class="dialog-header">
