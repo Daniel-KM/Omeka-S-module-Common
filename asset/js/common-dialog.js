@@ -68,6 +68,9 @@ var CommonDialog = (function() {
      *
      * The response may be a fail when http error codes are not used (not 2xx).
      * The dialog is displayed only if a message exists or in case of a failure.
+     * A spinner is appended when the event target (form or button) has
+     * attribute data-spinner true. It may be forced via button when the
+     * attribute set on form is true or false.
      */
     self.jSend = function (event) {
         event.preventDefault();
@@ -75,12 +78,20 @@ var CommonDialog = (function() {
         const isForm = target.tagName === 'FORM';
         const isButton = target.tagName === 'BUTTON';
 
-        let url, formData, formQuery;
+        let url, formData, formQuery, hasSpinner, spinnerTarget;
         // TODO Clean status for icon on submission.
         // const status = '';
 
         if (isForm) {
             const button = event.submitter;
+            spinnerTarget = button;
+            const hasSpinnerForm = [true, 1, '1', 'true'].includes(target.dataset.spinner);
+            const hasNoSpinnerForm = [false, 0, '0', 'false'].includes(target.dataset.spinner);
+            const hasSpinnerButton = [true, 1, '1', 'true'].includes(button.dataset.spinner);
+            const hasNoSpinnerButton = [false, 0, '0', 'false'].includes(button.dataset.spinner);
+            hasSpinner = (!hasSpinnerForm && !hasNoSpinnerForm && hasNoSpinnerButton)
+                || (hasSpinnerForm && !hasNoSpinnerButton)
+                || (hasNoSpinnerForm && hasSpinnerButton);
             url = target.action;
             formData = new FormData(target);
             // Include button name and value when exist (not included by default).
@@ -89,6 +100,8 @@ var CommonDialog = (function() {
             }
             formQuery = new URLSearchParams(formData).toString();
         } else if (isButton) {
+            spinnerTarget = target;
+            hasSpinner = [true, 1, '1', 'true'].includes(spinnerTarget.dataset.spinner);
             url = target.dataset.action;
             const payload = target.dataset.payload ? JSON.parse(target.dataset.payload) : {};
             formQuery = new URLSearchParams(payload).toString();
@@ -97,7 +110,10 @@ var CommonDialog = (function() {
             return null;
         }
 
-        self.spinnerEnable(target);
+        spinnerTarget.disabled = true;
+        if (hasSpinner) {
+            self.spinnerEnable(spinnerTarget);
+        }
 
         return fetch(url, {
             method: 'POST',
@@ -107,7 +123,12 @@ var CommonDialog = (function() {
         .then(response => response.json())
         .then(data => self.jSendResponse(data))
         .catch(error => self.jSendFail(error))
-        .finally(() => self.spinnerDisable(target));
+        .finally(() => {
+            if (hasSpinner) {
+                self.spinnerDisable(spinnerTarget);
+            }
+            spinnerTarget.disabled = false;
+        });
     };
 
     /**
