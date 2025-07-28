@@ -213,7 +213,7 @@ class SendEmail extends AbstractPlugin
 
         // Log any email sent for security purpose.
         $this->logger->info(
-            'An email was sent to {recipients}} with subject: {subject}', // @translate
+            'An email was sent to {recipients} with subject: {subject}', // @translate
             ['recipients' => json_encode($to, 320), 'subject' => $subject]
         );
 

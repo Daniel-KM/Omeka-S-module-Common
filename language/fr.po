@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-12 00:00+0000\n"
-"PO-Revision-Date: 2025-05-12 00:00+0000\n"
+"POT-Creation-Date: 2025-07-28 00:00+0000\n"
+"PO-Revision-Date: 2025-07-28 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -25,31 +25,41 @@ msgstr "Vérifiez votre saisie ou des données incorrectes."
 msgid "An internal error has occurred."
 msgstr "Une erreur interne s’est produite."
 
-#: src/Stdlib/PsrMessage.php:199
+#: src/Stdlib/PsrMessage.php:205
 msgid "default"
 msgstr "défaut"
 
-#: Module.php:143
+#: Module.php:64
+msgid ""
+"The php extension \"intl\" is not available. It is recommended to install it "
+"to manage diacritics and non-latin characters and to translate dates, "
+"numbers and more."
+msgstr ""
+"L’extension php « intl » n’est pas disponible. Il est recommandé de  pour "
+"gérer les caractères diacritiques et non-latin et pour traduire les dates, "
+"les nombres et plus."
+
+#: Module.php:165
 msgid "Some indexes will be added to tables to improve performance: {list}."
 msgstr ""
 "Certains index seront ajoutés aux tables pour améliorer la performance : "
 "{list}."
 
-#: Module.php:156
-#, php-format
+#: Module.php:178
 msgid ""
-"Unable to add index \"%1$s\" in table \"%2$s\" to improve performance: %3$s"
+"Unable to add index \"{index}\" in table \"{table}\" to improve performance: "
+"{message}"
 msgstr ""
-"Impossible d’ajouter l’index « %1$s » dans la table « %2$s » pour améliorer "
-"les performances : %3$s"
+"Impossible d’ajouter l’index « {index} » dans la table « {table} » pour "
+"améliorer les performances : {message}"
 
-#: Module.php:165
+#: Module.php:186
 msgid "Some indexes were added to tables to improve performance: {list}."
 msgstr ""
 "Certains index ont été ajoutés aux tables pour améliorer la performance : "
 "{list}."
 
-#: Module.php:186
+#: Module.php:210
 msgid "The module Generic is no longer needed and can be removed."
 msgstr "Le module Generic n’est plus nécessaire et peux être supprimé."
 
@@ -83,12 +93,57 @@ msgstr ""
 msgid "The status \"%s\" is not supported by jSend."
 msgstr "Le statut « %s » n’est pas pris en charge par jSend."
 
+#: src/Mvc/Controller/Plugin/SendEmail.php:82
+msgid "Email not sent: the content is missing (subject: {subject})."
+msgstr "Mail non envoyé : pas de contenu (sujet : {subject})."
+
+#: src/Mvc/Controller/Plugin/SendEmail.php:94
+msgid "Email not sent: there is no recipient (subject: {subject})."
+msgstr "Mail non envoyé : pas de destinataire (sujet : {subject})."
+
+#: src/Mvc/Controller/Plugin/SendEmail.php:123
+msgid ""
+"Email not sent: the sender \"{sender}\" is not valid (subject: {subject})."
+msgstr ""
+"Mail non envoyé : l’expéditeur « {sender} » est invalide (sujet : {subject})."
+
+#: src/Mvc/Controller/Plugin/SendEmail.php:130
+msgid ""
+"Email not sent: the sender email \"{sender}\" is invalid (subject: "
+"{subject})."
+msgstr ""
+"Mail non envoyé : le mail de l’expéditeur « {sender} » est invalide (sujet : "
+"{subject})."
+
+#: src/Mvc/Controller/Plugin/SendEmail.php:176
+msgid "Email not sent: the cc emails {list} are invalid (subject: {subject})."
+msgstr ""
+"Mail non envoyé : les mails en copie « {list} » sont invalides (sujet : "
+"{subject})."
+
+#: src/Mvc/Controller/Plugin/SendEmail.php:188
+msgid "Email not sent: the bcc emails {list} are invalid (subject: {subject})."
+msgstr ""
+"Mail non envoyé : les mails en copie cachée « {list} » sont invalides "
+"(sujet : {subject})."
+
+#: src/Mvc/Controller/Plugin/SendEmail.php:200
+msgid ""
+"Email not sent: the reply-to emails {list} are invalid (subject: {subject})."
+msgstr ""
+"Mail non envoyé : les mails répondre-à « {list} » sont invalides (sujet : "
+"{subject})."
+
+#: src/Mvc/Controller/Plugin/SendEmail.php:216
+msgid "An email was sent to {recipients} with subject: {subject}"
+msgstr "Un mail a été envoyé à {recipients} avec le sujet : {subject}."
+
 #: src/View/Helper/MediaTypeSelect.php:40
 #: src/Service/Form/Element/MediaTypeSelectFactory.php:28
 msgid "Select media type…"
 msgstr "Choisir un type de média…"
 
-#: src/I18n/Translator.php:50
+#: src/I18n/Translator.php:45
 msgid "A message to translate should be stringable."
 msgstr "Un message à traduire doit être convertible en chaîne."
 
@@ -253,11 +308,11 @@ msgstr ""
 "Un modèle de ressource nommé « {template} » existe : renommez ou supprimez-"
 "le avant d’installer ce module."
 
-#: ManageModuleAndResources.php:329
+#: ManageModuleAndResources.php:327
 msgid "The vocabulary \"{vocabulary}\" was already installed and was kept."
 msgstr "Le vocabulaire « {vocabulary} » a déjà été installé et a été conservé."
 
-#: ManageModuleAndResources.php:339
+#: ManageModuleAndResources.php:337
 msgid ""
 "An error occured when adding the prefix \"{prefix}\": another vocabulary "
 "exists with the same prefix. Resolve the conflict before installing this "
@@ -267,7 +322,7 @@ msgstr ""
 "vocabulaire existe avec le même préfixe. Merci de résoudre le conflit avant "
 "d’installer ce module."
 
-#: ManageModuleAndResources.php:351
+#: ManageModuleAndResources.php:349
 msgid ""
 "An error occured when adding the prefix \"{prefix}\" and the associated "
 "properties: {message}"
@@ -275,7 +330,7 @@ msgstr ""
 "Une erreur est survenue en ajoutant le préfixe « {prefix} » et les "
 "propriétés associées : {message}"
 
-#: ManageModuleAndResources.php:430 ManageModuleAndResources.php:439
+#: ManageModuleAndResources.php:428 ManageModuleAndResources.php:437
 msgid ""
 "An error occured when updating vocabulary \"{prefix}\" and the associated "
 "properties: {message}"
@@ -283,7 +338,7 @@ msgstr ""
 "Une erreur est survenue lors de la mise à jour du vocabulaire « {prefix} » "
 "et les propriétés associées : {message}"
 
-#: ManageModuleAndResources.php:534
+#: ManageModuleAndResources.php:532
 msgid ""
 "The following \"{name}\" of the vocabulary \"{label}\" were replaced: "
 "{members}"
@@ -291,7 +346,7 @@ msgstr ""
 "Les « {name} » suivants du vocabulaire « {label} » ont été remplacés : "
 "{members}"
 
-#: ManageModuleAndResources.php:544
+#: ManageModuleAndResources.php:542
 msgid ""
 "Resources, values and templates were updated, but you may check settings "
 "where the old ones were used."
@@ -299,7 +354,7 @@ msgstr ""
 "Les ressources, valeurs et modèles ont été mis à jour, mais vous pouvez "
 "vérifier les paramètres où les anciennes valeurs étaient utilisées."
 
-#: ManageModuleAndResources.php:571
+#: ManageModuleAndResources.php:569
 msgid ""
 "The resource template named \"{template}\" is already available and is "
 "skipped."
@@ -307,41 +362,41 @@ msgstr ""
 "Le modèle de ressource nommé « {template} » est déjà disponible et a été "
 "conservé."
 
-#: ManageModuleAndResources.php:775
+#: ManageModuleAndResources.php:772
 msgid "The custom vocab named \"{custom_vocab}\" is not available."
 msgstr ""
 "Le vocabulaire personnalisé nommé « {custom_vocab} » n’est pas disponible."
 
-#: ManageModuleAndResources.php:967
+#: ManageModuleAndResources.php:964
 msgid "No file or url set for the vocabulary."
 msgstr "Pas de fichier ou d’url pour le vocabulaire."
 
-#: ManageModuleAndResources.php:977
+#: ManageModuleAndResources.php:974
 msgid "The file \"{file}\" cannot be read. Check the url."
 msgstr "Le fichier « {file} » ne peut pas être lu. Merci de vérifier l’url."
 
-#: ManageModuleAndResources.php:987
+#: ManageModuleAndResources.php:984
 msgid "The file \"{file}\" cannot be read. Check the file."
 msgstr ""
 "Le fichier « {file} » ne peut pas être lu. Merci de vérifier le fichier."
 
-#: ManageModuleAndResources.php:1008
+#: ManageModuleAndResources.php:1005
 msgid "A vocabulary must have a namespace uri and a prefix."
 msgstr "Un vocabulaire doit avoir une uri pour l’espace de nom et un préfixe."
 
-#: TraitModule.php:113 TraitModule.php:987
+#: TraitModule.php:114 TraitModule.php:989
 msgid "This module requires the module \"{module}\"."
 msgstr "Ce module requiert le module « {module} »."
 
-#: TraitModule.php:118
+#: TraitModule.php:119
 msgid "This module requires modules \"{modules}\"."
 msgstr "Ce module requiert les modules « {modules} »."
 
-#: TraitModule.php:127
+#: TraitModule.php:128
 msgid "This module has resources that cannot be installed."
 msgstr "Ce module a des ressources qui ne peuvent pas être installées."
 
-#: TraitModule.php:135
+#: TraitModule.php:136
 msgid ""
 "This module cannot install its tables, because they exist already. Try to "
 "remove them first."
@@ -349,18 +404,18 @@ msgstr ""
 "Ce module ne peut pas installer ses tables car elles existent déjà. Essayez "
 "de les supprimer manuellement."
 
-#: TraitModule.php:463
+#: TraitModule.php:465
 msgid "The module removed tables \"{tables}\" from a previous broken install."
 msgstr ""
 "Le module a supprimé les tables \"{tables}\" depuis une installation échouée."
 
-#: TraitModule.php:982
+#: TraitModule.php:984
 msgid ""
 "This module requires the module \"{module}\", version {version} or above."
 msgstr ""
 "Ce module requiert le module « {module} », version {version} ou supérieure."
 
-#: TraitModule.php:1099
+#: TraitModule.php:1102
 msgid ""
 "The module \"{module}\" was automatically deactivated because the "
 "dependencies are unavailable."
@@ -368,11 +423,11 @@ msgstr ""
 "Le module « {module} » a été automatiquement désactivé car ses dépendances "
 "ne sont plus disponibles."
 
-#: TraitModule.php:1121
+#: TraitModule.php:1124
 msgid "The directory \"{path}\" is not writeable."
 msgstr "Le dossier « {path} » n’est pas inscriptible."
 
-#: TraitModule.php:1132
+#: TraitModule.php:1135
 msgid "The directory \"{path}\" is not writeable: {error}."
 msgstr "Le dossier « {path} » n’est pas inscriptible : {error}"
 
