@@ -88,9 +88,42 @@ trait CommonAdapterTrait
             }
             switch ($type) {
                 case 'id':
-                    // TODO Make a distinction between id and int.
-                    // In AbstractResourceEntityAdapter, a join is added for id. It may manage rights, but is it still useful?
-                    // No break for now.
+                    // TODO In AbstractResourceEntityAdapter, a join is added for id. It may manage rights, but is it still useful?
+                    $hasQueryField = true;
+                    $value = $query[$key];
+                    $values = is_array($value)
+                        ? array_values(array_unique(array_map('intval', $value)))
+                        : [(int) $value];
+                    if ($values === [0]) {
+                        $qb
+                            ->andWhere(
+                                $expr->isNull($entityAlias . '.' . $field)
+                            );
+                    } elseif (in_array(0, $values, true)) {
+                        $qb
+                        ->andWhere($expr->orX(
+                            $expr->isNull($entityAlias . '.' . $field),
+                            $expr->in(
+                                $entityAlias . '.' . $field,
+                                // TODO Add the type in Omeka S 4.2. Not required for integers anyway.
+                                $this->adapter->createNamedParameter($qb, $values)
+                            )
+                        ));
+                    } elseif (count($values) > 1) {
+                        $qb
+                            ->andWhere($expr->in(
+                                $entityAlias . '.' . $field,
+                                $this->adapter->createNamedParameter($qb, $values)
+                            ));
+                    } else {
+                        $qb
+                            ->andWhere($expr->eq(
+                                $entityAlias . '.' . $field,
+                                $this->adapter->createNamedParameter($qb, reset($values))
+                            ));
+                    }
+                    break;
+
                 case 'int':
                     $hasQueryField = true;
                     $value = $query[$key];
