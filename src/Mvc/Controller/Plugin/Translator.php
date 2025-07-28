@@ -20,7 +20,7 @@ class Translator extends AbstractPlugin
     /**
      * Get the Laminas Translator used in Omeka.
      *
-     * In controller, it's a quick shortcut to `$this->getEvent()->getApplication()->getServiceManager()->get('MvcTranslator')`
+     * In controller, it's a quick shortcut to `$this->getEvent()->getApplication()->getServiceManager()->get(\Laminas\I18n\Translator\TranslatorInterface::class)`
      * or `$this->viewHelpers()->get('translate')->getTranslator()`.
      */
     public function __invoke(): LaminasTranslator

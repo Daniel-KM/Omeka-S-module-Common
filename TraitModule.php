@@ -30,6 +30,7 @@ namespace Common;
 
 use Common\Stdlib\PsrMessage;
 use Laminas\EventManager\Event;
+use Laminas\I18n\Translator\TranslatorInterface;
 use Laminas\Mvc\Controller\AbstractController;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\View\Renderer\PhpRenderer;
@@ -104,7 +105,7 @@ trait TraitModule
         $this->initTranslations();
 
         /**@var \Laminas\Mvc\I18n\Translator $translator */
-        $translator = $services->get('MvcTranslator');
+        $translator = $services->get(TranslatorInterface::class);
 
         $this->preInstall();
         if (!$this->checkDependencies()) {
@@ -399,7 +400,7 @@ trait TraitModule
          * @var \Laminas\I18n\Translator\TranslatorInterface $translator
          * @var \Laminas\I18n\Translator\Translator $delegatedTranslator
          */
-        $translator = $services->get(\Laminas\I18n\Translator\TranslatorInterface::class);
+        $translator = $services->get(TranslatorInterface::class);
         $delegatedTranslator = $translator->getDelegatedTranslator();
         foreach ($conf['translator']['translation_file_patterns'] as $translationFilePattern) {
             $delegatedTranslator->addTranslationFilePattern(
@@ -625,7 +626,7 @@ trait TraitModule
             return $this;
         }
 
-        $translator = $this->getServiceLocator()->get('MvcTranslator');
+        $translator = $this->getServiceLocator()->get(TranslatorInterface::class);
 
         foreach ($defaultSettings as $name => $value) {
             switch ($process) {
@@ -864,7 +865,7 @@ trait TraitModule
             $stmt = $connection->executeQuery($sql);
         }
 
-        $translator = $services->get('MvcTranslator');
+        $translator = $services->get(TranslatorInterface::class);
 
         $currentSettings = $stmt->fetchAllKeyValue();
         // Skip settings that are arrays, because the fields "multi-checkbox"
@@ -977,7 +978,7 @@ trait TraitModule
         } elseif (!$exception) {
             return false;
         }
-        $translator = $services->get('MvcTranslator');
+        $translator = $services->get(TranslatorInterface::class);
         if ($version) {
             $message = new PsrMessage(
                 'This module requires the module "{module}", version {version} or above.', // @translate
@@ -1095,7 +1096,7 @@ trait TraitModule
         $managedModule = $moduleManager->getModule($module);
         $moduleManager->deactivate($managedModule);
 
-        $translator = $services->get('MvcTranslator');
+        $translator = $services->get(TranslatorInterface::class);
         $this->ensurePsrMessage();
         $message = new PsrMessage(
             'The module "{module}" was automatically deactivated because the dependencies are unavailable.', // @translate

@@ -14,16 +14,18 @@ use Laminas\I18n\Translator\TranslatorAwareTrait;
  *
  * ```
  * // To get a translator in a controller:
- * $translator = $this->translator();
- * // or:
+ * $translator = $this->getEvent()->getApplication()->getServiceManager()->get(\Laminas\I18n\Translator\TranslatorInterface::class);
+ * // or (deprecated):
  * $translator = $this->getEvent()->getApplication()->getServiceManager()->get('MvcTranslator');
  * // or:
  * $translator = $this->viewHelpers()->get('translate')->getTranslator();
+ * // or:
+ * $translator = $this->translator();
  *
  * // To get translator in a view:
- * $translator = $this->translator();
- * // or:
  * $translator = $this->plugin('translate')->getTranslator();
+ * // or:
+ * $translator = $this->translator();
  *
  * // To set the translator:
  * $psrMessage->setTranslator($translator);

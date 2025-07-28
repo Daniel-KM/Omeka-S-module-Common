@@ -4,6 +4,7 @@ namespace Common\Service\Form\Element;
 
 use Common\Form\Element\OptionalPropertySelect;
 use Interop\Container\ContainerInterface;
+use Laminas\I18n\Translator\TranslatorInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class OptionalPropertySelectFactory implements FactoryInterface
@@ -13,7 +14,7 @@ class OptionalPropertySelectFactory implements FactoryInterface
         $element = new OptionalPropertySelect(null, $options ?? []);
         $element->setEventManager($services->get('EventManager'));
         $element->setApiManager($services->get('Omeka\ApiManager'));
-        $element->setTranslator($services->get('MvcTranslator'));
+        $element->setTranslator($services->get(TranslatorInterface::class));
         return $element;
     }
 }
