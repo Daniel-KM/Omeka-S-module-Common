@@ -2,9 +2,9 @@
 
 namespace Common\Form\Element;
 
-use Laminas\Form\Element\MultiCheckbox;
+use Laminas\Form\Element\Select;
 
-class CustomVocabMultiCheckbox extends MultiCheckbox
+class CustomVocabSelect extends Select
 {
     use CustomVocabTrait;
     use TraitOptionalElement;

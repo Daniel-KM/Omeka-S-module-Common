@@ -78,6 +78,7 @@ return [
             // The only element that is overridden is DataTypeSelect, via the alias.
             Form\Element\CustomVocabMultiCheckbox::class => Service\Form\Element\CustomVocabMultiCheckboxFactory::class,
             Form\Element\CustomVocabRadio::class => Service\Form\Element\CustomVocabRadioFactory::class,
+            Form\Element\CustomVocabSelect::class => Service\Form\Element\CustomVocabSelectFactory::class,
             Form\Element\CustomVocabsSelect::class => Service\Form\Element\CustomVocabsSelectFactory::class,
             Form\Element\DataTypeSelect::class => Service\Form\Element\DataTypeSelectFactory::class,
             Form\Element\MediaIngesterSelect::class => Service\Form\Element\MediaIngesterSelectFactory::class,
