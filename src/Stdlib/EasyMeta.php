@@ -271,6 +271,19 @@ class EasyMeta
         'pages' => 'site_pages',
     ];
 
+    const RESOURCE_TABLES = [
+        'annotations' => 'annotation',
+        'assets' => 'asset',
+        'items' => 'item',
+        'item_sets' => 'item_set',
+        'media' => 'media',
+        'resources' => 'resource',
+        'value_annotations' => 'value_annotation',
+        // Common resources that are not base resources.
+        'sites' => 'site',
+        'site_pages' => 'site_page',
+    ];
+
     const RESOURCE_TYPES = [
         'annotations' => 'annotation',
         'assets' => 'asset',
@@ -513,6 +526,33 @@ class EasyMeta
         $searchKeys = array_flip($names);
         $result = array_intersect_key(static::RESOURCE_NAMES, $searchKeys);
         return array_replace(array_intersect_key($searchKeys, $result), $result);
+    }
+
+    /**
+     * Get the resource table name from any class, type or name.
+     *
+     * @param string $name
+     * @return string|null The resource table name if any.
+     */
+    public function resourceTable($name): ?string
+    {
+        return static::RESOURCE_TABLES[static::RESOURCE_NAMES[$name] ?? null] ?? null;
+    }
+
+    /**
+     * Get the resource table names from any class, type or name or all of them.
+     *
+     * @param array|string|null $names
+     * @return array The resource table name if any, or all table names as
+     * associative array with resource api names as key.
+     */
+    public function resourceTables($names = null): array
+    {
+        if (is_null($names)) {
+            return static::RESOURCE_TABLES;
+        }
+        $result = $this->resourceNames($names);
+        return array_map(fn ($v) => static::RESOURCE_TABLES[$v], $result);
     }
 
     /**
