@@ -1,32 +1,62 @@
 {
     "name": "daniel-km/omeka-s-module-common",
-    "type": "library",
     "description": "Module for Omeka S that manages internal features used in various modules: bulk functions, form elements, view helpers, one-time methods for install, etc.",
+    "type": "library",
+    "keywords": [
+        "Omeka S",
+        "Omeka S module",
+        "development"
+    ],
     "license": "CECILL-2.1",
+    "homepage": "https://gitlab.com/Daniel-KM/Omeka-S-module-Common",
     "authors": [
         {
             "name": "Daniel Berthereau",
             "email": "Daniel.packagist@Berthereau.net"
         }
     ],
-    "homepage": "https://gitlab.com/Daniel-KM/Omeka-S-module-Common",
     "support": {
         "issues": "https://gitlab.com/Daniel-KM/Omeka-S-module-Common/-/issues",
         "forum": "https://forum.omeka.org/"
     },
-    "keywords": [
-        "Omeka S",
-        "Omeka S module",
-        "development"
-    ],
+    "require": {
+        "devbridge/jquery-autocomplete": "^1.4.11",
+        "oomphinc/composer-installers-extender": "^2.0"
+    },
     "autoload": {
         "psr-4": {
             "Common\\": "src/"
         }
     },
-    "config": {
-        "platform": {
-            "php": "7.4"
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "devbridge/jquery-autocomplete",
+                "version": "1.4.11",
+                "type": "omeka-addon-asset",
+                "dist": {
+                    "type": "file",
+                    "url": "https://github.com/Daniel-KM/Omeka-S-module-Common/releases/download/3.4.71/jquery.autocomplete.min.js",
+                    "reference": ""
+                }
+            }
         }
+    ],
+    "config": {
+        "platform": {"php": "7.4"},
+        "allow-plugins": {
+            "composer/installers": true,
+            "oomphinc/composer-installers-extender": true
+        }
+    },
+    "extra": {
+        "installer-types": ["omeka-addon-asset"],
+        "installer-paths": {
+            "asset/vendor/{$name}/": [
+                "type:omeka-addon-asset"
+            ]
+        },
+        "installer-name" : "Common"
     }
 }
