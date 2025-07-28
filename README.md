@@ -30,6 +30,9 @@ copy-paste common code between modules.
 - Form elements
 
   - Array Text
+  - Custom Vocab MultiCheckbox
+  - Custom Vocab Radio
+  - Custom Vocab Select
   - Custom Vocabs Select
   - Data Textarea
   - Data Type Select
@@ -95,23 +98,33 @@ Installation
 
 See general end user documentation for [installing a module].
 
+The module uses an external library [jQuery-Autocomplete], so use the release
+zip to install it, or use and init the source.
+
 * From the zip
 
-Download the last release [Common.zip] from the list of releases, and
-uncompress it in the `modules` directory.
+Download the last release [Common.zip] from the list of releases (the master
+does not contain the dependency), and uncompress it in the `modules` directory.
 
-* From the source and for development
+* From the source and for development:
 
 If the module was installed from the source, rename the name of the folder of
-the module to `Common`.
+the module to `Common`, and go to the root module, and run:
 
-Then install it like any other Omeka module and follow the config instructions.
+```sh
+composer install --no-dev
+```
 
 
 Usage (for developer)
 ---------------------
 
 ### Services, controller plugins and view helpers
+
+#### Simple and complete query builder for api adapter
+
+Just add the trait `CommonAdapterTrait` and the list of query arguments for all
+common queries will work, including queries with multiple values.
 
 #### AssetUrl
 
@@ -285,7 +298,8 @@ An exception should not be translated early. Nevertheless, if you really need
 it, you can use:
 
 ```php
-# Where `$this->translator` is the MvcTranslator from services, either:
+# Where `$this->translator` is \Laminas\I18n\Translator\TranslatorInterface or
+# MvcTranslator from services, either:
 throw new \RuntimeException($this->translator->translate($message));
 throw new \Exception($message->setTranslator($this->translator)->translate());
 ```
