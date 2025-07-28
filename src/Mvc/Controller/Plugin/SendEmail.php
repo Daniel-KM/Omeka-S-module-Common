@@ -169,15 +169,39 @@ class SendEmail extends AbstractPlugin
             ->setBody($body);
 
         if ($cc) {
-            $message->addCc($cc);
+            try {
+                $message->addCc($cc);
+            } catch (\Exception $e) {
+                $this->logger->err(
+                    'Email not sent: the cc emails {list} are invalid (subject: {subject}).', // @translate
+                    ['list' => json_encode($cc, 320), 'subject' => $subject]
+                );
+                return false;
+            }
         }
 
         if ($bcc) {
-            $message->addBcc($bcc);
+            try {
+                $message->addBcc($bcc);
+            } catch (\Exception $e) {
+                $this->logger->err(
+                    'Email not sent: the bcc emails {list} are invalid (subject: {subject}).', // @translate
+                    ['list' => json_encode($bcc, 320), 'subject' => $subject]
+                );
+                return false;
+            }
         }
 
         if ($replyTo) {
-            $message->addReplyTo($replyTo);
+            try {
+                $message->addReplyTo($replyTo);
+            } catch (\Exception $e) {
+                $this->logger->err(
+                    'Email not sent: the reply-to emails {list} are invalid (subject: {subject}).', // @translate
+                    ['list' => json_encode($replyTo, 320), 'subject' => $subject]
+                );
+                return false;
+            }
         }
 
         try {
