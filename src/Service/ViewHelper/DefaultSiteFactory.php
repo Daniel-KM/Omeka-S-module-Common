@@ -31,13 +31,27 @@ class DefaultSiteFactory implements FactoryInterface
         }
         // Fix issues after Omeka install without public site.
         if (empty($site)) {
-            // Search first public site first.
-            $sites = $api->search('sites', ['is_public' => true, 'limit' => 1])->getContent();
-            $site = $sites ? reset($sites) : null;
-            // Else first site.
-            if (empty($sites)) {
-                $sites = $api->search('sites', ['limit' => 1])->getContent();
-                $site = $sites ? reset($sites) : null;
+            // Use a sql query to avoid long process of api and possible issue
+            // with module Advanced Search delegator.
+            // Use Doctrine DQL to fetch the site entity directly.
+            // In most of the cases, the first site is the default one and is
+            // public and is already cached in entity manager.
+            /** @var \Doctrine\ORM\EntityManager $entityManager */
+            $entityManager = $services->get('Omeka\EntityManager');
+            $queryBuilder = $entityManager->createQueryBuilder();
+            $queryBuilder
+                ->select('site')
+                ->from(\Omeka\Entity\Site::class, 'site')
+                ->orderBy('site.isPublic', 'DESC')
+                ->setMaxResults(1);
+            $site = $queryBuilder->getQuery()->getOneOrNullResult();
+            if ($site) {
+                try {
+                    $site = $api->read('sites', ['id' => $site->getId()])->getContent();
+                } catch (\Exception $e) {
+                    // Reset site, because it is probably private to the user.
+                    $site = null;
+                }
             }
         }
         return new DefaultSite($site);
