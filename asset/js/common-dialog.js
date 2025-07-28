@@ -74,7 +74,12 @@ var CommonDialog = (function() {
         const url = form.action;
         // TODO Clean status for icon on submission.
         // const status = '';
-        const formQuery = new URLSearchParams(new FormData(form)).toString();
+        const formData = new FormData(form);
+        // Include button name and value when exist (not included by default).
+        if (button.name && button.value) {
+            formData.append(button.name, button.value);
+        }
+        const formQuery = new URLSearchParams(formData).toString();
         self.spinnerEnable(button);
         fetch(url, {
             method: 'POST',
