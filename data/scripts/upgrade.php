@@ -26,5 +26,6 @@ $messenger = $plugins->get('messenger');
 // $entityManager = $services->get('Omeka\EntityManager');
 
 $this->preparePsrMessage();
+$this->checkExtensionIntl();
 $this->fixIndexes();
 $this->checkGeneric();

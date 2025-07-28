@@ -32,6 +32,7 @@ class Module extends AbstractModule
     {
         $this->setServiceLocator($services);
         $this->preparePsrMessage();
+        $this->checkExtensionIntl();
         $this->fixIndexes();
         $this->checkGeneric();
     }
@@ -51,6 +52,18 @@ class Module extends AbstractModule
         require_once __DIR__ . '/src/Stdlib/PsrInterpolateInterface.php';
         require_once __DIR__ . '/src/Stdlib/PsrInterpolateTrait.php';
         require_once __DIR__ . '/src/Stdlib/PsrMessage.php';
+    }
+
+    protected function checkExtensionIntl(): void
+    {
+        if (!extension_loaded('intl')) {
+            /** @var \Omeka\Mvc\Controller\Plugin\Messenger $messenger */
+            $services = $this->getServiceLocator();
+            $messenger = $services->get('ControllerPluginManager')->get('messenger');
+            $messenger->addWarning(
+                'The php extension "intl" is not available. It is recommended to install it to translate dates.' // @translate
+            );
+        }
     }
 
     /**
