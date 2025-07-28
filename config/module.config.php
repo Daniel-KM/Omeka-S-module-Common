@@ -71,15 +71,17 @@ return [
             Form\Element\UrlQuery::class => Form\Element\UrlQuery::class,
         ],
         'factories' => [
-            // This element does not exist in Omeka.
+            // Some elements fix or improve omeka ones: MediaIngesterSelect, MediaRendererSelect,
+            // ThumbnailTypeSelect. But they don't have the same namespace.
+            // SitesPageSelect is not the same than \Omeka\Form\Element\SitePageSelect,
+            // but manage multiple sites.
+            // The only element that is overridden is DataTypeSelect, via the alias.
+            Form\Element\CustomVocabMultiCheckbox::class => Service\Form\Element\CustomVocabMultiCheckboxFactory::class,
             Form\Element\CustomVocabsSelect::class => Service\Form\Element\CustomVocabsSelectFactory::class,
-            // This element does not exist in Omeka.
             Form\Element\DataTypeSelect::class => Service\Form\Element\DataTypeSelectFactory::class,
             Form\Element\MediaIngesterSelect::class => Service\Form\Element\MediaIngesterSelectFactory::class,
             Form\Element\MediaRendererSelect::class => Service\Form\Element\MediaRendererSelectFactory::class,
-            // This element does not exist in Omeka.
             Form\Element\MediaTypeSelect::class => Service\Form\Element\MediaTypeSelectFactory::class,
-            // This element is not the same than \Omeka\Form\Element\SitePageSelect (singular site).
             Form\Element\SitesPageSelect::class => Service\Form\Element\SitesPageSelectFactory::class,
             Form\Element\ThumbnailTypeSelect::class => Service\Form\Element\ThumbnailTypeSelectFactory::class,
             // Optional core elements.
