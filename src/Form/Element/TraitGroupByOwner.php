@@ -2,11 +2,23 @@
 
 namespace Common\Form\Element;
 
+use Omeka\Api\Manager as ApiManager;
 use Omeka\Api\Representation\UserRepresentation;
 
 trait TraitGroupByOwner
 {
     use TraitPrependValuesOptions;
+
+    /**
+     * @var ApiManager
+     */
+    protected $apiManager;
+
+    public function setApiManager(ApiManager $apiManager): self
+    {
+        $this->apiManager = $apiManager;
+        return $this;
+    }
 
     /**
      * Fix prepending value "0" and owner without resource.
