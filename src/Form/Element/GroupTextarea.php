@@ -55,7 +55,7 @@ class GroupTextarea extends ArrayTextarea
     {
         if (is_array($string)) {
             return $string;
-        } elseif ($string === '' || is_null($string)) {
+        } elseif ($string === '' || $string === null) {
             return [];
         }
 

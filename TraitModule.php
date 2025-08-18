@@ -231,7 +231,7 @@ trait TraitModule
 
         $this->initDataToPopulate($settings, 'config');
         $data = $this->prepareDataToPopulate($settings, 'config');
-        if (is_null($data)) {
+        if ($data === null) {
             return null;
         }
 
@@ -719,7 +719,7 @@ trait TraitModule
         } else {
             $this->initDataToPopulate($settings, $settingsType, $id);
             $data = $this->prepareDataToPopulate($settings, $settingsType);
-            if (is_null($data)) {
+            if ($data === null) {
                 return null;
             }
         }

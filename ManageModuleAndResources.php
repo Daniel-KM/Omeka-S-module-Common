@@ -95,7 +95,7 @@ class ManageModuleAndResources
                 ));
             }
             $exists = $this->checkVocabulary($data, $module);
-            if (is_null($exists)) {
+            if ($exists === null) {
                 throw new ModuleCannotInstallException((string) new PsrMessage(
                     'An error occured when adding the prefix "{prefix}": another vocabulary exists. Resolve the conflict before installing this module.', // @translate
                     ['prefix' => $data['vocabulary']['o:prefix']]
@@ -107,7 +107,7 @@ class ManageModuleAndResources
         // The presence of the module should be already checked during install.
         foreach ($this->listFilesInDir($filepathData . 'custom-vocabs') as $filepath) {
             $exists = $this->checkCustomVocab($filepath);
-            if (is_null($exists)) {
+            if ($exists === null) {
                 throw new ModuleCannotInstallException((string) new PsrMessage(
                     'A custom vocab exists for "{name}". Remove it or rename it before installing this module.', // @translate
                     ['name' => pathinfo($filepath, PATHINFO_FILENAME)]
@@ -118,7 +118,7 @@ class ManageModuleAndResources
         // Resource templates.
         foreach ($this->listFilesInDir($filepathData . 'resource-templates') as $filepath) {
             $exists = $this->checkResourceTemplate($filepath);
-            if (is_null($exists)) {
+            if ($exists === null) {
                 throw new ModuleCannotInstallException((string) new PsrMessage(
                     'A resource template exists for {template}. Rename it or remove it before installing this module.', // @translate
                     ['template' => pathinfo($filepath, PATHINFO_FILENAME)]

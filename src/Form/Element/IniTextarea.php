@@ -149,7 +149,7 @@ class IniTextarea extends Textarea implements InputProviderInterface
     {
         if (is_string($array)) {
             return $array;
-        } elseif (is_null($array)) {
+        } elseif ($array === null) {
             return '';
         }
 
@@ -182,7 +182,7 @@ class IniTextarea extends Textarea implements InputProviderInterface
     {
         if (is_array($string)) {
             return $string;
-        } elseif (is_null($string)) {
+        } elseif ($string === null) {
             return [];
         }
 

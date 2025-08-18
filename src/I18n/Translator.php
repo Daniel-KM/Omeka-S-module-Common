@@ -17,7 +17,7 @@ class Translator extends \Omeka\I18n\Translator
     {
         if (is_scalar($message)) {
             return $this->translator->translate((string) $message, $textDomain, $locale);
-        } elseif (is_null($message)) {
+        } elseif ($message === null) {
             return '';
         }
 

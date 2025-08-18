@@ -514,7 +514,7 @@ class EasyMeta
      */
     public function resourceNames($names = null): array
     {
-        if (is_null($names)) {
+        if ($names === null) {
             $result = array_unique(static::RESOURCE_NAMES);
             return array_combine($result, $result);
         }
@@ -548,7 +548,7 @@ class EasyMeta
      */
     public function resourceTables($names = null): array
     {
-        if (is_null($names)) {
+        if ($names === null) {
             return static::RESOURCE_TABLES;
         }
         $result = $this->resourceNames($names);
@@ -576,7 +576,7 @@ class EasyMeta
      */
     public function resourceTypes($names = null): array
     {
-        if (is_null($names)) {
+        if ($names === null) {
             return static::RESOURCE_TYPES;
         }
         $result = $this->resourceNames($names);
@@ -630,7 +630,7 @@ class EasyMeta
         if (!$dataType) {
             return null;
         }
-        if (is_null(static::$dataTypesByNames)) {
+        if (static::$dataTypesByNames === null) {
             $this->initDataTypes();
         }
         $dataType = mb_strtolower($dataType);
@@ -646,10 +646,10 @@ class EasyMeta
      */
     public function dataTypeNames($dataTypes = null): array
     {
-        if (is_null(static::$dataTypesByNames)) {
+        if (static::$dataTypesByNames === null) {
             $this->initDataTypes();
         }
-        if (is_null($dataTypes)) {
+        if ($dataTypes === null) {
             return static::$dataTypesByNames;
         }
         if (is_scalar($dataTypes)) {
@@ -667,10 +667,10 @@ class EasyMeta
      */
     public function dataTypeNamesUsed($dataTypes = null): array
     {
-        if (is_null(static::$dataTypesByNamesUsed)) {
+        if (static::$dataTypesByNamesUsed === null) {
             $this->initDataTypesUsed();
         }
-        if (is_null($dataTypes)) {
+        if ($dataTypes === null) {
             return static::$dataTypesByNamesUsed;
         }
         if (is_scalar($dataTypes)) {
@@ -688,10 +688,10 @@ class EasyMeta
      */
     public function dataTypeLabels($dataTypes = null): array
     {
-        if (is_null(static::$dataTypeLabelsByNames)) {
+        if (static::$dataTypeLabelsByNames === null) {
             $this->initDataTypes();
         }
-        if (is_null($dataTypes)) {
+        if ($dataTypes === null) {
             return static::$dataTypeLabelsByNames;
         }
         if (is_scalar($dataTypes)) {
@@ -766,7 +766,7 @@ class EasyMeta
         if (!$dataType) {
             return null;
         }
-        if (is_null(static::$dataTypesMainCustomVocabs)) {
+        if (static::$dataTypesMainCustomVocabs === null) {
             $this->initDataTypesMainCustomVocabs();
         }
         $dataType = mb_strtolower($dataType);
@@ -784,10 +784,10 @@ class EasyMeta
      */
     public function dataTypeMainCustomVocabs($dataTypes = null): array
     {
-        if (is_null(static::$dataTypesMainCustomVocabs)) {
+        if (static::$dataTypesMainCustomVocabs === null) {
             $this->initDataTypesMainCustomVocabs();
         }
-        if (is_null($dataTypes)) {
+        if ($dataTypes === null) {
             return static::$dataTypesMainCustomVocabs;
         }
         if (is_scalar($dataTypes)) {
@@ -804,7 +804,7 @@ class EasyMeta
      */
     public function propertyId($termOrId): ?int
     {
-        if (is_null(static::$propertyIdsByTermsAndIds)) {
+        if (static::$propertyIdsByTermsAndIds === null) {
             $this->initProperties();
         }
         return static::$propertyIdsByTermsAndIds[$termOrId] ?? null;
@@ -820,7 +820,7 @@ class EasyMeta
      */
     public function propertyIds($termsOrIds = null): array
     {
-        if (is_null(static::$propertyIdsByTermsAndIds)) {
+        if (static::$propertyIdsByTermsAndIds === null) {
             $this->initProperties();
         }
         if (!$termsOrIds) {
@@ -849,7 +849,7 @@ class EasyMeta
      */
     public function propertyIdsUsed($termsOrIds = null): array
     {
-        if (is_null(static::$propertyIdsByTermsAndIdsUsed)) {
+        if (static::$propertyIdsByTermsAndIdsUsed === null) {
             $this->initPropertiesUsed();
         }
         if (!$termsOrIds) {
@@ -876,7 +876,7 @@ class EasyMeta
      */
     public function propertyTerm($termOrId): ?string
     {
-        if (is_null(static::$propertyIdsByTermsAndIds)) {
+        if (static::$propertyIdsByTermsAndIds === null) {
             $this->initProperties();
         }
         if (!isset(static::$propertyIdsByTermsAndIds[$termOrId])) {
@@ -897,7 +897,7 @@ class EasyMeta
      */
     public function propertyTerms($termsOrIds = null): array
     {
-        if (is_null(static::$propertyIdsByTermsAndIds)) {
+        if (static::$propertyIdsByTermsAndIds === null) {
             $this->initProperties();
         }
         if (!$termsOrIds) {
@@ -905,7 +905,7 @@ class EasyMeta
                 ? array_flip(static::$propertyIdsByTerms)
                 : [];
         }
-        if (is_null(static::$propertyTermsByTermsAndIds)) {
+        if (static::$propertyTermsByTermsAndIds === null) {
             $propertyTermsByIds = array_flip(static::$propertyIdsByTerms);
             static::$propertyTermsByTermsAndIds = array_combine($propertyTermsByIds, $propertyTermsByIds)
                 + $propertyTermsByIds;
@@ -930,7 +930,7 @@ class EasyMeta
      */
     public function propertyLabel($termOrId): ?string
     {
-        if (is_null(static::$propertyIdsByTermsAndIds)) {
+        if (static::$propertyIdsByTermsAndIds === null) {
             $this->initProperties();
         }
         return static::$propertyLabelsByTermsAndIds[$termOrId] ?? null;
@@ -947,7 +947,7 @@ class EasyMeta
      */
     public function propertyLabels($termsOrIds = null): array
     {
-        if (is_null(static::$propertyLabelsByTerms)) {
+        if (static::$propertyLabelsByTerms === null) {
             $this->initProperties();
         }
         if (!$termsOrIds) {
@@ -971,7 +971,7 @@ class EasyMeta
      */
     public function resourceClassId($termOrId): ?int
     {
-        if (is_null(static::$resourceClassIdsByTermsAndIds)) {
+        if (static::$resourceClassIdsByTermsAndIds === null) {
             $this->initResourceClasses();
         }
         return static::$resourceClassIdsByTermsAndIds[$termOrId] ?? null;
@@ -987,7 +987,7 @@ class EasyMeta
      */
     public function resourceClassIds($termsOrIds = null): array
     {
-        if (is_null(static::$resourceClassIdsByTermsAndIds)) {
+        if (static::$resourceClassIdsByTermsAndIds === null) {
             $this->initResourceClasses();
         }
         if (!$termsOrIds) {
@@ -1017,7 +1017,7 @@ class EasyMeta
      */
     public function resourceClassIdsUsed($termsOrIds = null): array
     {
-        if (is_null(static::$resourceClassIdsByTermsAndIdsUsed)) {
+        if (static::$resourceClassIdsByTermsAndIdsUsed === null) {
             $this->initResourceClassesUsed();
         }
         if (!$termsOrIds) {
@@ -1044,7 +1044,7 @@ class EasyMeta
      */
     public function resourceClassTerm($termOrId): ?string
     {
-        if (is_null(static::$resourceClassIdsByTermsAndIds)) {
+        if (static::$resourceClassIdsByTermsAndIds === null) {
             $this->initResourceClasses();
         }
         if (!isset(static::$resourceClassIdsByTermsAndIds[$termOrId])) {
@@ -1065,7 +1065,7 @@ class EasyMeta
      */
     public function resourceClassTerms($termsOrIds = null): array
     {
-        if (is_null(static::$resourceClassIdsByTermsAndIds)) {
+        if (static::$resourceClassIdsByTermsAndIds === null) {
             $this->initResourceClasses();
         }
         if (!$termsOrIds) {
@@ -1073,7 +1073,7 @@ class EasyMeta
                 ? array_flip(static::$resourceClassIdsByTerms)
                 : [];
         }
-        if (is_null(static::$resourceClassTermsByTermsAndIds)) {
+        if (static::$resourceClassTermsByTermsAndIds === null) {
             $resourceClassTermsByIds = array_flip(static::$resourceClassIdsByTerms);
             static::$resourceClassTermsByTermsAndIds = array_combine($resourceClassTermsByIds, $resourceClassTermsByIds)
                 + $resourceClassTermsByIds;
@@ -1098,7 +1098,7 @@ class EasyMeta
      */
     public function resourceClassLabel($termOrId): ?string
     {
-        if (is_null(static::$resourceClassIdsByTermsAndIds)) {
+        if (static::$resourceClassIdsByTermsAndIds === null) {
             $this->initResourceClasses();
         }
         return static::$resourceClassLabelsByTermsAndIds[$termOrId] ?? null;
@@ -1115,7 +1115,7 @@ class EasyMeta
      */
     public function resourceClassLabels($termsOrIds = null): array
     {
-        if (is_null(static::$resourceClassLabelsByTerms)) {
+        if (static::$resourceClassLabelsByTerms === null) {
             $this->initResourceClasses();
         }
         if (!$termsOrIds) {
@@ -1139,7 +1139,7 @@ class EasyMeta
      */
     public function resourceTemplateId($labelOrId): ?int
     {
-        if (is_null(static::$resourceTemplateIdsByLabelsAndIds)) {
+        if (static::$resourceTemplateIdsByLabelsAndIds === null) {
             $this->initResourceTemplates();
         }
         return static::$resourceTemplateIdsByLabelsAndIds[$labelOrId] ?? null;
@@ -1155,7 +1155,7 @@ class EasyMeta
      */
     public function resourceTemplateIds($labelsOrIds = null): array
     {
-        if (is_null(static::$resourceTemplateIdsByLabelsAndIds)) {
+        if (static::$resourceTemplateIdsByLabelsAndIds === null) {
             $this->initResourceTemplates();
         }
         if (!$labelsOrIds) {
@@ -1185,7 +1185,7 @@ class EasyMeta
      */
     public function resourceTemplateIdsUsed($labelsOrIds = null): array
     {
-        if (is_null(static::$resourceTemplateIdsByLabelsAndIdsUsed)) {
+        if (static::$resourceTemplateIdsByLabelsAndIdsUsed === null) {
             $this->initResourceTemplatesUsed();
         }
         if (!$labelsOrIds) {
@@ -1212,7 +1212,7 @@ class EasyMeta
      */
     public function resourceTemplateLabel($labelOrId): ?string
     {
-        if (is_null(static::$resourceTemplateIdsByLabelsAndIds)) {
+        if (static::$resourceTemplateIdsByLabelsAndIds === null) {
             $this->initResourceTemplates();
         }
         return static::$resourceTemplateIdsByLabelsAndIds[$labelOrId] ?? null;
@@ -1228,7 +1228,7 @@ class EasyMeta
      */
     public function resourceTemplateLabels($labelsOrIds = null): array
     {
-        if (is_null(static::$resourceTemplateIdsByLabelsAndIds)) {
+        if (static::$resourceTemplateIdsByLabelsAndIds === null) {
             $this->initResourceTemplates();
         }
         if (!$labelsOrIds) {
@@ -1271,7 +1271,7 @@ class EasyMeta
      */
     public function resourceTemplateClassIds($labelsOrIds = null): array
     {
-        if (is_null(static::resourceTemplateClassesByIds)) {
+        if (static::resourceTemplateClassesByIds === null) {
             $this->initResourceTemplateClasses();
         }
         if (!$labelsOrIds) {
@@ -1298,7 +1298,7 @@ class EasyMeta
      */
     public function vocabularyId($prefixOrUriOrId): ?int
     {
-        if (is_null(static::$vocabularyIdsByPrefixesAndUrisAndIds)) {
+        if (static::$vocabularyIdsByPrefixesAndUrisAndIds === null) {
             $this->initVocabularies();
         }
         return static::$vocabularyIdsByPrefixesAndUrisAndIds[$prefixOrUriOrId] ?? null;
@@ -1315,7 +1315,7 @@ class EasyMeta
      */
     public function vocabularyIds($prefixesOrUrisOrIds = null): array
     {
-        if (is_null(static::$vocabularyIdsByPrefixesAndUrisAndIds)) {
+        if (static::$vocabularyIdsByPrefixesAndUrisAndIds === null) {
             $this->initVocabularies();
         }
         if (!$prefixesOrUrisOrIds) {
@@ -1337,7 +1337,7 @@ class EasyMeta
      */
     public function vocabularyPrefix($prefixOrUriOrId): ?string
     {
-        if (is_null(static::$vocabularyIdsByPrefixesAndUrisAndIds)) {
+        if (static::$vocabularyIdsByPrefixesAndUrisAndIds === null) {
             $this->initVocabularies();
         }
         if (!isset(static::$vocabularyIdsByPrefixesAndUrisAndIds[$prefixOrUriOrId])) {
@@ -1361,7 +1361,7 @@ class EasyMeta
      */
     public function vocabularyPrefixes($prefixesOrUrisOrIds = null): array
     {
-        if (is_null(static::$vocabularyIdsByPrefixesAndUrisAndIds)) {
+        if (static::$vocabularyIdsByPrefixesAndUrisAndIds === null) {
             $this->initVocabularies();
         }
         if (!$prefixesOrUrisOrIds) {
@@ -1384,7 +1384,7 @@ class EasyMeta
      */
     public function vocabularyUri($prefixOrUriOrId): ?string
     {
-        if (is_null(static::$vocabularyIdsByPrefixesAndUrisAndIds)) {
+        if (static::$vocabularyIdsByPrefixesAndUrisAndIds === null) {
             $this->initVocabularies();
         }
         if (!isset(static::$vocabularyIdsByPrefixesAndUrisAndIds[$prefixOrUriOrId])) {
@@ -1408,7 +1408,7 @@ class EasyMeta
      */
     public function vocabularyUrisByPrefixes($prefixesOrUrisOrIds = null): array
     {
-        if (is_null(static::$vocabularyIdsByPrefixesAndUrisAndIds)) {
+        if (static::$vocabularyIdsByPrefixesAndUrisAndIds === null) {
             $this->initVocabularies();
         }
         if (!$prefixesOrUrisOrIds) {
@@ -1432,7 +1432,7 @@ class EasyMeta
      */
     public function vocabularyLabel($prefixOrUriOrId): ?string
     {
-        if (is_null(static::$vocabularyLabelsByPrefixesAndUrisAndIds)) {
+        if (static::$vocabularyLabelsByPrefixesAndUrisAndIds === null) {
             $this->initVocabularies();
         }
         return static::$vocabularyLabelsByPrefixesAndUrisAndIds[$prefixOrUriOrId] ?? null;
@@ -1449,7 +1449,7 @@ class EasyMeta
      */
     public function vocabularyLabels($prefixesOrUrisOrIds = null): array
     {
-        if (is_null(static::$vocabularyLabelsByPrefixesAndUrisAndIds)) {
+        if (static::$vocabularyLabelsByPrefixesAndUrisAndIds === null) {
             $this->initVocabularies();
         }
         if (!$prefixesOrUrisOrIds) {

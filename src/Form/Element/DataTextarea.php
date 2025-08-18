@@ -58,7 +58,7 @@ class DataTextarea extends ArrayTextarea
     {
         if (is_string($array)) {
             return $array;
-        } elseif (is_null($array)) {
+        } elseif ($array === null) {
             return '';
         }
         $textMode = $this->getDataTextMode();
@@ -72,7 +72,7 @@ class DataTextarea extends ArrayTextarea
     {
         if (is_array($string)) {
             return $string;
-        } elseif (is_null($string)) {
+        } elseif ($string === null) {
             return [];
         }
         $textMode = $this->getDataTextMode();
