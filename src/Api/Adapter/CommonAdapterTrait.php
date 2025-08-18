@@ -85,11 +85,13 @@ trait CommonAdapterTrait
 
         $expr = $qb->expr();
 
-        foreach ($this->queryFields as $type => $keyFields) foreach (array_intersect_key($keyFields, $query) as $key => $field) {
+        foreach ($queryFields as $type => $keyFields) foreach (array_intersect_key($keyFields, $query) as $key => $field) {
             if (!isset($query[$key]) || $query[$key] === '' || $query[$key] === []) {
                 continue;
             }
+            // TODO Add type in Omeka S 4.2 with createNameParameter(). Not required anyway.
             switch ($type) {
+                // Unlike main AbstractEntityAdapter, an id may be "0" to search empty values.
                 case 'id':
                     // TODO In AbstractResourceEntityAdapter, a join is added for id. It may manage rights, but is it still useful?
                     $hasQueryField = true;
@@ -99,39 +101,33 @@ trait CommonAdapterTrait
                         : [(int) $value];
                     if ($values === [0]) {
                         $qb
-                            ->andWhere(
-                                $expr->isNull($entityAlias . '.' . $field)
-                            );
+                            ->andWhere($expr->isNull($entityAlias . '.' . $field));
                     } elseif (in_array(0, $values, true)) {
+                        $fieldAlias = $this->createAlias();
                         $qb
-                        ->andWhere($expr->orX(
-                            $expr->isNull($entityAlias . '.' . $field),
-                            $expr->in(
-                                $entityAlias . '.' . $field,
-                                // TODO Add the type in Omeka S 4.2. Not required for integers anyway.
-                                $this->adapter->createNamedParameter($qb, $values)
-                            )
-                        ));
+                            ->andWhere($expr->orX(
+                                $expr->isNull($entityAlias . '.' . $field),
+                                $expr->in($entityAlias . '.' . $field, ':' . $fieldAlias)
+                            ))
+                            ->setParameter($fieldAlias, $values, Connection::PARAM_INT_ARRAY);
                     } elseif (count($values) > 1) {
+                        $fieldAlias = $this->createAlias();
                         $qb
-                            ->andWhere($expr->in(
-                                $entityAlias . '.' . $field,
-                                $this->adapter->createNamedParameter($qb, $values)
-                            ));
+                            ->andWhere($expr->in($entityAlias . '.' . $field, ':' . $fieldAlias))
+                            ->setParameter($fieldAlias, $values, Connection::PARAM_INT_ARRAY);
                     } else {
+                        $fieldAlias = $this->createAlias();
                         $qb
-                            ->andWhere($expr->eq(
-                                $entityAlias . '.' . $field,
-                                $this->adapter->createNamedParameter($qb, reset($values))
-                            ));
+                            ->andWhere($expr->eq($entityAlias . '.' . $field, ':' . $fieldAlias))
+                            ->setParameter($fieldAlias, reset($values), ParameterType::INTEGER);
                     }
                     break;
 
                 case 'int':
                     $hasQueryField = true;
                     $value = $query[$key];
+                    $fieldAlias = $this->createAlias();
                     if (is_array($value)) {
-                        $fieldAlias = $this->createAlias();
                         $values = array_values(array_unique(array_map('intval', $value)));
                         $qb
                             ->andWhere($expr->in($entityAlias . '.' . $field, ':' . $fieldAlias))
@@ -139,18 +135,16 @@ trait CommonAdapterTrait
                     } else {
                         $value = (int) $value;
                         $qb
-                            ->andWhere($expr->eq(
-                                $entityAlias . '.' . $field,
-                                $this->createNamedParameter($qb, $value, ParameterType::INTEGER)
-                            ));
+                            ->andWhere($expr->eq($entityAlias . '.' . $field, ':' . $fieldAlias))
+                            ->setParameter($fieldAlias, $value, ParameterType::INTEGER);
                     }
                     break;
 
                 case 'string':
                     $hasQueryField = true;
                     $value = $query[$key];
+                    $fieldAlias = $this->createAlias();
                     if (is_array($value)) {
-                        $fieldAlias = $this->createAlias();
                         $values = array_values(array_unique(array_map('strval', $value)));
                         $qb
                             ->andWhere($expr->in($entityAlias . '.' . $field, ':' . $fieldAlias))
@@ -158,21 +152,18 @@ trait CommonAdapterTrait
                     } else {
                         $value = (string) $value;
                         $qb
-                            ->andWhere($expr->eq(
-                                $entityAlias . '.' . $field,
-                                $this->createNamedParameter($qb, $value, ParameterType::STRING)
-                            ));
+                            ->andWhere($expr->eq($entityAlias . '.' . $field, ':' . $fieldAlias))
+                            ->setParameter($fieldAlias, $value, ParameterType::STRING);
                     }
                     break;
 
                 case 'bool':
                     if (is_scalar($value)) {
                         $hasQueryField = true;
+                        $fieldAlias = $this->createAlias();
                         $qb
-                            ->andWhere($expr->eq(
-                                $entityAlias . '.' . $field,
-                                $this->createNamedParameter($qb, $query[$value] ? 1 : 0, ParameterType::INTEGER)
-                            ));
+                            ->andWhere($expr->eq($entityAlias . '.' . $field, ':' . $fieldAlias))
+                            ->setParameter($fieldAlias, $query[$value] ? 1 : 0, ParameterType::INTEGER);
                     }
                     break;
 
@@ -198,12 +189,11 @@ trait CommonAdapterTrait
                         }
                     }
                     $hasQueryField = true;
+                    $fieldAlias = $this->createAlias();
                     $qb
-                        ->andWhere($expr->{$field[0]} (
-                            $entityAlias . '.' . $field[1],
-                            // If the date is invalid, pass null to ensure no results.
-                        $this->createNamedParameter($qb, $date ?: null, $date ? ParameterType::STRING : ParameterType::NULL)
-                        ));
+                        ->andWhere($expr->{$field[0]}($entityAlias . '.' . $field[1], ':' . $fieldAlias))
+                        // If the date is invalid, pass null to ensure no results.
+                        ->setParameter($fieldAlias, $date ? (string) $date : null, $date ? ParameterType::STRING : ParameterType::NULL);
                     break;
 
                 default:
