@@ -13,9 +13,10 @@ use Omeka\Stdlib\ErrorStore;
 /**
  * Manage common features of api adapter.
  *
- * WARNING: Take care of upgrade process when this trait is used: it must
- * not block access to site, login page, admin board or modules page when it
- * is used. So before use:
+ * WARNING: This file is included automatically with TraitModule, but for more
+ * security on running instance of Omeka, take care of upgrade process when this
+ * trait is used: it must not block access to site, login page, admin board or
+ * modules page when it is used. So:
  * - check an upgrade of the module that uses this adapter;
  * - check an upgrade of the module Common itself.
  * Then some countermeasures can be taken, generally "require_once" this file

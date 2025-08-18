@@ -28,6 +28,8 @@
 
 namespace Common;
 
+require_once __DIR__ . '/src/Api/Adapter/CommonAdapterTrait.php';
+
 use Common\Stdlib\PsrMessage;
 use Laminas\EventManager\Event;
 use Laminas\I18n\Translator\TranslatorInterface;
