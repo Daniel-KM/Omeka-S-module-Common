@@ -30,9 +30,7 @@ namespace Common;
 
 use Common\Stdlib\PsrMessage;
 use Laminas\ServiceManager\ServiceLocatorInterface;
-use Omeka\Api\Exception\NotFoundException;
 use Omeka\Api\Exception\RuntimeException;
-use Omeka\Api\Representation\AbstractEntityRepresentation;
 use Omeka\Api\Representation\ResourceTemplateRepresentation;
 use Omeka\Entity\Vocabulary;
 use Omeka\Module\Exception\ModuleCannotInstallException;
