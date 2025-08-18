@@ -111,13 +111,25 @@ trait CommonAdapterTrait
             if (!isset($query[$key]) || $query[$key] === '' || $query[$key] === []) {
                 continue;
             }
+            $hasQueryField = true;
+            $value = $query[$key];
             // TODO Add type in Omeka S 4.2 with createNameParameter(). Not required anyway.
             switch ($type) {
+                case 'bool':
+                    $fieldAlias = $this->createAlias();
+                    if (is_scalar($value)) {
+                        $qb
+                            ->andWhere($expr->eq($entityAlias . '.' . $field, ':' . $fieldAlias))
+                            ->setParameter($fieldAlias, $value ? 1 : 0, ParameterType::INTEGER);
+                    } else {
+                        $qb
+                            ->andWhere($entityAlias . '.' . $field . ' = "bad value"');
+                    }
+                    break;
+
                 case 'id':
                     // Unlike main AbstractEntityAdapter, an id may be "0" to search empty values.
                     // TODO In AbstractResourceEntityAdapter, a join is added for id. It may manage rights, but is it still useful?
-                    $hasQueryField = true;
-                    $value = $query[$key];
                     $values = is_array($value)
                         ? array_values(array_unique(array_map('intval', $value)))
                         : [(int) $value];
@@ -147,8 +159,6 @@ trait CommonAdapterTrait
                     break;
 
                 case 'int':
-                    $hasQueryField = true;
-                    $value = $query[$key];
                     $fieldAlias = $this->createAlias();
                     if (is_array($value)) {
                         $values = array_values(array_unique(array_map('intval', $value)));
@@ -164,8 +174,6 @@ trait CommonAdapterTrait
                     break;
 
                 case 'int_empty':
-                    $hasQueryField = true;
-                    $value = $query[$key];
                     $values = is_array($value)
                         ? array_values(array_unique(array_map('intval', $value)))
                         : [(int) $value];
@@ -197,8 +205,6 @@ trait CommonAdapterTrait
                     break;
 
                 case 'string':
-                    $hasQueryField = true;
-                    $value = $query[$key];
                     $fieldAlias = $this->createAlias();
                     if (is_array($value)) {
                         $values = array_values(array_unique(array_map('strval', $value)));
@@ -214,8 +220,6 @@ trait CommonAdapterTrait
                     break;
 
                 case 'string_empty':
-                    $hasQueryField = true;
-                    $value = $query[$key];
                     $values = is_array($value)
                         ? array_values(array_unique(array_map('strval', $value)))
                         : [(string) $value];
@@ -249,13 +253,54 @@ trait CommonAdapterTrait
                     }
                     break;
 
-                case 'bool':
-                    if (is_scalar($value)) {
-                        $hasQueryField = true;
+                case 'string_operator':
+                    // There is no optimization with sql "between" in lieu of
+                    // </≤ and >/≥. It can be done in adapter if really needed.
+                    $values = is_array($value) ? $value : [$value];
+                    // Simplify the list of values by operator.
+                    $opVals = [];
+                    foreach ($values as $value) {
+                        $operator = mb_substr((string) $value, 0, 1);
+                        if ($operator === '=') {
+                            $opVals['='][] = mb_substr((string) $value, 1);
+                        } elseif ($operator === '≠') {
+                            $opVals['<>'][] = mb_substr((string) $value, 1);
+                        } elseif (isset($this->operatorsSql[$operator])) {
+                            $opVals[$this->operatorsSql[$operator]][] = mb_substr((string) $value, 1);
+                        } else {
+                            $opVals['='][] = (string) $value;
+                        }
+                    }
+                    foreach ($opVals as $opSql => $vals) {
                         $fieldAlias = $this->createAlias();
-                        $qb
-                            ->andWhere($expr->eq($entityAlias . '.' . $field, ':' . $fieldAlias))
-                            ->setParameter($fieldAlias, $query[$value] ? 1 : 0, ParameterType::INTEGER);
+                        if ($opSql === '=') {
+                            if (count($vals) === 1) {
+                                $qb
+                                    ->andWhere($entityAlias . '.' . $field . ' = :' . $fieldAlias)
+                                    ->setParameter($fieldAlias, reset($vals), ParameterType::STRING);
+                            } else {
+                                $qb
+                                    ->andWhere($expr->in($entityAlias . '.' . $field, ':' . $fieldAlias))
+                                    ->setParameter($fieldAlias, $vals, Connection::PARAM_STR_ARRAY);
+                            }
+                        } elseif ($opSql === '<>') {
+                            if (count($vals) === 1) {
+                                $qb
+                                    ->andWhere($entityAlias . '.' . $field . ' <> :' . $fieldAlias)
+                                    ->setParameter($fieldAlias, reset($vals), ParameterType::STRING);
+                            } else {
+                                $qb
+                                ->andWhere($expr->notIn($entityAlias . '.' . $field, ':' . $fieldAlias))
+                                ->setParameter($fieldAlias, $vals, Connection::PARAM_STR_ARRAY);
+                            }
+                        } else {
+                            $val = $opSql === '<' || $opSql === '<=' ? min($vals) : max($vals);
+                            $qb
+                                // Comparison is just a string concatenation.
+                                // ->andWhere(new Comparison($entityAlias . '.' . $field, $opSql, ':' . $fieldAlias))
+                                ->andWhere($entityAlias . '.' . $field . ' ' . $opSql . ' :' . $fieldAlias)
+                                ->setParameter($fieldAlias, $val, ParameterType::STRING);
+                        }
                     }
                     break;
 
@@ -280,7 +325,6 @@ trait CommonAdapterTrait
                             break;
                         }
                     }
-                    $hasQueryField = true;
                     $fieldAlias = $this->createAlias();
                     $qb
                         ->andWhere($expr->{$field[0]}($entityAlias . '.' . $field[1], ':' . $fieldAlias))
