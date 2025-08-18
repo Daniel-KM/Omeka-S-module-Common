@@ -6,6 +6,9 @@ use DateTime;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\QueryBuilder;
+use Omeka\Api\Request;
+use Omeka\Entity\EntityInterface;
+use Omeka\Stdlib\ErrorStore;
 
 /**
  * Manage common features of api adapter.
@@ -209,5 +212,25 @@ trait CommonAdapterTrait
         }
 
         return $hasQueryField;
+    }
+
+    /**
+     * Generic hydration process for common cases.
+     *
+     * This process does not check request type (create or update).
+     * The method shouldHydrate() is not called, so partial update is managed
+     * only basically with the presence of keys.
+     */
+    public function hydrate(Request $request, EntityInterface $entity, ErrorStore $errorStore): void
+    {
+        $data = $request->getContent();
+        foreach ($data as $key => $value) {
+            $posColon = strpos($key, ':');
+            $keyName = $posColon === false ? $key : substr($key, $posColon + 1);
+            $method = 'set' . strtr(ucwords($keyName, ' _-'), [' ' => '', '_' => '', '-' => '']);
+            if (method_exists($entity, $method)) {
+                $entity->$method($value);
+            }
+        }
     }
 }
