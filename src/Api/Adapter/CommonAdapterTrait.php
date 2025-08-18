@@ -6,6 +6,7 @@ use DateTime;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Query\Expr\Comparison;
 use Omeka\Api\Request;
 use Omeka\Entity\EntityInterface;
 use Omeka\Stdlib\ErrorStore;
@@ -41,6 +42,9 @@ trait CommonAdapterTrait
      *     'int' => [
      *         'total' => 'total',
      *     ],
+     *      'int_operator' => [
+     *          'count' => 'count',
+     *      ],
      *      'string' => [
      *          'slug' => 'slug',
      *          'title' => 'title',
@@ -54,17 +58,20 @@ trait CommonAdapterTrait
      *          'is_associative' => 'isAssociative',
      *      ],
      *      'datetime' => [
-     *          'created' => ['eq', 'created'],
-     *          'created_before' => ['lt', 'created'],
-     *          'created_after' => ['gt', 'created'],
-     *          'created_until' => ['lte', 'created'],
-     *          'created_since' => ['gte', 'created'],
-     *          'modified' => ['eq', 'modified'],
-     *          'modified_before' => ['lt', 'modified'],
-     *          'modified_after' => ['gt', 'modified'],
-     *          'modified_until' => ['lte', 'modified'],
-     *          'modified_since' => ['gte', 'modified'],
+     *          'created' => ['=', 'created'],
+     *          'created_before' => ['<', 'created'],
+     *          'created_after' => ['>', 'created'],
+     *          'created_until' => ['<=', 'created'],
+     *          'created_since' => ['>=', 'created'],
+     *          'modified' => ['=', 'modified'],
+     *          'modified_before' => ['<', 'modified'],
+     *          'modified_after' => ['>', 'modified'],
+     *          'modified_until' => ['<=', 'modified'],
+     *          'modified_since' => ['>=', 'modified'],
      *     ],
+     *      'datetime_operator' => [
+     *          'validated' => 'validated',
+     *      ],
      * ];
      * ```
      *
@@ -79,6 +86,9 @@ trait CommonAdapterTrait
      *   Note that values are casted first to integer in all cases.
      * - "id" is like a simplified "int_empty", because the id is never 0.
      *   Furthermore, a join may be added in a future version if really needed.
+     * - For datetime, it is simpler to use the mathematical operators that are
+     *   more versatile, but the key names are used for compatibility with omeka
+     *   main adapter. In Omeka Classic, since" and "until" were used.
      *
      * For now, there is no way to manage the difference between empty value
      * (no-length string or 0) and no value (null). It is useless most of the
@@ -106,6 +116,52 @@ trait CommonAdapterTrait
         $queryFields ??= $this->queryFields;
 
         $expr = $qb->expr();
+
+        $operators = [
+            '<' => Comparison::LT,
+            '≤' => Comparison::LTE,
+            '≥' => Comparison::GTE,
+            '>' => Comparison::GT,
+            '=' => Comparison::EQ,
+            '≠' => Comparison::NEQ,
+            /* @todo Use operators ∃ and ∄ (\u2203/\u2204) for is not null/is null.
+            '∄' => 'IS NULL',
+            '∃' => 'IS NOT NULL',
+            */
+        ];
+
+        $dateGranularities = [
+            DateTime::ISO8601,
+            '!Y-m-d\TH:i:s',
+            '!Y-m-d\TH:i',
+            '!Y-m-d\TH',
+            '!Y-m-d',
+            '!Y-m',
+            '!Y',
+        ];
+
+        /**
+         * A DateTime is formatted 'Y-m-d H:i:s.u' in doctrine, whatever initial
+         * precision. Missing parts are replaced by 1 (date) or 0 (time).
+         * So it is usable only to compare full date time.
+         *
+         * @see \Doctrine\DBAL\Platforms\SQLAnywherePlatform::getDateTimeFormatString()
+         * @see \Omeka\Api\Adapter\AbstractResourceEntityAdapter::buildQuery()
+         */
+        $dateClean = function ($value) use ($dateGranularities): ?DateTime {
+            if (!$value) {
+                return null;
+            }
+            foreach ($dateGranularities as $dateGranularity) {
+                $date = DateTime::createFromFormat($dateGranularity, $value);
+                if ($date !== false) {
+                    return $date;
+                }
+            }
+            return null;
+        };
+
+        // TODO Using "Expr" is generally useless, because it's just a string builder. Replacing with string concatenation avoids some calls.
 
         foreach ($queryFields as $type => $keyFields) foreach (array_intersect_key($keyFields, $query) as $key => $field) {
             if (!isset($query[$key]) || $query[$key] === '' || $query[$key] === []) {
@@ -201,6 +257,64 @@ trait CommonAdapterTrait
                         $qb
                             ->andWhere($expr->in($entityAlias . '.' . $field, ':' . $fieldAlias))
                             ->setParameter($fieldAlias, $values, Connection::PARAM_INT_ARRAY);
+                    }
+                    break;
+
+                case 'int_operator':
+                    // There is no optimization with sql "between" in lieu of
+                    // </≤ and >/≥. It can be done in adapter if really needed.
+                    $hasQueryField = true;
+                    $value = $query[$key];
+                    $values = is_array($value) ? $value : [$value];
+                    // Simplify the list of values by operator.
+                    $opVals = [];
+                    foreach ($values as $value) {
+                        $operator = mb_substr((string) $value, 0, 1);
+                        if (is_numeric($operator) || $operator === '-') {
+                            $opVals['='][] = (int) $value;
+                        } elseif ($operator === '=') {
+                            $opVals['='][] = (int) mb_substr((string) $value, 1);
+                        } elseif ($operator === '≠') {
+                            $opVals['≠'][] = (int) mb_substr((string) $value, 1);
+                        } elseif (isset($operators[$operator])) {
+                            $opVals[$operators[$operator]][] = (int) mb_substr($value, 1);
+                        } else {
+                            // Unknown operator means error, so no result.
+                            $qb
+                                ->andWhere($expr->eq('bad', 'operator'));
+                            break;
+                        }
+                    }
+                    foreach ($opVals as $op => $vals) {
+                        $fieldAlias = $this->createAlias();
+                        if ($op === '=') {
+                            if (count($vals) === 1) {
+                                $qb
+                                    ->andWhere($entityAlias . '.' . $field . ' = :' . $fieldAlias)
+                                    ->setParameter($fieldAlias, reset($vals), ParameterType::INTEGER);
+                            } else {
+                                $qb
+                                    ->andWhere($expr->in($entityAlias . '.' . $field, ':' . $fieldAlias))
+                                    ->setParameter($fieldAlias, $vals, Connection::PARAM_INT_ARRAY);
+                            }
+                        } elseif ($op === '≠') {
+                            if (count($vals) === 1) {
+                                $qb
+                                    ->andWhere($entityAlias . '.' . $field . ' <> :' . $fieldAlias)
+                                    ->setParameter($fieldAlias, reset($vals), ParameterType::INTEGER);
+                            } else {
+                                $qb
+                                    ->andWhere($expr->notIn($entityAlias . '.' . $field, ':' . $fieldAlias))
+                                    ->setParameter($fieldAlias, $vals, Connection::PARAM_INT_ARRAY);
+                            }
+                        } else {
+                            $val = $op === '<' || $op === '≤' ? min($vals) : max($vals);
+                            $qb
+                                // Comparison is just a string concatenation.
+                                // ->andWhere(new Comparison($entityAlias . '.' . $field, $op, ':' . $fieldAlias))
+                                ->andWhere($entityAlias . '.' . $field . ' ' . $op . ' :' . $fieldAlias)
+                                ->setParameter($fieldAlias, $val, ParameterType::INTEGER);
+                        }
                     }
                     break;
 
@@ -305,31 +419,42 @@ trait CommonAdapterTrait
                     break;
 
                 case 'datetime':
-                    // TODO Make date use array.
-                    // TODO For created and modified, may use a sign like in module Log?
-                    /** @see \Log\Api\Adapter\LogAdapter::buildQueryDateComparison() */
-                    /** @see \Omeka\Api\Adapter\AbstractResourceEntityAdapter::buildQuery() */
-                    // In Omeka Classic, used "since" and "until".
-                    $dateGranularities = [
-                        DateTime::ISO8601,
-                        '!Y-m-d\TH:i:s',
-                        '!Y-m-d\TH:i',
-                        '!Y-m-d\TH',
-                        '!Y-m-d',
-                        '!Y-m',
-                        '!Y',
-                    ];
-                    foreach ($dateGranularities as $dateGranularity) {
-                        $date = DateTime::createFromFormat($dateGranularity, $value);
-                        if (false !== $date) {
-                            break;
-                        }
-                    }
+                    // If the date is invalid, pass null to ensure no results.
+                    $date = is_scalar($value) ? $dateClean($value, $field[0]) : null;
                     $fieldAlias = $this->createAlias();
                     $qb
-                        ->andWhere($expr->{$field[0]}($entityAlias . '.' . $field[1], ':' . $fieldAlias))
-                        // If the date is invalid, pass null to ensure no results.
-                        ->setParameter($fieldAlias, $date ? (string) $date : null, $date ? ParameterType::STRING : ParameterType::NULL);
+                        // ->andWhere($expr->{$field[0]}($entityAlias . '.' . $field[1], ':' . $fieldAlias))
+                        ->andWhere($entityAlias . '.' . $field[1] . ' ' . $field[0] .  ':' . $fieldAlias)
+                        ->setParameter($fieldAlias, $date, $date ? null : ParameterType::NULL);
+                    break;
+
+                case 'datetime_operator':
+                    // See "datetime" and "int_operator".
+                    // There is no optimization when there are multiple times
+                    // the same operator <≤=≠≥>, because it is rare. It may be
+                    // done earlier in adapter if really needed.
+                    // There is no optimization with sql "between" in lieu of
+                    // </≤ and >/≥. It will require a lot of checks and can be
+                    // done earlier in adapter if really needed.
+                    $values = is_array($value) ? $value : [$value];
+                    foreach ($values as $value) {
+                        $operator = mb_substr((string) $value, 0, 1);
+                        if (is_numeric($operator) || $operator === '-') {
+                            $operator = '=';
+                        } elseif (!isset($operators[$operator])) {
+                            // Unknown operator means error, so no result.
+                            $qb
+                                ->andWhere($expr->eq('bad', 'operator'));
+                            continue;
+                        } else {
+                            $operator = $operators[$operator];
+                            $value = mb_substr((string) $value, 1);
+                        }
+                        $value = $dateClean($value);
+                        $qb
+                            ->andWhere($entityAlias . '.' . $field . ' ' . $operator . ' :' . $fieldAlias)
+                            ->setParameter($fieldAlias, $date, $date ? null : ParameterType::NULL);
+                    }
                     break;
 
                 default:
