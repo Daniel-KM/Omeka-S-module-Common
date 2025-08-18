@@ -28,20 +28,27 @@ use Omeka\Stdlib\ErrorStore;
 trait CommonAdapterTrait
 {
     /**
+     * WARNING: This property must be set in the adapter to use the builder.
+     *
      * @var array
      *
-     * @example From module Table:
+     * @example From module Table (adapted to display more possibilities):
      * ```php
      * [
      *     'id' => [
      *         'owner_id' => 'owner',
      *     ],
+     *     'int' => [
+     *         'total' => 'total',
+     *     ],
      *      'string' => [
      *          'slug' => 'slug',
      *          'title' => 'title',
-     *          'lang' => 'lang',
      *          'source' => 'source',
      *          'comment' => 'comment',
+     *      ],
+     *      'string_empty' => [
+     *          'lang' => 'lang',
      *      ],
      *      'bool' => [
      *          'is_associative' => 'isAssociative',
@@ -61,7 +68,22 @@ trait CommonAdapterTrait
      * ];
      * ```
      *
-     * This property must be set in the adapter to use the builder.
+     * Notes:
+     * - "string" and "string_empty" are the same, but with "search_empty",
+     *   there is a convention for the value double single quote ('') that means
+     *   to search empty string or null.
+     *   Note that values are casted first to string in all cases, like any
+     *   query arguments anyway.
+     * - "int" and "int_empty" are the same, but with "int_empty", the value
+     *   zero (0) means to search empty values (0 or null).
+     *   Note that values are casted first to integer in all cases.
+     * - "id" is like a simplified "int_empty", because the id is never 0.
+     *   Furthermore, a join may be added in a future version if really needed.
+     *
+     * For now, there is no way to manage the difference between empty value
+     * (no-length string or 0) and no value (null). It is useless most of the
+     * time, depends on the column format (accept null or not), and any specific
+     * rules can be added in any adapter anyway.
      */
     // protected $queryFields = [];
 
@@ -91,8 +113,8 @@ trait CommonAdapterTrait
             }
             // TODO Add type in Omeka S 4.2 with createNameParameter(). Not required anyway.
             switch ($type) {
-                // Unlike main AbstractEntityAdapter, an id may be "0" to search empty values.
                 case 'id':
+                    // Unlike main AbstractEntityAdapter, an id may be "0" to search empty values.
                     // TODO In AbstractResourceEntityAdapter, a join is added for id. It may manage rights, but is it still useful?
                     $hasQueryField = true;
                     $value = $query[$key];
@@ -100,8 +122,14 @@ trait CommonAdapterTrait
                         ? array_values(array_unique(array_map('intval', $value)))
                         : [(int) $value];
                     if ($values === [0]) {
+                        // Unlike "int_empty", an "id" is never 0.
                         $qb
                             ->andWhere($expr->isNull($entityAlias . '.' . $field));
+                    } elseif (count($values) === 1) {
+                        $fieldAlias = $this->createAlias();
+                        $qb
+                            ->andWhere($expr->eq($entityAlias . '.' . $field, ':' . $fieldAlias))
+                            ->setParameter($fieldAlias, reset($values), ParameterType::INTEGER);
                     } elseif (in_array(0, $values, true)) {
                         $fieldAlias = $this->createAlias();
                         $qb
@@ -110,16 +138,11 @@ trait CommonAdapterTrait
                                 $expr->in($entityAlias . '.' . $field, ':' . $fieldAlias)
                             ))
                             ->setParameter($fieldAlias, $values, Connection::PARAM_INT_ARRAY);
-                    } elseif (count($values) > 1) {
+                    } else {
                         $fieldAlias = $this->createAlias();
                         $qb
                             ->andWhere($expr->in($entityAlias . '.' . $field, ':' . $fieldAlias))
                             ->setParameter($fieldAlias, $values, Connection::PARAM_INT_ARRAY);
-                    } else {
-                        $fieldAlias = $this->createAlias();
-                        $qb
-                            ->andWhere($expr->eq($entityAlias . '.' . $field, ':' . $fieldAlias))
-                            ->setParameter($fieldAlias, reset($values), ParameterType::INTEGER);
                     }
                     break;
 
@@ -140,6 +163,39 @@ trait CommonAdapterTrait
                     }
                     break;
 
+                case 'int_empty':
+                    $hasQueryField = true;
+                    $value = $query[$key];
+                    $values = is_array($value)
+                        ? array_values(array_unique(array_map('intval', $value)))
+                        : [(int) $value];
+                    $fieldAlias = $this->createAlias();
+                    if ($values === [0]) {
+                        // Unlike "id", a value may be 0.
+                        $qb
+                            ->andWhere($expr->orX(
+                                $expr->isNull($entityAlias . '.' . $field),
+                                $expr->eq($entityAlias . '.' . $field, ':' . $fieldAlias)
+                            ))
+                            ->setParameter($fieldAlias, 0, ParameterType::INTEGER);
+                    } elseif (count($values) === 1) {
+                        $qb
+                            ->andWhere($expr->eq($entityAlias . '.' . $field, ':' . $fieldAlias))
+                            ->setParameter($fieldAlias, reset($values), ParameterType::INTEGER);
+                    } elseif (in_array(0, $values, true)) {
+                        $qb
+                            ->andWhere($expr->orX(
+                                $expr->isNull($entityAlias . '.' . $field),
+                                $expr->in($entityAlias . '.' . $field, ':' . $fieldAlias)
+                            ))
+                            ->setParameter($fieldAlias, $values, Connection::PARAM_INT_ARRAY);
+                    } else {
+                        $qb
+                            ->andWhere($expr->in($entityAlias . '.' . $field, ':' . $fieldAlias))
+                            ->setParameter($fieldAlias, $values, Connection::PARAM_INT_ARRAY);
+                    }
+                    break;
+
                 case 'string':
                     $hasQueryField = true;
                     $value = $query[$key];
@@ -154,6 +210,42 @@ trait CommonAdapterTrait
                         $qb
                             ->andWhere($expr->eq($entityAlias . '.' . $field, ':' . $fieldAlias))
                             ->setParameter($fieldAlias, $value, ParameterType::STRING);
+                    }
+                    break;
+
+                case 'string_empty':
+                    $hasQueryField = true;
+                    $value = $query[$key];
+                    $values = is_array($value)
+                        ? array_values(array_unique(array_map('strval', $value)))
+                        : [(string) $value];
+                    $fieldAlias = $this->createAlias();
+                    if ($values === ["''"]) {
+                        $qb
+                            ->andWhere($expr->orX(
+                                $expr->isNull($entityAlias . '.' . $field),
+                                $expr->eq($entityAlias . '.' . $field, ':' . $fieldAlias)
+                            ))
+                            ->setParameter($fieldAlias, '', ParameterType::STRING);
+                    } elseif (count($values) === 1) {
+                        $qb
+                            ->andWhere($expr->eq($entityAlias . '.' . $field, ':' . $fieldAlias))
+                            ->setParameter($fieldAlias, reset($values), ParameterType::STRING);
+                    } elseif (($posEmpty = array_search("''", $values, true)) !== false) {
+                        // Manage the convention for empty string. There may be
+                        // another native empty string in the list of values,
+                        // but it doesn't matter.
+                        $values[$posEmpty] = '';
+                        $qb
+                            ->andWhere($expr->orX(
+                                $expr->isNull($entityAlias . '.' . $field),
+                                $expr->in($entityAlias . '.' . $field, ':' . $fieldAlias)
+                            ))
+                            ->setParameter($fieldAlias, $values, Connection::PARAM_STR_ARRAY);
+                    } else {
+                        $qb
+                            ->andWhere($expr->in($entityAlias . '.' . $field, ':' . $fieldAlias))
+                            ->setParameter($fieldAlias, $values, Connection::PARAM_STR_ARRAY);
                     }
                     break;
 
