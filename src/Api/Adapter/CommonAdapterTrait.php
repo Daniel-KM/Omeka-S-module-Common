@@ -6,7 +6,6 @@ use DateTime;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Query\Expr\Comparison;
 use Omeka\Api\Request;
 use Omeka\Entity\EntityInterface;
 use Omeka\Stdlib\ErrorStore;
@@ -28,6 +27,35 @@ use Omeka\Stdlib\ErrorStore;
  */
 trait CommonAdapterTrait
 {
+    /**
+     * @var array
+     */
+    protected $operatorsSql = [
+        '<' => '<',
+        '≤' => '<=',
+        '≥' => '>=',
+        '>' => '>',
+        '=' => '=',
+        '≠' => '<>',
+        /*
+        // Keys with more than one character allows to manage internal cases.
+        // No more used: the process requires one character only.
+        '<=' => '<=',
+        '>=' => '>=',
+        '<>' => '<>',
+        'lt' => '<',
+        'lte' => '<=',
+        'gte' => '>=',
+        'gt' => '>',
+        'eq' => '=',
+        'neq' => '<>',
+        */
+        /* @todo Use operators ∃ and ∄ (\u2203/\u2204) for is not null/is null.
+        '∄' => 'IS NULL',
+        '∃' => 'IS NOT NULL',
+        */
+    ];
+
     /**
      * WARNING: This property must be set in the adapter to use the builder.
      *
@@ -58,19 +86,18 @@ trait CommonAdapterTrait
      *          'is_associative' => 'isAssociative',
      *      ],
      *      'datetime' => [
-     *          'created' => ['=', 'created'],
      *          'created_before' => ['<', 'created'],
      *          'created_after' => ['>', 'created'],
-     *          'created_until' => ['<=', 'created'],
-     *          'created_since' => ['>=', 'created'],
-     *          'modified' => ['=', 'modified'],
+     *          'created_until' => ['≤', 'created'],
+     *          'created_since' => ['≥', 'created'],
      *          'modified_before' => ['<', 'modified'],
      *          'modified_after' => ['>', 'modified'],
-     *          'modified_until' => ['<=', 'modified'],
-     *          'modified_since' => ['>=', 'modified'],
+     *          'modified_until' => ['≤', 'modified'],
+     *          'modified_since' => ['≥', 'modified'],
      *     ],
      *      'datetime_operator' => [
-     *          'validated' => 'validated',
+     *          'created' => 'created',
+     *          'modified' => 'modified',
      *      ],
      * ];
      * ```
@@ -89,6 +116,9 @@ trait CommonAdapterTrait
      * - For datetime, it is simpler to use the mathematical operators that are
      *   more versatile, but the key names are used for compatibility with omeka
      *   main adapter. In Omeka Classic, since" and "until" were used.
+     * - "datetime_operator" is limited to dates between -9999 and 9999. For
+     *   older dates, an integer is required. Note that mysql allows only dates
+     *   between 1000 and 9999, so a literal column is required for older dates.
      *
      * For now, there is no way to manage the difference between empty value
      * (no-length string or 0) and no value (null). It is useless most of the
@@ -116,50 +146,6 @@ trait CommonAdapterTrait
         $queryFields ??= $this->queryFields;
 
         $expr = $qb->expr();
-
-        $operators = [
-            '<' => Comparison::LT,
-            '≤' => Comparison::LTE,
-            '≥' => Comparison::GTE,
-            '>' => Comparison::GT,
-            '=' => Comparison::EQ,
-            '≠' => Comparison::NEQ,
-            /* @todo Use operators ∃ and ∄ (\u2203/\u2204) for is not null/is null.
-            '∄' => 'IS NULL',
-            '∃' => 'IS NOT NULL',
-            */
-        ];
-
-        $dateGranularities = [
-            DateTime::ISO8601,
-            '!Y-m-d\TH:i:s',
-            '!Y-m-d\TH:i',
-            '!Y-m-d\TH',
-            '!Y-m-d',
-            '!Y-m',
-            '!Y',
-        ];
-
-        /**
-         * A DateTime is formatted 'Y-m-d H:i:s.u' in doctrine, whatever initial
-         * precision. Missing parts are replaced by 1 (date) or 0 (time).
-         * So it is usable only to compare full date time.
-         *
-         * @see \Doctrine\DBAL\Platforms\SQLAnywherePlatform::getDateTimeFormatString()
-         * @see \Omeka\Api\Adapter\AbstractResourceEntityAdapter::buildQuery()
-         */
-        $dateClean = function ($value) use ($dateGranularities): ?DateTime {
-            if (!$value) {
-                return null;
-            }
-            foreach ($dateGranularities as $dateGranularity) {
-                $date = DateTime::createFromFormat($dateGranularity, $value);
-                if ($date !== false) {
-                    return $date;
-                }
-            }
-            return null;
-        };
 
         // TODO Using "Expr" is generally useless, because it's just a string builder. Replacing with string concatenation avoids some calls.
 
@@ -419,41 +405,52 @@ trait CommonAdapterTrait
                     break;
 
                 case 'datetime':
-                    // If the date is invalid, pass null to ensure no results.
-                    $date = is_scalar($value) ? $dateClean($value, $field[0]) : null;
-                    $fieldAlias = $this->createAlias();
-                    $qb
-                        // ->andWhere($expr->{$field[0]}($entityAlias . '.' . $field[1], ':' . $fieldAlias))
-                        ->andWhere($entityAlias . '.' . $field[1] . ' ' . $field[0] .  ':' . $fieldAlias)
-                        ->setParameter($fieldAlias, $date, $date ? null : ParameterType::NULL);
-                    break;
-
+                    $value = $field[0] . $value;
+                    $field = $field[1];
+                    // No break.
                 case 'datetime_operator':
-                    // See "datetime" and "int_operator".
                     // There is no optimization when there are multiple times
                     // the same operator <≤=≠≥>, because it is rare. It may be
                     // done earlier in adapter if really needed.
                     // There is no optimization with sql "between" in lieu of
-                    // </≤ and >/≥. It will require a lot of checks and can be
-                    // done earlier in adapter if really needed.
+                    // </≤ and >/≥. It can be done earlier in adapter if needed.
+                    // Warning: if the column is an sql datetime, the year must
+                    // be between 1000 and 9999.
                     $values = is_array($value) ? $value : [$value];
                     foreach ($values as $value) {
                         $operator = mb_substr((string) $value, 0, 1);
                         if (is_numeric($operator) || $operator === '-') {
                             $operator = '=';
-                        } elseif (!isset($operators[$operator])) {
+                        } elseif (isset($this->operatorsSql[$operator])) {
+                            $value = mb_substr((string) $value, 1);
+                        } else {
                             // Unknown operator means error, so no result.
                             $qb
-                                ->andWhere($expr->eq('bad', 'operator'));
+                                ->andWhere('"bad" = "operator"');
                             continue;
-                        } else {
-                            $operator = $operators[$operator];
-                            $value = mb_substr((string) $value, 1);
                         }
-                        $value = $dateClean($value);
-                        $qb
-                            ->andWhere($entityAlias . '.' . $field . ' ' . $operator . ' :' . $fieldAlias)
-                            ->setParameter($fieldAlias, $date, $date ? null : ParameterType::NULL);
+                        $value = $this->dateComplete($value, $operator);
+                        if (!$value) {
+                            // Empty date means error, so no result.
+                            $qb
+                                ->andWhere('"bad" = "date"');
+                        } elseif (is_array($value)) {
+                            $fieldAliasFrom = $this->createAlias();
+                            $fieldAliasTo = $this->createAlias();
+                            if ($operator === '=') {
+                                $qb->andWhere($entityAlias . '.' . $field . ' BETWEEN :' . $fieldAliasFrom . ' AND :' . $fieldAliasTo);
+                            } else {
+                                $qb->andWhere('NOT(' . $entityAlias . '.' . $field . ' BETWEEN :' . $fieldAliasFrom . ' AND :' . $fieldAliasTo . ')');
+                            }
+                            $qb
+                                ->setParameter($fieldAliasFrom, $value['from'], ParameterType::STRING)
+                                ->setParameter($fieldAliasTo, $value['to'], ParameterType::STRING);
+                        } else {
+                            $fieldAlias = $this->createAlias();
+                            $qb
+                                ->andWhere($entityAlias . '.' . $field . ' ' . $this->operatorsSql[$operator] . ' :' . $fieldAlias)
+                                ->setParameter($fieldAlias, $value, ParameterType::STRING);
+                        }
                     }
                     break;
 
@@ -463,6 +460,77 @@ trait CommonAdapterTrait
         }
 
         return $hasQueryField;
+    }
+
+    /**
+     * Format a full or partial date for search.
+     *
+     * Min/max year is 10000. In other cases, an integer is enough.
+     * Note that in sql, dates can be only between 1000 and 9999.
+     *
+     * A DateTime is formatted 'Y-m-d H:i:s.u' in doctrine, whatever initial
+     * precision. Missing parts are replaced by 1 (date) or 0 (time).
+     * So it is usable only to compare full date time (year may be negative).
+     * For other values, the function completes the missing parts with start or
+     * end of the existing part according to the operator.
+     *
+     * @see \Doctrine\DBAL\Platforms\SQLAnywherePlatform::getDateTimeFormatString()
+     * @see \Omeka\Api\Adapter\AbstractResourceEntityAdapter::buildQuery()
+     *
+     * @param string|DateTime $value
+     * @param string $operator One character math operator: <≤=≠≥>.
+     * @return string|array|null The output may be array to manage partial date.
+     */
+    protected function dateComplete($value, string $operator = '=')
+    {
+        if ($value instanceof DateTime) {
+            return $value->format('Y-m-d H:i:s');
+        }
+
+        // Support iso value, but convert it to mysql.
+        $value = trim(strtr((string) $value, 'T', ' '));
+        if (!$value) {
+            return null;
+        }
+
+        $isNegative = mb_substr($value, 0, 1) === '-';
+        if ($isNegative) {
+            $value = mb_substr($value, 1);
+        }
+
+        // Pad the year with leading zeros if less than 4 digits.
+        $parts = explode('-', $value, 2);
+        if (isset($parts[0]) && is_numeric($parts[0]) && mb_strlen($parts[0]) < 4) {
+            $parts[0] = str_pad($parts[0], 4, '0', STR_PAD_LEFT);
+            $value = implode('-', $parts);
+        }
+
+        if (mb_strlen($value) >= 19) {
+            return $isNegative ? '-' . $value : $value;
+        }
+
+        // Complete each part as min or max according to operator.
+        $dateMin = '0000-01-01 00:00:00';
+        $dateMax = '9999-12-31 23:59:59';
+
+        if ($operator === '<') {
+            $value = substr_replace($dateMin, $value, 0, mb_strlen($value) - 19);
+        } elseif ($operator === '≤') {
+            $value = substr_replace($dateMax, $value, 0, mb_strlen($value) - 19);
+        } elseif ($operator === '≥') {
+            $value = substr_replace($dateMin, $value, 0, mb_strlen($value) - 19);
+        } elseif ($operator === '>') {
+            $value = substr_replace($dateMax, $value, 0, mb_strlen($value) - 19);
+        } elseif ($operator === '=' || $operator === '≠') {
+            $valueFrom = substr_replace($dateMin, $value, 0, mb_strlen($value) - 19);
+            $valueTo = substr_replace($dateMax, $value, 0, mb_strlen($value) - 19);
+            return $isNegative
+                ? ['from' => '-' . $valueFrom, 'to' => '-' . $valueTo]
+                : ['from' => $valueFrom, 'to' => $valueTo];
+        } else {
+            return null;
+        }
+        return $isNegative ? '-' . $value : $value;
     }
 
     /**
