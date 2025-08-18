@@ -130,9 +130,12 @@ trait CommonAdapterTrait
     /**
      * Simplify and manage all common cases for the arguments of the api.
      *
+     * So a loop and a switch allow to build query in all modules and to manage
+     * empty, single or multiple values for any field.
+     *
      * @todo May avoid to join the related entity multiple times. Require that the fields are not the same, or pass them here.
      *
-     * @return bool True if there is a query on a metadata.
+     * @return bool True if there is at least one valid query on a metadata.
      */
     protected function buildQueryFields(
         QueryBuilder $qb,
@@ -161,7 +164,8 @@ trait CommonAdapterTrait
                     $fieldAlias = $this->createAlias();
                     if (is_scalar($value)) {
                         $qb
-                            ->andWhere($expr->eq($entityAlias . '.' . $field, ':' . $fieldAlias))
+                            ->andWhere($entityAlias . '.' . $field . ' = :' . $fieldAlias)
+                            // TODO A boolean parameter type can be used.
                             ->setParameter($fieldAlias, $value ? 1 : 0, ParameterType::INTEGER);
                     } else {
                         $qb
@@ -182,7 +186,7 @@ trait CommonAdapterTrait
                     } elseif (count($values) === 1) {
                         $fieldAlias = $this->createAlias();
                         $qb
-                            ->andWhere($expr->eq($entityAlias . '.' . $field, ':' . $fieldAlias))
+                            ->andWhere($entityAlias . '.' . $field . ' = :' . $fieldAlias)
                             ->setParameter($fieldAlias, reset($values), ParameterType::INTEGER);
                     } elseif (in_array(0, $values, true)) {
                         $fieldAlias = $this->createAlias();
@@ -210,7 +214,7 @@ trait CommonAdapterTrait
                     } else {
                         $value = (int) $value;
                         $qb
-                            ->andWhere($expr->eq($entityAlias . '.' . $field, ':' . $fieldAlias))
+                            ->andWhere($entityAlias . '.' . $field . ' = :' . $fieldAlias)
                             ->setParameter($fieldAlias, $value, ParameterType::INTEGER);
                     }
                     break;
@@ -225,12 +229,12 @@ trait CommonAdapterTrait
                         $qb
                             ->andWhere($expr->orX(
                                 $expr->isNull($entityAlias . '.' . $field),
-                                $expr->eq($entityAlias . '.' . $field, ':' . $fieldAlias)
+                                $entityAlias . '.' . $field . ' = :' . $fieldAlias
                             ))
                             ->setParameter($fieldAlias, 0, ParameterType::INTEGER);
                     } elseif (count($values) === 1) {
                         $qb
-                            ->andWhere($expr->eq($entityAlias . '.' . $field, ':' . $fieldAlias))
+                            ->andWhere($entityAlias . '.' . $field . ' = :' . $fieldAlias)
                             ->setParameter($fieldAlias, reset($values), ParameterType::INTEGER);
                     } elseif (in_array(0, $values, true)) {
                         $qb
@@ -249,8 +253,6 @@ trait CommonAdapterTrait
                 case 'int_operator':
                     // There is no optimization with sql "between" in lieu of
                     // </≤ and >/≥. It can be done in adapter if really needed.
-                    $hasQueryField = true;
-                    $value = $query[$key];
                     $values = is_array($value) ? $value : [$value];
                     // Simplify the list of values by operator.
                     $opVals = [];
@@ -261,19 +263,19 @@ trait CommonAdapterTrait
                         } elseif ($operator === '=') {
                             $opVals['='][] = (int) mb_substr((string) $value, 1);
                         } elseif ($operator === '≠') {
-                            $opVals['≠'][] = (int) mb_substr((string) $value, 1);
-                        } elseif (isset($operators[$operator])) {
-                            $opVals[$operators[$operator]][] = (int) mb_substr($value, 1);
+                            $opVals['<>'][] = (int) mb_substr((string) $value, 1);
+                        } elseif (isset($this->operatorsSql[$operator])) {
+                            $opVals[$this->operatorsSql[$operator]][] = (int) mb_substr($value, 1);
                         } else {
                             // Unknown operator means error, so no result.
                             $qb
-                                ->andWhere($expr->eq('bad', 'operator'));
+                                ->andWhere('"bad" = "operator"');
                             break;
                         }
                     }
-                    foreach ($opVals as $op => $vals) {
+                    foreach ($opVals as $opSql => $vals) {
                         $fieldAlias = $this->createAlias();
-                        if ($op === '=') {
+                        if ($opSql === '=') {
                             if (count($vals) === 1) {
                                 $qb
                                     ->andWhere($entityAlias . '.' . $field . ' = :' . $fieldAlias)
@@ -283,7 +285,7 @@ trait CommonAdapterTrait
                                     ->andWhere($expr->in($entityAlias . '.' . $field, ':' . $fieldAlias))
                                     ->setParameter($fieldAlias, $vals, Connection::PARAM_INT_ARRAY);
                             }
-                        } elseif ($op === '≠') {
+                        } elseif ($opSql === '<>') {
                             if (count($vals) === 1) {
                                 $qb
                                     ->andWhere($entityAlias . '.' . $field . ' <> :' . $fieldAlias)
@@ -294,11 +296,11 @@ trait CommonAdapterTrait
                                     ->setParameter($fieldAlias, $vals, Connection::PARAM_INT_ARRAY);
                             }
                         } else {
-                            $val = $op === '<' || $op === '≤' ? min($vals) : max($vals);
+                            $val = $opSql === '<' || $opSql === '<=' ? min($vals) : max($vals);
                             $qb
                                 // Comparison is just a string concatenation.
-                                // ->andWhere(new Comparison($entityAlias . '.' . $field, $op, ':' . $fieldAlias))
-                                ->andWhere($entityAlias . '.' . $field . ' ' . $op . ' :' . $fieldAlias)
+                                // ->andWhere(new Comparison($entityAlias . '.' . $field, $opSql, ':' . $fieldAlias))
+                                ->andWhere($entityAlias . '.' . $field . ' ' . $opSql . ' :' . $fieldAlias)
                                 ->setParameter($fieldAlias, $val, ParameterType::INTEGER);
                         }
                     }
@@ -314,7 +316,7 @@ trait CommonAdapterTrait
                     } else {
                         $value = (string) $value;
                         $qb
-                            ->andWhere($expr->eq($entityAlias . '.' . $field, ':' . $fieldAlias))
+                            ->andWhere($entityAlias . '.' . $field . ' = :' . $fieldAlias)
                             ->setParameter($fieldAlias, $value, ParameterType::STRING);
                     }
                     break;
@@ -328,12 +330,12 @@ trait CommonAdapterTrait
                         $qb
                             ->andWhere($expr->orX(
                                 $expr->isNull($entityAlias . '.' . $field),
-                                $expr->eq($entityAlias . '.' . $field, ':' . $fieldAlias)
+                                $entityAlias . '.' . $field . ' = :' . $fieldAlias
                             ))
                             ->setParameter($fieldAlias, '', ParameterType::STRING);
                     } elseif (count($values) === 1) {
                         $qb
-                            ->andWhere($expr->eq($entityAlias . '.' . $field, ':' . $fieldAlias))
+                            ->andWhere($entityAlias . '.' . $field . ' = :' . $fieldAlias)
                             ->setParameter($fieldAlias, reset($values), ParameterType::STRING);
                     } elseif (($posEmpty = array_search("''", $values, true)) !== false) {
                         // Manage the convention for empty string. There may be
