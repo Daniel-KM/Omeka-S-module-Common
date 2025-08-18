@@ -121,10 +121,17 @@ Usage (for developer)
 
 ### Services, controller plugins and view helpers
 
-#### Simple and complete query builder for api adapter
+#### Api Adapter: Simple and complete query builder
 
-Just add the trait `CommonAdapterTrait` and the list of query arguments for all
-common queries will work, including queries with multiple values.
+Just add the trait `CommonAdapterTrait`, the list of query arguments for all
+common queries and a call to `buildQueryFields()`. Then, all queries will work,
+including queries with empty or multiple values and use of operators `<≤=≠≥>`.
+
+#### Api Adapter: Simple hydrator
+
+Just add the trait `CommonAdapterTrait` and it will automatically manage the
+method `hydrate()` in a generic way, as long as the entity methods and the keys
+used in the api or the form are compatible.
 
 #### AssetUrl
 

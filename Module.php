@@ -15,7 +15,7 @@ use Omeka\Module\AbstractModule;
  * module. It replaces previous modules Generic, Next, and various controller
  * plugins and view helpers from many modules.
  *
- * This module is useless alone: it is designed to be used by other module.
+ * This module is useless alone: it is designed to be used by other modules.
  * See readme.
  *
  * @copyright Daniel Berthereau, 2018-2025
