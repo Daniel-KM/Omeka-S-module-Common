@@ -665,6 +665,7 @@ trait TraitModule
         global $globalNext;
 
         $services = $this->getServiceLocator();
+        $formElementManager = $services->get('FormElementManager');
 
         // TODO Check fieldsets in the config of the module.
         $settingFieldsets = [
@@ -673,7 +674,9 @@ trait TraitModule
             'site_settings' => static::NAMESPACE . '\Form\SiteSettingsFieldset',
             'user_settings' => static::NAMESPACE . '\Form\UserSettingsFieldset',
         ];
-        if (!isset($settingFieldsets[$settingsType])) {
+        if (!isset($settingFieldsets[$settingsType])
+            || !$formElementManager->has($settingFieldsets[$settingsType])
+        ) {
             return null;
         }
 
@@ -727,7 +730,7 @@ trait TraitModule
          * @var \Laminas\Form\Fieldset $fieldset
          * @var \Laminas\Form\Form $form
          */
-        $fieldset = $services->get('FormElementManager')->get($settingFieldsets[$settingsType]);
+        $fieldset = $formElementManager->get($settingFieldsets[$settingsType]);
         $fieldset->setName($space);
         $form = $event->getTarget();
 
