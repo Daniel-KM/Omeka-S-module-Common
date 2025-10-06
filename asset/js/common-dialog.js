@@ -32,36 +32,31 @@ var CommonDialog = (function() {
     /**
      * Display a message as a dialog, so it can be used to replace a js alert().
      *
-     * Trigger o:dialog-opened.
+     * @deprecated Use dialogAlert() instead.
      */
     self.dialogMessage = function (body, nl2br = false) {
-        // Use a dialog to display a message, that should be escaped.
-        let dialog = document.querySelector('dialog.dialog-message');
-        if (!dialog) {
-            dialog = document.createElement('dialog');
-            dialog.className = 'dialog-common dialog-message';
-            dialog.setAttribute('data-is-dynamic', '1');
-            dialog.innerHTML = `
-                <div class="dialog-background">
-                    <div class="dialog-panel">
-                        <div class="dialog-header">
-                            <button type="button" class="dialog-header-close-button" title="${Omeka.jsTranslate('Close')}" autofocus="autofocus">
-                                <span class="dialog-close">🗙</span>
-                            </button>
-                        </div>
-                        <div class="dialog-contents">
-                            <div class="dialog-heading"></div>
-                            <div class="dialog-message"></div>
-                            <div class="dialog-body">${nl2br ? body.replace(/(?:\r\n|\r|\n)/g, '<br/>') : body}</div>
-                        </div>
-                        <div class="dialog-footer"></div>
-                    </div>
-                </div>
-                `;
-            document.body.appendChild(dialog);
+        console.warn('CommonDialog.dialogMessage() is deprecated. Use CommonDialog.dialogAlert() instead.');
+        return self.dialogAlert({
+            message: body,
+            nl2br: nl2br,
+         });
+    };
+
+    /**
+     * Display a message as a dialog, so it can be used to replace a js alert().
+     *
+     * Trigger o:dialog-opened.
+     */
+    self.dialogAlert = function(options = {}) {
+        if (typeof options !== 'object') {
+            options = {};
         }
-        dialog.showModal();
-        dialog.dispatchEvent(new Event('o:dialog-opened'));
+        options.message = options.message || '';
+        options.nl2br = options.nl2br || false;
+        options.textOk = options.textOk || Omeka.jsTranslate('OK');
+        options.textCancel = null;
+        options.input = false;
+        return self.dialogGeneric(options);
     };
 
     /**
@@ -70,10 +65,16 @@ var CommonDialog = (function() {
      *
      * Trigger o:dialog-opened.
      */
-    self.dialogConfirm = function(message) {
-        return self.dialogGeneric({
-            message: message,
-        });
+    self.dialogConfirm = function(options = {}) {
+        if (typeof options !== 'object') {
+            options = {};
+        }
+        options.message = options.message || '';
+        options.nl2br = options.nl2br || false;
+        options.textOk = options.textOk || Omeka.jsTranslate('OK');
+        options.textCancel = options.textCancel || Omeka.jsTranslate('Cancel');
+        options.input = false;
+        return self.dialogGeneric(options);
     };
 
     /**
@@ -82,82 +83,113 @@ var CommonDialog = (function() {
      *
      * Trigger o:dialog-opened.
      */
-    self.dialogPrompt = function(message, defaultValue = '') {
-        return self.dialogGeneric({
-            message: message,
-            input: true,
-            defaultValue: defaultValue,
-        });
+    self.dialogPrompt = function(options = {}) {
+        if (typeof options !== 'object') {
+            options = {};
+        }
+        options.message = message;
+        options.nl2br = options.nl2br || false;
+        options.textOk = options.textOk || Omeka.jsTranslate('OK');
+        options.textCancel = options.textCancel || Omeka.jsTranslate('Cancel');
+        options.input = true;
+        options.defaultValue = options.defaultValue || '';
+        return self.dialogGeneric(options);
     };
 
     /**
      * Display a message with an input or a confirmation as a dialog, so it can
      * be used to replace a js confirm() or prompt().
      *
+     * @param object options Options:
+     * - heading (string) Heading to display.
+     * - message (string) Message to display.
+     * - nl2br (bool) Convert new lines to <br/>.
+     * - body (string) A body to display.
+     * - input (bool) Display an input field instead of the body option.
+     * - defaultValue (string) Default value of the input field.
+    * - textOk (string) Text for the ok button.
+    * - textCancel (string) If null, the cancel button is not displayed.
+     *
      * Trigger o:dialog-opened.
      */
     self.dialogGeneric = function(options) {
         return new Promise(function(resolve) {
             let dialog = document.querySelector('dialog.dialog-generic');
-            if (!dialog) {
-                dialog = document.createElement('dialog');
-                dialog.className = 'dialog-common dialog-generic';
-                dialog.setAttribute('data-is-dynamic', '1');
-                dialog.innerHTML = `
-                    <form method="dialog" class="dialog-background">
-                        <div class="dialog-panel">
-                            <div class="dialog-header">
-                                <button type="button" class="dialog-header-close-button" title="${Omeka.jsTranslate('Close')}">
-                                    <span class="dialog-close">🗙</span>
-                                </button>
-                            </div>
-                            <div class="dialog-contents">
-                                <div class="dialog-message"></div>
-                                ${options.input
-                                    ? `<input type="text" class="dialog-input" value="${options.defaultValue || ''}" autofocus="autofocus" />`
-                                    : ''}
-                            </div>
-                            <div class="dialog-footer">
-                                <button type="button" class="dialog-button dialog-cancel">${options.cancelText || Omeka.jsTranslate('Cancel')}</button>
-                                <button type="submit" class="dialog-button dialog-ok">${options.okText || Omeka.jsTranslate('OK')}</button>
-                            </div>
-                        </div>
-                    </form>
-                    `;
-                document.body.appendChild(dialog);
+            if (dialog) {
+                dialog.remove();
+            }
+            dialog = document.createElement('dialog');
+            dialog.className = 'dialog-common dialog-generic';
+            dialog.setAttribute('data-is-dynamic', '1');
+
+            // Build footer buttons according to options.
+            let footerHtml = '';
+            if (options.textCancel !== null) {
+                footerHtml += `<button type="button" class="dialog-button dialog-cancel">${options.textCancel || Omeka.jsTranslate('Cancel')}</button>`;
+            }
+            if (options.textOk) {
+                footerHtml += `<button type="submit" class="dialog-button dialog-ok">${options.textOk || Omeka.jsTranslate('OK')}</button>`;
             }
 
-            dialog.querySelector('.dialog-message').textContent = options.message;
-
+            // Build input field if needed.
+            let body = options.body || '';
             if (options.input) {
-                let input = dialog.querySelector('.dialog-input');
-                if (!input) {
-                    dialog.querySelector('.dialog-contents').insertAdjacentHTML('beforeend',
-                        `<input type="text" class="dialog-input" value="${options.defaultValue || ''}" autofocus="autofocus" />`);
-                    input = dialog.querySelector('.dialog-input');
-                } else {
-                    input.value = options.defaultValue || '';
-                }
+                body = `<input type="text" class="dialog-input" value="${options.defaultValue || ''}" autofocus="autofocus" />`;
             }
 
+            dialog.innerHTML = `
+                <form method="dialog" class="dialog-background">
+                    <div class="dialog-panel">
+                        <div class="dialog-header">
+                            <button type="button" class="dialog-header-close-button" title="${Omeka.jsTranslate('Close')}">
+                                <span class="dialog-close">🗙</span>
+                            </button>
+                        </div>
+                        <div class="dialog-contents">
+                            <div class="dialog-heading"></div>
+                            <div class="dialog-message"></div>
+                            <div class="dialog-body">${body}</div>
+                        </div>
+                        <div class="dialog-footer">
+                            ${footerHtml}
+                        </div>
+                    </div>
+                </form>
+                `;
+            document.body.appendChild(dialog);
+
+            // Set heading.
+            const heading = options.heading || '';
+            dialog.querySelector('.dialog-heading').textContent = heading;
+
+            // Set message with optional nl2br.
+            const msg = options.nl2br
+                ? options.message.replace(/(?:\r\n|\r|\n)/g, '<br/>')
+                : options.message;
+            dialog.querySelector('.dialog-message').innerHTML = msg;
+
+            // Button handlers.
             const okBtn = dialog.querySelector('.dialog-ok');
             const cancelBtn = dialog.querySelector('.dialog-cancel');
-            const closeBtn = dialog.querySelector('.dialog-header-close-button');
             const input = dialog.querySelector('.dialog-input');
 
-            okBtn.onclick = function(e) {
-                e.preventDefault();
-                resolve(options.input ? input.value : true);
-                dialog.close();
-                dialog.remove();
-            };
-            cancelBtn.onclick = function(e) {
-                e.preventDefault();
-                resolve(options.input ? null : false);
-                dialog.close();
-                dialog.remove();
-            };
-            closeBtn.onclick = function(e) {
+            if (okBtn) {
+                okBtn.onclick = function(e) {
+                    e.preventDefault();
+                    resolve(options.input ? input.value : true);
+                    dialog.close();
+                    dialog.remove();
+                };
+            }
+            if (cancelBtn) {
+                cancelBtn.onclick = function(e) {
+                    e.preventDefault();
+                    resolve(options.input ? null : false);
+                    dialog.close();
+                    dialog.remove();
+                };
+            }
+            dialog.querySelector('.dialog-header-close-button').onclick = function(e) {
                 e.preventDefault();
                 resolve(options.input ? null : false);
                 dialog.close();
@@ -169,7 +201,7 @@ var CommonDialog = (function() {
 
             dialog.showModal();
             dialog.dispatchEvent(new Event('o:dialog-opened'));
-            (input ? input : okBtn).focus();
+            (input ? input : okBtn)?.focus();
         });
     };
 
