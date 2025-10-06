@@ -30,7 +30,7 @@ var CommonDialog = (function() {
     };
 
     /**
-     * Display a message as a dialog, so it can be used to replace an alert.
+     * Display a message as a dialog, so it can be used to replace a js alert().
      *
      * Trigger o:dialog-opened.
      */
@@ -56,11 +56,121 @@ var CommonDialog = (function() {
                         </div>
                         <div class="dialog-footer"></div>
                     </div>
-                </div>`;
+                </div>
+                `;
             document.body.appendChild(dialog);
         }
         dialog.showModal();
         dialog.dispatchEvent(new Event('o:dialog-opened'));
+    };
+
+    /**
+     * Display a message with a confirmation as a dialog, so it can be used to
+     * replace a js confirm().
+     *
+     * Trigger o:dialog-opened.
+     */
+    self.dialogConfirm = function(message) {
+        return self.dialogGeneric({
+            message: message,
+        });
+    };
+
+    /**
+     * Display a message with an input field as a dialog, so it can be used to
+     * replace a js prompt().
+     *
+     * Trigger o:dialog-opened.
+     */
+    self.dialogPrompt = function(message, defaultValue = '') {
+        return self.dialogGeneric({
+            message: message,
+            input: true,
+            defaultValue: defaultValue,
+        });
+    };
+
+    /**
+     * Display a message with an input or a confirmation as a dialog, so it can
+     * be used to replace a js confirm() or prompt().
+     *
+     * Trigger o:dialog-opened.
+     */
+    self.dialogGeneric = function(options) {
+        return new Promise(function(resolve) {
+            let dialog = document.querySelector('dialog.dialog-generic');
+            if (!dialog) {
+                dialog = document.createElement('dialog');
+                dialog.className = 'dialog-common dialog-generic';
+                dialog.setAttribute('data-is-dynamic', '1');
+                dialog.innerHTML = `
+                    <form method="dialog" class="dialog-background">
+                        <div class="dialog-panel">
+                            <div class="dialog-header">
+                                <button type="button" class="dialog-header-close-button" title="${Omeka.jsTranslate('Close')}">
+                                    <span class="dialog-close">🗙</span>
+                                </button>
+                            </div>
+                            <div class="dialog-contents">
+                                <div class="dialog-message"></div>
+                                ${options.input
+                                    ? `<input type="text" class="dialog-input" value="${options.defaultValue || ''}" autofocus="autofocus" />`
+                                    : ''}
+                            </div>
+                            <div class="dialog-footer">
+                                <button type="button" class="dialog-button dialog-cancel">${options.cancelText || Omeka.jsTranslate('Cancel')}</button>
+                                <button type="submit" class="dialog-button dialog-ok">${options.okText || Omeka.jsTranslate('OK')}</button>
+                            </div>
+                        </div>
+                    </form>
+                    `;
+                document.body.appendChild(dialog);
+            }
+
+            dialog.querySelector('.dialog-message').textContent = options.message;
+
+            if (options.input) {
+                let input = dialog.querySelector('.dialog-input');
+                if (!input) {
+                    dialog.querySelector('.dialog-contents').insertAdjacentHTML('beforeend',
+                        `<input type="text" class="dialog-input" value="${options.defaultValue || ''}" autofocus="autofocus" />`);
+                    input = dialog.querySelector('.dialog-input');
+                } else {
+                    input.value = options.defaultValue || '';
+                }
+            }
+
+            const okBtn = dialog.querySelector('.dialog-ok');
+            const cancelBtn = dialog.querySelector('.dialog-cancel');
+            const closeBtn = dialog.querySelector('.dialog-header-close-button');
+            const input = dialog.querySelector('.dialog-input');
+
+            okBtn.onclick = function(e) {
+                e.preventDefault();
+                resolve(options.input ? input.value : true);
+                dialog.close();
+                dialog.remove();
+            };
+            cancelBtn.onclick = function(e) {
+                e.preventDefault();
+                resolve(options.input ? null : false);
+                dialog.close();
+                dialog.remove();
+            };
+            closeBtn.onclick = function(e) {
+                e.preventDefault();
+                resolve(options.input ? null : false);
+                dialog.close();
+                dialog.remove();
+            };
+            dialog.addEventListener('close', function() {
+                if (dialog.parentNode) dialog.remove();
+            }, { once: true });
+
+            dialog.showModal();
+            dialog.dispatchEvent(new Event('o:dialog-opened'));
+            (input ? input : okBtn).focus();
+        });
     };
 
     /**
@@ -179,6 +289,7 @@ var CommonDialog = (function() {
      *
      * The element may be a button (semantically recommended), an input, or a
      * fake link (anchor a with href="#").
+     * jQuery is not supported here, so use `element[0]` if needed.
      *
      * The spinner is set after an input or inside a button or other element.
      */
