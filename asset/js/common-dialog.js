@@ -49,7 +49,9 @@ var CommonDialog = (function() {
      */
     self.dialogAlert = function(options = {}) {
         if (typeof options !== 'object') {
-            options = {};
+            options = typeof options === 'string'
+                ? { message: options }
+                : {};
         }
         options.message = options.message || '';
         options.nl2br = options.nl2br || false;
@@ -67,7 +69,9 @@ var CommonDialog = (function() {
      */
     self.dialogConfirm = function(options = {}) {
         if (typeof options !== 'object') {
-            options = {};
+            options = typeof options === 'string'
+                ? { message: options }
+                : {};
         }
         options.message = options.message || '';
         options.nl2br = options.nl2br || false;
@@ -85,7 +89,9 @@ var CommonDialog = (function() {
      */
     self.dialogPrompt = function(options = {}) {
         if (typeof options !== 'object') {
-            options = {};
+            options = typeof options === 'string'
+                ? { message: options }
+                : {};
         }
         options.message = message;
         options.nl2br = options.nl2br || false;
