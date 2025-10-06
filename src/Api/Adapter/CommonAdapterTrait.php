@@ -543,7 +543,7 @@ trait CommonAdapterTrait
      * The method shouldHydrate() is not called, so partial update is managed
      * only basically with the presence of keys.
      */
-    public function hydrate(Request $request, EntityInterface $entity, ErrorStore $errorStore): void
+    protected function hydrateAuto(Request $request, EntityInterface $entity, ErrorStore $errorStore): void
     {
         $data = $request->getContent();
         foreach ($data as $key => $value) {
