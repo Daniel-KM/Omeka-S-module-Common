@@ -11,8 +11,10 @@ var CommonDialog = (function() {
         const dialog = eventOrElement.target
             ? eventOrElement.target.closest('dialog')
             : eventOrElement.closest('dialog');
-        dialog.showModal();
-        dialog.dispatchEvent(new Event('o:dialog-opened'));
+        if (dialog) {
+            dialog.showModal();
+            dialog.dispatchEvent(new Event('o:dialog-opened'));
+        }
     };
 
     /**
@@ -22,10 +24,12 @@ var CommonDialog = (function() {
         const dialog = eventOrElement.target
             ? eventOrElement.target.closest('dialog')
             : eventOrElement.closest('dialog');
-        dialog.dispatchEvent(new Event('o:dialog-close'));
-        dialog.close();
-        if (dialog.hasAttribute('data-is-dynamic') && dialog.getAttribute('data-is-dynamic')) {
-            dialog.remove();
+        if (dialog) {
+            dialog.dispatchEvent(new Event('o:dialog-close'));
+            dialog.close();
+            if (dialog.hasAttribute('data-is-dynamic') && dialog.getAttribute('data-is-dynamic')) {
+                dialog.remove();
+            }
         }
     };
 
@@ -93,7 +97,7 @@ var CommonDialog = (function() {
                 ? { message: options }
                 : {};
         }
-        options.message = message;
+        options.message = options.message || '';
         options.nl2br = options.nl2br || false;
         options.textOk = options.textOk || Omeka.jsTranslate('OK');
         options.textCancel = options.textCancel || Omeka.jsTranslate('Cancel');
@@ -219,6 +223,8 @@ var CommonDialog = (function() {
      * A spinner is appended when the event target (form or button) has
      * attribute data-spinner true. It may be forced via button when the
      * attribute set on form is true or false.
+     *
+     * @see https://github.com/omniti-labs/jsend
      */
     self.jSend = function (event) {
         event.preventDefault();
@@ -250,7 +256,7 @@ var CommonDialog = (function() {
         } else if (isButton) {
             spinnerTarget = target;
             hasSpinner = [true, 1, '1', 'true'].includes(spinnerTarget.dataset.spinner);
-            url = target.dataset.action;
+            url = target.dataset.action ? target.dataset.action : target.dataset.url;
             const payload = target.dataset.payload ? JSON.parse(target.dataset.payload) : {};
             formQuery = new URLSearchParams(payload).toString();
         } else {
@@ -290,10 +296,12 @@ var CommonDialog = (function() {
             self.jSendFail(data);
         } else {
             const dialog = document.querySelector('dialog.dialog-common');
-            dialog.close();
+            if (dialog) {
+                dialog.close();
+            }
             const msg = self.jSendMessage(data);
             if (msg) {
-                self.dialogMessage(msg);
+                self.dialogAlert(msg);
             }
             document.dispatchEvent(new CustomEvent('o:jsend-success', { detail: data }));
         }
@@ -305,7 +313,7 @@ var CommonDialog = (function() {
     self.jSendFail = function (error) {
         error = error.responseJSON || error;
         const msg = self.jSendMessage(error) || Omeka.jsTranslate('An error occurred.');
-        self.dialogMessage(msg, true);
+        self.dialogAlert({ message: msg, nl2br: true });
         document.dispatchEvent(new CustomEvent('o:jsend-fail', { detail: error }));
     };
 

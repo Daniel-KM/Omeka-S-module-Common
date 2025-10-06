@@ -94,6 +94,14 @@
         margin-left: 1em;
     }
 
+    .icons-only a .spinner,
+    .icons-only input .spinner,
+    .icons-only button .spinner,
+    a .spinner.icon-only,
+    input .spinner.icon-only,
+    button .spinner.icon-only {
+        margin-left: inherit;
+    }
 }
 
 @media screen and (max-width:640px) {
