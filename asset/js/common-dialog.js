@@ -303,6 +303,7 @@ var CommonDialog = (function() {
      * Manage ajax fail via jSend.
      */
     self.jSendFail = function (error) {
+        error = error.responseJSON || error;
         const msg = self.jSendMessage(error) || Omeka.jsTranslate('An error occurred.');
         self.dialogMessage(msg, true);
         document.dispatchEvent(new CustomEvent('o:jsend-fail', { detail: error }));
@@ -310,14 +311,25 @@ var CommonDialog = (function() {
 
     /**
      * Get the main message of jSend output, in particular for status fail.
+     *
+     * For fail, when there is no message, return the first string value of data,
+     * that should contain an error message.
+     * @todo Return keys with all messages for fail? Adapt for a form?
      */
     self.jSendMessage = function (data) {
         if (typeof data !== 'object') return null;
         if (data.message) return data.message.length ? data.message : null;
         if (!data.data) return null;
         if (data.data.message) return data.data.message.length ? data.data.message : null;
-        for (let value of Object.values(data.data)) {
-            if (typeof value === 'string' && value.length) return value;
+        if (!data.status) return null;
+        if (data.status === 'fail') {
+            let result = '';
+            for (let value of Object.values(data.data)) {
+                if (typeof value === 'string' && value.length) {
+                    result += "\n" + value;
+                }
+            }
+            return result.length ? result : null;
         }
         return null;
     };
