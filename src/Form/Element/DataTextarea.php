@@ -211,7 +211,9 @@ class DataTextarea extends ArrayTextarea
      * With option "as_key_value", the first value will be the used as key for
      * the main array too.
      *
-     * @example When passing options to an element:
+     * This example divide each string into an array of four values (field,
+     * label, type and options) and set specific settings for options only.
+     * @example
      * ```php
      *     'data_options' => [
      *         'field' => null,

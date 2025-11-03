@@ -148,12 +148,14 @@ class Module extends AbstractModule
             ['session' => 'modified'],
         ];
 
+        // Do not create index if it exists, whatever the name is.
         $newIndices = [];
         foreach ($tableColumns as $key => $tableColumn) {
             $table = key($tableColumn);
             $column = reset($tableColumn);
-            $result = $connection->executeQuery("SHOW INDEX FROM `$table` WHERE `column_name` = '$column';");
-            if ($result->fetchOne()) {
+            $stmt = $connection->executeQuery("SHOW INDEX FROM `$table` WHERE `column_name` = '$column';");
+            $result = $stmt->fetchOne();
+            if ($result) {
                 unset($tableColumns[$key]);
             } else {
                 $newIndices[] = "$table/$column";

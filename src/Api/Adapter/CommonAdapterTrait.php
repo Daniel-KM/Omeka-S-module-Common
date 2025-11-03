@@ -199,6 +199,7 @@ trait CommonAdapterTrait
                             ->andWhere($entityAlias . '.' . $field . ' = :' . $fieldAlias)
                             ->setParameter($fieldAlias, reset($values), ParameterType::INTEGER);
                     } elseif (in_array(0, $values, true)) {
+                        // TODO Remove the possibiliy to search id = 0 with something else. See OaiPmhHarvester.
                         $fieldAlias = $this->createAlias();
                         $qb
                             ->andWhere($expr->orX(

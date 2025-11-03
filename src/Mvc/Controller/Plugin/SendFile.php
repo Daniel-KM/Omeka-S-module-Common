@@ -106,6 +106,7 @@ class SendFile extends AbstractPlugin
             ->addHeaderLine('Content-Transfer-Encoding: binary');
 
         if ($cache) {
+            // Cache for 30 days.
             $cacheDuration = is_bool($cache) ? 30 * 24 * 60 * 60 : (int) $cache;
             $headers
                 ->addHeaderLine(sprintf('Cache-Control: private, max-age=%1$d, post-check=%1$d, pre-check=%1$d', $cacheDuration))
@@ -146,11 +147,11 @@ class SendFile extends AbstractPlugin
             $response
                 ->setStatusCode($response::STATUS_CODE_206);
             $headers
-                ->addHeaderLine(sprintf('Content-Length: %d', $end - $start + 1))
-                ->addHeaderLine(sprintf('Content-Range: bytes %1$d-%2$d/%3$d', $start, $end, $filesize));
+                ->addHeaderLine('Content-Length: ' . ($end - $start + 1))
+                ->addHeaderLine("Content-Range: bytes $start-$end/$filesize");
         } else {
             $headers
-                ->addHeaderLine(sprintf('Content-Length: %d', $filesize));
+                ->addHeaderLine('Content-Length: ' . $filesize);
         }
 
         // Fix deprecated warning in \Laminas\Http\PhpEnvironment\Response::sendHeaders() (l. 113).
