@@ -298,7 +298,13 @@ var CommonDialog = (function() {
             },
             credentials: 'same-origin',
         })
-        .then(response => response.json())
+        .then(response => {
+            const contentType = response.headers.get('content-type');
+            return contentType && contentType.includes('application/json')
+                ? response.json()
+                // Non-json response: html error page, etc.
+                : { status: 'error', message: Omeka.jsTranslate('An error occurred.') };
+        })
         .then(data => self.jSendResponse(data, {target: spinnerTarget}))
         .catch(error => self.jSendFail(error, {target: spinnerTarget}))
         .finally(() => {
