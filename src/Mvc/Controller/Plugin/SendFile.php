@@ -25,7 +25,9 @@ class SendFile extends AbstractPlugin
      * - content_type (string): the content type to set in the headers, that is
      *   the media type of the file, or automatically defined from the file.
      * - filename (string): filename for download; default based on filepath.
-     * - disposition_mode (string): "inline" (default) or "attachment".
+     * - disposition_mode (string): "inline" (default), "attachment" or "query".
+     *   With query, the argument "download" with any value casted as true means
+     *   attachement, else inline.
      * - cache (boolean|int): set or disable cache; default 30 days  as seconds.
      * - resource (MediaRepresentation|AssetRepresentation): allow to get the
      *   media type automatically.
@@ -76,9 +78,16 @@ class SendFile extends AbstractPlugin
             ? trim($params['filename'])
             : basename($filepath);
 
-        $dispositionMode = ($params['disposition_mode'] ?? null) === 'attachment'
-            ? 'attachment'
-            : 'inline';
+        $dispositionMode = $params['disposition_mode'] ?? 'inline';
+        if ($dispositionMode === 'query') {
+            $dispositionMode = $this->getController()->params()->fromQuery('download')
+                ? 'attachment'
+                : 'inline';
+        } else {
+            $dispositionMode = ($params['disposition_mode'] ?? null) === 'attachment'
+                ? 'attachment'
+                : 'inline';
+        }
 
         $cache = $params['cache'] ?? false;
 
