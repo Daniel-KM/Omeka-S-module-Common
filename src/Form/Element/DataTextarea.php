@@ -35,6 +35,13 @@ class DataTextarea extends ArrayTextarea
     protected $dataFlatKey = '';
 
     /**
+     * @var array
+     *
+     * Keys whose sub-values must be cast to integer when parsed.
+     */
+    protected $dataIntegerKeys = [];
+
+    /**
      * @var string
      *
      * May be "by_line" (one line by data, default) or "last_is_list".
@@ -195,7 +202,8 @@ class DataTextarea extends ArrayTextarea
      * - separator (string): allow to explode the string to create a sub-array
      * - associative (string): allow to create an associative sub-array. This
      *   option as no effect for last key when option "last_is_list" is set.
-     * When the value is a string, it's the separator used to get the sub-array.
+     *   When the value is a string, it's the separator used to get sub-array.
+     * - is_integer (bool): cast each value of the sub-array as integer.
      *
      * Each specified key will be used as the keys of each part of each line.
      * There is no default keys: in that case, the values are a simple array of
@@ -212,6 +220,7 @@ class DataTextarea extends ArrayTextarea
      *         'options' => [
      *             'separator' => '|',
      *             'associative' => '=',
+     *             'is_integer' => true,
      *         ],
      *     ],
      * ```
@@ -223,8 +232,10 @@ class DataTextarea extends ArrayTextarea
         // TODO For compatibility as long as code is not updated to use dataOptions.
         // Backward-compatible to fill deprecated structures.
         $this->dataKeys = array_fill_keys(array_keys($dataOptions), null);
+
         $arrayKeys = [];
         $associativeKeys = [];
+        $integerKeys = [];
         foreach (array_filter($dataOptions) as $key => $value) {
             if (is_array($value)) {
                 if (isset($value['separator'])) {
@@ -233,6 +244,9 @@ class DataTextarea extends ArrayTextarea
                 if (isset($value['associative'])) {
                     $associativeKeys[$key] = (string) $value['associative'];
                 }
+                if (!empty($value['is_integer'])) {
+                    $integerKeys[$key] = true;
+                }
             } elseif (is_scalar($value)) {
                 $arrayKeys[$key] = $value;
             }
@@ -240,6 +254,7 @@ class DataTextarea extends ArrayTextarea
 
         $this->dataArrayKeys = $arrayKeys;
         $this->dataAssociativeKeys = $associativeKeys;
+        $this->dataIntegerKeys = $integerKeys;
         return $this;
     }
 
@@ -409,14 +424,14 @@ class DataTextarea extends ArrayTextarea
                         foreach ($parts as $k => $v) {
                             if (strpos($v, $this->dataAssociativeKeys[$arrayKey]) !== false) {
                                 [$kk, $vv] = array_map('trim', explode($this->dataAssociativeKeys[$arrayKey], $v, 2));
-                                $asso[$kk] = $vv;
+                                $asso[$kk] = $this->castToInteger($arrayKey, $vv);
                             } else {
-                                $asso[$k] = $v;
+                                $asso[$k] = $this->castToInteger($arrayKey, $v);
                             }
                         }
                         $data[$arrayKey] = $asso;
                     } else {
-                        $data[$arrayKey] = $parts;
+                        $data[$arrayKey] = $this->castToIntegerArray($arrayKey, $parts);
                     }
                 }
                 $array = $this->appendToArray($array, $data);
@@ -476,14 +491,14 @@ class DataTextarea extends ArrayTextarea
                         foreach ($parts as $k => $v) {
                             if (strpos($v, $this->dataAssociativeKeys[$arrayKey]) !== false) {
                                 [$kk, $vv] = array_map('trim', explode($this->dataAssociativeKeys[$arrayKey], $v, 2));
-                                $asso[$kk] = $vv;
+                                $asso[$kk] = $this->castToInteger($arrayKey, $vv);
                             } else {
-                                $asso[$k] = $v;
+                                $asso[$k] = $this->castToInteger($arrayKey, $v);
                             }
                         }
                         $data[$arrayKey] = $asso;
                     } else {
-                        $data[$arrayKey] = $parts;
+                        $data[$arrayKey] = $this->castToIntegerArray($arrayKey, $parts);
                     }
                 }
                 $array = $this->appendToArray($array, $data);
@@ -596,5 +611,19 @@ class DataTextarea extends ArrayTextarea
         }
         $parts = array_map('trim', explode($separator, $value));
         return array_values(array_filter($parts, 'strlen'));
+    }
+
+    protected function castToInteger(string $key, $value)
+    {
+        return isset($this->dataIntegerKeys[$key]) && is_numeric($value)
+            ? (int) $value
+            : $value;
+    }
+
+    protected function castToIntegerArray(string $key, array $values): array
+    {
+        return isset($this->dataIntegerKeys[$key])
+            ? array_map(fn($v) => is_numeric($v) ? (int) $v : $v, $values)
+            : $values;
     }
 }
