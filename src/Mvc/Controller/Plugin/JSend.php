@@ -2,10 +2,12 @@
 
 namespace Common\Mvc\Controller\Plugin;
 
+use Common\Stdlib\PsrMessage;
 use Laminas\Http\PhpEnvironment\Response;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 use Laminas\Mvc\Exception\RuntimeException;
 use Laminas\View\Model\JsonModel;
+use Omeka\Stdlib\Message;
 
 class JSend extends AbstractPlugin
 {
@@ -20,6 +22,7 @@ class JSend extends AbstractPlugin
      * - Unlike jSend, any status can have a main message and a code.
      * - For statuses fail and error, the error messages are taken from
      *   messenger messages when not set.
+     * - PsrMessage() and Message() are automatically translated.
      *
      * @see https://github.com/omniti-labs/jsend
      *
@@ -28,11 +31,23 @@ class JSend extends AbstractPlugin
     public function __invoke(
         string $status,
         ?array $data = null,
-        ?string $message = null,
+        // Message is null, string or stringable.
+        $message = null,
         ?int $httpStatusCode = null,
         ?int $code = null
     ): JsonModel {
         $controller = $this->getController();
+
+        // Make the message a simple string.
+        if ($message instanceof PsrMessage) {
+            $message = $message->setTranslator($controller->translator())->translate();
+        } elseif ($message instanceof Message) {
+            if ($message->hasArgs()) {
+                $message = vsprintf($controller->translate($message->getMessage()), $message->getArgs());
+            } else {
+                $message = $controller->translate($message->getMessage());
+            }
+        }
 
         switch ($status) {
             case self::SUCCESS:
@@ -86,7 +101,7 @@ class JSend extends AbstractPlugin
                 break;
 
             default:
-                throw new RuntimeException(sprintf('The status "%s" is not supported by jSend.', $status)); // @translate
+                throw new RuntimeException(sprintf($controller->translate('The status "%s" is not supported by jSend.'), $status)); // @translate
         }
 
         if ($httpStatusCode) {
