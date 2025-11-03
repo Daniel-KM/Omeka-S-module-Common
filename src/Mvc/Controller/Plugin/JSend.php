@@ -3,7 +3,7 @@
 namespace Common\Mvc\Controller\Plugin;
 
 use Common\Stdlib\PsrMessage;
-use Laminas\Http\PhpEnvironment\Response;
+use Laminas\Http\PhpEnvironment\Response as HttpResponse;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 use Laminas\Mvc\Exception\RuntimeException;
 use Laminas\View\Model\JsonModel;
@@ -27,15 +27,22 @@ class JSend extends AbstractPlugin
      * @see https://github.com/omniti-labs/jsend
      *
      * @throws \Laminas\Mvc\Exception\RuntimeException
+     *
+     * @return JsonModel|self When status is not set, it returns itself for
+     * shortcut methods.
      */
     public function __invoke(
-        string $status,
+        ?string $status = null,
         ?array $data = null,
         // Message is null, string or stringable.
         $message = null,
         ?int $httpStatusCode = null,
         ?int $code = null
-    ): JsonModel {
+    ) /* JsonModel|self */ {
+        if ($status === null) {
+            return $this;
+        }
+
         $controller = $this->getController();
 
         // Make the message a simple string.
@@ -80,7 +87,7 @@ class JSend extends AbstractPlugin
                 if (isset($code)) {
                     $json['code'] = $code;
                 }
-                $httpStatusCode ??= Response::STATUS_CODE_400;
+                $httpStatusCode ??= HttpResponse::STATUS_CODE_400;
                 break;
 
             case self::ERROR:
@@ -97,7 +104,7 @@ class JSend extends AbstractPlugin
                 if (isset($code)) {
                     $json['code'] = $code;
                 }
-                $httpStatusCode ??= Response::STATUS_CODE_500;
+                $httpStatusCode ??= HttpResponse::STATUS_CODE_500;
                 break;
 
             default:
@@ -111,5 +118,40 @@ class JSend extends AbstractPlugin
         }
 
         return new JsonModel($json);
+    }
+
+    public function success(
+        ?array $data = null,
+        // Message is null, string or stringable.
+        $message = null,
+        ?int $httpStatusCode = null,
+        ?int $code = null
+    ) {
+        return $this->__invoke(self::SUCCESS, $data, $message, $httpStatusCode, $code);
+    }
+
+    public function fail(
+        ?array $data = null,
+        // Message is null, string or stringable.
+        $message = null,
+        ?int $httpStatusCode = null,
+        ?int $code = null
+    ) {
+        return $this->__invoke(self::FAIL, $data, $message, $httpStatusCode, $code);
+    }
+
+    public function error(
+        ?array $data = null,
+        // Message is null, string or stringable.
+        $message = null,
+        ?int $httpStatusCode = null,
+        ?int $code = null
+    ) {
+        return $this->__invoke(self::ERROR, $data, $message, $httpStatusCode, $code);
+    }
+
+    public function jsonErrorNotFound(?array $data = null)
+    {
+        return $this->__invoke(self::FAIL, $data, $this->translate('Not found.'), HttpResponse::STATUS_CODE_404);
     }
 }
