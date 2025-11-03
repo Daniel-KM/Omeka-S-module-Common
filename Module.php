@@ -144,7 +144,7 @@ class Module extends AbstractModule
             ['resource' => 'resource_type'],
             ['value' => 'type'],
             ['value' => 'lang'],
-            // Keep session last, because it may fail on big base.
+            // Keep session last, because it may fail on a big database.
             ['session' => 'modified'],
         ];
 
@@ -161,33 +161,15 @@ class Module extends AbstractModule
         }
 
         if ($newIndices) {
+            // Dispatch background job to add indexes.
+            // The class is not available during upgrade or install.
+            require_once __DIR__ . '/src/Job/AddDatabaseIndexes.php';
+            $dispatcher = $services->get('Omeka\Job\Dispatcher');
+            $dispatcher->dispatch(\Common\Job\AddDatabaseIndexes::class);
             $message = new \Common\Stdlib\PsrMessage(
-                'Some indexes will be added to tables to improve performance: {list}.', // @translate
-                ['list' => implode(', ', $newIndices)]
+                'A background job has been started to add database indexes.' // @translate
             );
-            $messenger->addWarning($message);
-            $newIndices = [];
-            foreach ($tableColumns as $key => $tableColumn) {
-                $table = key($tableColumn);
-                $column = reset($tableColumn);
-                try {
-                    $connection->executeStatement("ALTER TABLE `$table` ADD INDEX `$column` (`$column`);");
-                    $newIndices[] = "$table/$column";
-                } catch (\Exception $e) {
-                    $message = new \Common\Stdlib\PsrMessage(
-                        'Unable to add index "{index}" in table "{table}" to improve performance: {message}', // @translate
-                        ['index' => $column, 'table' => $table, 'message' => $e->getMessage()]
-                    );
-                    $messenger->addError($message);
-                }
-            }
-            if ($newIndices) {
-                $message = new \Common\Stdlib\PsrMessage(
-                    'Some indexes were added to tables to improve performance: {list}.', // @translate
-                    ['list' => implode(', ', $newIndices)]
-                );
-                $messenger->addSuccess($message);
-            }
+            $messenger->addSuccess($message);
         }
     }
 
