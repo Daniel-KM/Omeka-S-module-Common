@@ -134,6 +134,20 @@ class SendEmail extends AbstractPlugin
             }
         }
 
+        $spamKeywords = include dirname(__DIR__, 4) . '/data/mailer/spam_keywords.php';
+        $bodyLower = mb_strtolower($body);
+        foreach ($spamKeywords as $spamKeyword) {
+            // str_contains() is not always utf-8 safe with ascii keywords.
+            if (mb_substr_count($bodyLower, $spamKeyword)) {
+                $this->logger->warn(
+                    'Email not sent: this is a spam with "{keyword}" (To: {to}; From: {from}): {body}', // @translate
+                    ['keyword' => $spamKeyword, 'to' => json_encode($to, 320), 'from' => json_encode($from, 320), 'body' => $body]
+                );
+                // Return true to inform the spammer about a valid message sent.
+                return true;
+            }
+        }
+
         $adminEmail = $this->settings->get('administrator_email');
         $adminName = $this->settings->get('administrator_name')
             ?: $this->settings->get('easyadmin_administrator_name')
