@@ -382,12 +382,10 @@ class DataTextarea extends ArrayTextarea
                 $data = array_combine(array_keys($this->dataKeys), $values);
                 // Manage sub-values.
                 foreach ($arrayKeys as $arrayKey => $arraySeparator) {
-                    $data[$arrayKey] = $data[$arrayKey] === ''
-                        ? []
-                        : array_map('trim', explode($arraySeparator, $data[$arrayKey]));
-                    if ($data[$arrayKey] && isset($this->dataAssociativeKeys[$arrayKey])) {
+                    $parts = $this->splitAndClean($data[$arrayKey], $arraySeparator);
+                    if ($parts && isset($this->dataAssociativeKeys[$arrayKey])) {
                         $asso = [];
-                        foreach ($data[$arrayKey] as $k => $v) {
+                        foreach ($parts as $k => $v) {
                             if (strpos($v, $this->dataAssociativeKeys[$arrayKey]) !== false) {
                                 [$kk, $vv] = array_map('trim', explode($this->dataAssociativeKeys[$arrayKey], $v, 2));
                                 $asso[$kk] = $vv;
@@ -396,6 +394,8 @@ class DataTextarea extends ArrayTextarea
                             }
                         }
                         $data[$arrayKey] = $asso;
+                    } else {
+                        $data[$arrayKey] = $parts;
                     }
                 }
                 $array = $this->appendToArray($array, $data);
@@ -425,7 +425,11 @@ class DataTextarea extends ArrayTextarea
             // Create groups from empty lines, namely a double line break.
             $groups = array_filter(array_map('trim', explode("\n\n", $this->fixEndOfLine($string))), 'strlen');
             foreach ($groups as $group) {
-                $values = array_map('trim', explode("\n", $group));
+                // Remove empty lines inside group.
+                $values = array_values(array_filter(array_map('trim', explode("\n", $group)), 'strlen'));
+                if ($values === []) {
+                    continue;
+                }
                 $firstFieldsValues = array_map('trim', explode($this->keyValueSeparator, reset($values), $countDataKeys - 1));
                 $lastFieldValues = array_slice($values, 1);
                 // Add empty missing values. The number cannot be higher.
@@ -435,6 +439,7 @@ class DataTextarea extends ArrayTextarea
                     $firstFieldsValues = array_merge($firstFieldsValues, array_fill(0, $missing, ''));
                 }
                 $values = $firstFieldsValues;
+                // Last field is a list of lines already trimmed and cleaned above.
                 $values[] = $lastFieldValues;
                 $data = array_combine(array_keys($this->dataKeys), $values);
                 // Manage sub-values.
@@ -444,12 +449,10 @@ class DataTextarea extends ArrayTextarea
                     if ($isLastKey) {
                         continue;
                     }
-                    $data[$arrayKey] = $data[$arrayKey] === ''
-                        ? []
-                        : array_map('trim', explode($arraySeparator, $data[$arrayKey]));
-                    if ($data[$arrayKey] && isset($this->dataAssociativeKeys[$arrayKey])) {
+                    $parts = $this->splitAndClean($data[$arrayKey], $arraySeparator);
+                    if ($parts && isset($this->dataAssociativeKeys[$arrayKey])) {
                         $asso = [];
-                        foreach ($data[$arrayKey] as $k => $v) {
+                        foreach ($parts as $k => $v) {
                             if (strpos($v, $this->dataAssociativeKeys[$arrayKey]) !== false) {
                                 [$kk, $vv] = array_map('trim', explode($this->dataAssociativeKeys[$arrayKey], $v, 2));
                                 $asso[$kk] = $vv;
@@ -458,6 +461,8 @@ class DataTextarea extends ArrayTextarea
                             }
                         }
                         $data[$arrayKey] = $asso;
+                    } else {
+                        $data[$arrayKey] = $parts;
                     }
                 }
                 $array = $this->appendToArray($array, $data);
@@ -467,7 +472,7 @@ class DataTextarea extends ArrayTextarea
             $groups = array_filter(array_map('trim', explode("\n\n", $this->fixEndOfLine($string))), 'strlen');
             foreach ($groups as $group) {
                 // No keys: a simple list.
-                $data = array_map('trim', explode("\n", $group));
+                $data = array_values(array_filter(array_map('trim', explode("\n", $group)), 'strlen'));
                 $array = $this->appendToArray($array, $data);
             }
         }
@@ -503,5 +508,17 @@ class DataTextarea extends ArrayTextarea
             $array[] = $data;
         }
         return $array;
+    }
+
+    /**
+     * Split and trim string with a separator and remove empty strings ("").
+     */
+    protected function splitAndClean(string $value, string $separator): array
+    {
+        if ($value === '') {
+            return [];
+        }
+        $parts = array_map('trim', explode($separator, $value));
+        return array_values(array_filter($parts, 'strlen'));
     }
 }
