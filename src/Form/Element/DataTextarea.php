@@ -29,6 +29,14 @@ class DataTextarea extends ArrayTextarea
     /**
      * @var string
      *
+     * Name of the key to return directly (flatten) when asKeyValue is true.
+     * If set, top-level array will map first field as data[dataFlatKey].
+     */
+    protected $dataFlatKey = '';
+
+    /**
+     * @var string
+     *
      * May be "by_line" (one line by data, default) or "last_is_list".
      */
     protected $dataTextMode = '';
@@ -52,6 +60,9 @@ class DataTextarea extends ArrayTextarea
         if (array_key_exists('data_text_mode', $this->options)) {
             $this->setDataTextMode($this->options['data_text_mode']);
         }
+        if (array_key_exists('data_flat_key', $this->options)) {
+            $this->setDataFlatKey($this->options['data_flat_key']);
+        }
         // For backward-compatibility: allow explicit associative keys.
         if (array_key_exists('data_associative_keys', $this->options)
             && is_array($this->options['data_associative_keys'])
@@ -69,6 +80,10 @@ class DataTextarea extends ArrayTextarea
         } elseif ($array === null) {
             return '';
         }
+
+        // Rebuild original rows if data was flattened.
+        $array = $this->unflatDataKey((array) $array);
+
         $textMode = $this->getDataTextMode();
         if ($textMode === 'last_is_list') {
             return $this->arrayToStringLastIsList($array);
@@ -254,6 +269,12 @@ class DataTextarea extends ArrayTextarea
     public function setDataTextMode(?string $dataTextMode)
     {
         $this->dataTextMode = (string) $dataTextMode;
+        return $this;
+    }
+
+    public function setDataFlatKey(?string $dataFlatKey)
+    {
+        $this->dataFlatKey = (string) $dataFlatKey;
         return $this;
     }
 
@@ -499,7 +520,9 @@ class DataTextarea extends ArrayTextarea
         if ($this->asKeyValue) {
             $key = reset($data);
             if (is_scalar($key)) {
-                $array[(string) $key] = $data;
+                $array[(string) $key] = strlen($this->dataFlatKey) && array_key_exists($this->dataFlatKey, $data)
+                    ? $data[$this->dataFlatKey]
+                    : $data;
             } else {
                 // Fallback: cannot use non-scalar key.
                 $array[] = $data;
@@ -508,6 +531,59 @@ class DataTextarea extends ArrayTextarea
             $array[] = $data;
         }
         return $array;
+    }
+
+    /**
+     * For option dataFlatKey, rebuild full rows from array.
+     */
+    protected function unflatDataKey(array $array): array
+    {
+        if (!$this->asKeyValue
+            || !strlen($this->dataFlatKey)
+            || !$this->dataKeys
+            || !array_key_exists($this->dataFlatKey, $this->dataKeys)
+        ) {
+            return $array;
+        }
+
+        $dataKeys = array_keys($this->dataKeys);
+
+        $firstKey = $dataKeys[0];
+        $flatKey = $this->dataFlatKey;
+
+        // Detect if rows are already structured (contain all named keys).
+        $structured = true;
+        foreach ($array as $row) {
+            if (!is_array($row) || array_intersect($dataKeys, array_keys((array) $row)) !== $dataKeys) {
+                $structured = false;
+                break;
+            }
+        }
+
+        // Already a full structure.
+        if ($structured) {
+            return array_values($array);
+        }
+
+        $rebuilt = [];
+        foreach ($array as $topKey => $flatValue) {
+            $row = array_fill_keys($dataKeys, '');
+            $row[$firstKey] = $topKey;
+
+            // Normalize flattened value: keep arrays, wrap scalars, preserve
+            // empty.
+            if (is_array($flatValue)) {
+                $row[$flatKey] = $flatValue;
+            } elseif ($flatValue === '') {
+                $row[$flatKey] = [];
+            } else {
+                $row[$flatKey] = [$flatValue];
+            }
+
+            $rebuilt[] = $row;
+        }
+
+        return $rebuilt;
     }
 
     /**
