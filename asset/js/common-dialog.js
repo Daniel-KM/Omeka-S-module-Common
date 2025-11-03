@@ -216,13 +216,16 @@ var CommonDialog = (function() {
     };
 
     /**
-     * Send data via jSend from a form or a single button and display a message if any.
+     * Send data via jSend from a form, a button or a link and display a message if any.
      *
      * The response may be a fail when http error codes are not used (not 2xx).
      * The dialog is displayed only if a message exists or in case of a failure.
      * A spinner is appended when the event target (form or button) has
      * attribute data-spinner true. It may be forced via button when the
      * attribute set on form is true or false.
+     *
+     * For semantical reasons, it is recommended to replace fake html links <a>
+     * by buttons <button>.
      *
      * A header for ajax / XmlHttpRequest is added to simplify the use of jSend.
      *
@@ -233,6 +236,7 @@ var CommonDialog = (function() {
         const target = event.target;
         const isForm = target.tagName === 'FORM';
         const isButton = target.tagName === 'BUTTON';
+        const isA = target.tagName === 'A';
 
         let url, formData, formQuery, hasSpinner, spinnerTarget;
         // TODO Clean status for icon on submission.
@@ -255,10 +259,12 @@ var CommonDialog = (function() {
                 formData.append(button.name, button.value);
             }
             formQuery = new URLSearchParams(formData).toString();
-        } else if (isButton) {
+        } else if (isButton || isA) {
             spinnerTarget = target;
             hasSpinner = [true, 1, '1', 'true'].includes(spinnerTarget.dataset.spinner);
-            url = target.dataset.action ? target.dataset.action : target.dataset.url;
+            url = target.dataset.url
+                || target.dataset.action
+                || (target.attributes.href?.value && target.attributes.href?.value !== '#' ? target.attributes.href.value : null);
             const payload = target.dataset.payload ? JSON.parse(target.dataset.payload) : {};
             formQuery = new URLSearchParams(payload).toString();
         } else {
