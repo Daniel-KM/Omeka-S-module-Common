@@ -266,7 +266,7 @@ var CommonDialog = (function() {
             url = target.action;
             formData = new FormData(target);
             // Include button name and value when exist (not included by default).
-            if (button.name && button.value) {
+            if (button?.name && button?.value) {
                 formData.append(button.name, button.value);
             }
             formQuery = new URLSearchParams(formData).toString();
@@ -299,8 +299,8 @@ var CommonDialog = (function() {
             credentials: 'same-origin',
         })
         .then(response => response.json())
-        .then(data => self.jSendResponse(data))
-        .catch(error => self.jSendFail(error))
+        .then(data => self.jSendResponse(data, {target: spinnerTarget}))
+        .catch(error => self.jSendFail(error, {target: spinnerTarget}))
         .finally(() => {
             if (hasSpinner) {
                 self.spinnerDisable(spinnerTarget);
@@ -314,10 +314,12 @@ var CommonDialog = (function() {
      *
      * The response may be a fail when http error codes are not used (not 2xx).
      * The dialog is displayed only if a message exists or in case of a failure.
+     *
+     * The triggered element is included in the event detail as target.
      */
-    self.jSendResponse = function(data) {
+    self.jSendResponse = function(data, context) {
         if (!data.status || data.status !== 'success') {
-            self.jSendFail(data);
+            self.jSendFail(data, context);
         } else {
             const dialog = document.querySelector('dialog.dialog-common');
             if (dialog) {
@@ -327,18 +329,20 @@ var CommonDialog = (function() {
             if (msg) {
                 self.dialogAlert(msg);
             }
-            document.dispatchEvent(new CustomEvent('o:jsend-success', { detail: data }));
+            document.dispatchEvent(new CustomEvent('o:jsend-success', { detail: { data, context } }));
         }
     };
 
     /**
      * Manage ajax fail via jSend.
+     *
+     * The triggered element is included in the event detail as target.
      */
-    self.jSendFail = function (error) {
+    self.jSendFail = function (error, context) {
         error = error.responseJSON || error;
         const msg = self.jSendMessage(error) || Omeka.jsTranslate('An error occurred.');
         self.dialogAlert({ message: msg, nl2br: true });
-        document.dispatchEvent(new CustomEvent('o:jsend-fail', { detail: error }));
+        document.dispatchEvent(new CustomEvent('o:jsend-fail', { detail: { error, context } }));
     };
 
     /**
@@ -380,10 +384,13 @@ var CommonDialog = (function() {
         if (!spinner) {
             spinner = document.createElement('span');
             spinner.className = 'spinner appended fas fa-sync';
-            element.tagName === 'INPUT' ? element.insertAdjacentElement('afterend', spinner) : element.appendChild(spinner);
+            element.tagName === 'INPUT'
+                ? element.insertAdjacentElement('afterend', spinner)
+                : element.appendChild(spinner);
         }
         spinner.classList.add('fa-spin');
         element.disabled = true;
+        element.setAttribute('aria-busy', 'true');
     };
 
     /**
@@ -398,6 +405,7 @@ var CommonDialog = (function() {
             }
         }
         element.disabled = false;
+        element.removeAttribute('aria-busy');
     };
 
     /**
