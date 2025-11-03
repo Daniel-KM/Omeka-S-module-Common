@@ -224,6 +224,8 @@ var CommonDialog = (function() {
      * attribute data-spinner true. It may be forced via button when the
      * attribute set on form is true or false.
      *
+     * A header for ajax / XmlHttpRequest is added to simplify the use of jSend.
+     *
      * @see https://github.com/omniti-labs/jsend
      */
     self.jSend = function (event) {
@@ -272,7 +274,12 @@ var CommonDialog = (function() {
         return fetch(url, {
             method: 'POST',
             body: formQuery,
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+            },
+            credentials: 'same-origin',
         })
         .then(response => response.json())
         .then(data => self.jSendResponse(data))
