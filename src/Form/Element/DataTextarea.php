@@ -306,6 +306,9 @@ class DataTextarea extends ArrayTextarea
         // Reorder values according to specified keys and fill empty values.
         $string = '';
         $countDataKeys = count($this->dataKeys);
+        $kvSeparator = $this->keyValueSeparator !== ' '
+            ? ' ' . $this->keyValueSeparator . ' '
+            : $this->keyValueSeparator;
         // Associative array.
         if ($countDataKeys) {
             $arrayKeys = array_intersect_key($this->dataArrayKeys, $this->dataKeys);
@@ -316,10 +319,12 @@ class DataTextarea extends ArrayTextarea
                 $data = array_replace($this->dataKeys, $values);
                 // Manage sub-values.
                 foreach ($arrayKeys as $arrayKey => $arraySeparator) {
-                    $separator = ' ' . $arraySeparator . ' ';
+                    $separator = $arraySeparator !== ' ' ? ' ' . $arraySeparator . ' ' : $arraySeparator;
                     $list = array_map('strval', isset($data[$arrayKey]) ? (array) $data[$arrayKey] : []);
                     if (isset($this->dataAssociativeKeys[$arrayKey]) && !$this->arrayIsList($list)) {
-                        $subSeparator = ' ' . $this->dataAssociativeKeys[$arrayKey] . ' ';
+                        $subSeparator = $this->dataAssociativeKeys[$arrayKey] !== ' '
+                            ? ' ' . $this->dataAssociativeKeys[$arrayKey] . ' '
+                            : $this->dataAssociativeKeys[$arrayKey];
                         $kvList = [];
                         foreach ($list as $k => $v) {
                             $kvList[] = $k . $subSeparator . $v;
@@ -329,7 +334,7 @@ class DataTextarea extends ArrayTextarea
                         $data[$arrayKey] = implode($separator, $list);
                     }
                 }
-                $string .= implode(' ' . $this->keyValueSeparator . ' ', array_map('strval', $data)) . "\n";
+                $string .= implode($kvSeparator, array_map('strval', $data)) . "\n";
             }
         }
         // Simple list.
@@ -339,7 +344,7 @@ class DataTextarea extends ArrayTextarea
                     $values = (array) $values;
                 }
                 $data = array_values($values);
-                $string .= implode(' ' . $this->keyValueSeparator . ' ', array_map('strval', $data)) . "\n";
+                $string .= implode($kvSeparator, array_map('strval', $data)) . "\n";
             }
         }
         $string = rtrim($string, "\n");
@@ -351,6 +356,9 @@ class DataTextarea extends ArrayTextarea
         // Reorder values according to specified keys and fill empty values.
         $string = '';
         $countDataKeys = count($this->dataKeys);
+        $kvSeparator = $this->keyValueSeparator !== ' '
+            ? ' ' . $this->keyValueSeparator . ' '
+            : $this->keyValueSeparator;
         // Associative array.
         if ($countDataKeys) {
             // Without last key, the result is the same than by line.
@@ -367,10 +375,14 @@ class DataTextarea extends ArrayTextarea
                 // Manage sub-values.
                 foreach ($arrayKeys as $arrayKey => $arraySeparator) {
                     $isLastKey = $arrayKey === $lastKey;
-                    $separator = $isLastKey ? "\n" : ' ' . $arraySeparator . ' ';
+                    $separator = $isLastKey
+                        ? "\n"
+                        : ($arraySeparator !== ' ' ? ' ' . $arraySeparator . ' ' : $arraySeparator);
                     $list = array_map('strval', isset($data[$arrayKey]) ? (array) $data[$arrayKey] : []);
                     if (isset($this->dataAssociativeKeys[$arrayKey]) && !$this->arrayIsList($list)) {
-                        $subSeparator = ' ' . $this->dataAssociativeKeys[$arrayKey] . ' ';
+                        $subSeparator = $this->dataAssociativeKeys[$arrayKey] !== ' '
+                            ? ' ' . $this->dataAssociativeKeys[$arrayKey] . ' '
+                            : $this->dataAssociativeKeys[$arrayKey];
                         $kvList = [];
                         foreach ($list as $k => $v) {
                             $kvList[] = $k . $subSeparator . $v;
@@ -382,7 +394,7 @@ class DataTextarea extends ArrayTextarea
                 }
                 // Don't add the key value separator for the last field, and
                 // append a line break to add an empty line.
-                $string .= implode(' ' . $this->keyValueSeparator . ' ', array_map('strval', array_slice($data, 0, -1))) . "\n"
+                $string .= implode($kvSeparator, array_map('strval', array_slice($data, 0, -1))) . "\n"
                     . $data[$lastKey] . "\n\n";
             }
         }
