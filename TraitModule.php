@@ -38,6 +38,7 @@ use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\View\Renderer\PhpRenderer;
 use Omeka\Module\Exception\ModuleCannotInstallException;
 use Omeka\Module\Manager as ModuleManager;
+use Omeka\Settings\AbstractTargetSettings;
 use Omeka\Settings\SettingsInterface;
 
 /**
@@ -502,23 +503,6 @@ trait TraitModule
     }
 
     /**
-     * @deprecated Not really useful. Will be removed in a future version.
-     */
-    protected function getServiceSettings(string $settingsType): \Omeka\Settings\AbstractSettings
-    {
-        $settingsTypes = [
-            // 'config' => 'Omeka\Settings',
-            'settings' => 'Omeka\Settings',
-            'site_settings' => 'Omeka\Settings\Site',
-            'user_settings' => 'Omeka\Settings\User',
-        ];
-        if (!isset($settingsTypes[$settingsType])) {
-            return null;
-        }
-        return $this->getServiceLocator()->get($settingsTypes[$settingsType]);
-    }
-
-    /**
      * Set, delete or update settings of the config of a module.
      *
      * @param string $process
@@ -567,12 +551,12 @@ trait TraitModule
         $api = $services->get('Omeka\ApiManager');
         $ids = $api->search('sites', [], ['returnScalar' => 'id'])->getContent();
         foreach ($ids as $id) {
-            $settings->setTargetId($id);
             $this->manageAnySettings(
                 $settings,
                 $settingsType,
                 $process,
-                $values[$id] ?? []
+                $values[$id] ?? [],
+                (int) $id
             );
         }
         return $this;
@@ -599,12 +583,12 @@ trait TraitModule
         $api = $services->get('Omeka\ApiManager');
         $ids = $api->search('users', [], ['returnScalar' => 'id'])->getContent();
         foreach ($ids as $id) {
-            $settings->setTargetId($id);
             $this->manageAnySettings(
                 $settings,
                 $settingsType,
                 $process,
-                $values[$id] ?? []
+                $values[$id] ?? [],
+                (int) $id
             );
         }
         return $this;
@@ -619,16 +603,52 @@ trait TraitModule
      * @param string $settingsType
      * @param string $process "install", "uninstall", "update".
      * @param array $values
+     * @param int|null $targetId
      * @return $this;
      */
-    protected function manageAnySettings(SettingsInterface $settings, string $settingsType, string $process, array $values = []): self
-    {
+    protected function manageAnySettings(
+        SettingsInterface $settings,
+        string $settingsType,
+        string $process,
+        array $values = [],
+        ?int $targetId = null
+    ): self {
         $defaultSettings = $this->getModuleConfig($settingsType);
         if (!$defaultSettings) {
             return $this;
         }
 
         $translator = $this->getServiceLocator()->get(TranslatorInterface::class);
+
+        // This check avoids to force the target id with setTargetId() for next
+        // processing, so it keeps the target id managed by omeka.
+        if ($targetId && $settings instanceof AbstractTargetSettings) {
+            foreach ($defaultSettings as $name => $value) {
+                switch ($process) {
+                    case 'install':
+                        $settings->set(
+                            $name,
+                            $this->isSettingTranslatable($settingsType, $name) ? $translator->translate($value) : $value,
+                            $targetId
+                        );
+                        break;
+                    case 'uninstall':
+                        $settings->delete($name, $targetId);
+                        break;
+                    case 'update':
+                        if (array_key_exists($name, $values)) {
+                            $settings->set(
+                                $name,
+                                $this->isSettingTranslatable($settingsType, $name) ? $translator->translate($values[$name]) : $values[$name],
+                                $targetId
+                            );
+                        }
+                        break;
+                }
+            }
+
+            return $this;
+        }
 
         foreach ($defaultSettings as $name => $value) {
             switch ($process) {
@@ -702,7 +722,7 @@ trait TraitModule
             case 'user_settings':
                 /** @var \Laminas\Router\Http\RouteMatch $routeMatch */
                 $routeMatch = $services->get('Application')->getMvcEvent()->getRouteMatch();
-                $id = $routeMatch->getParam('id');
+                $id = (int) $routeMatch->getParam('id');
                 break;
             default:
                 return null;
@@ -720,7 +740,7 @@ trait TraitModule
             $data = [];
         } else {
             $this->initDataToPopulate($settings, $settingsType, $id);
-            $data = $this->prepareDataToPopulate($settings, $settingsType);
+            $data = $this->prepareDataToPopulate($settings, $settingsType, $id);
             if ($data === null) {
                 return null;
             }
@@ -838,12 +858,12 @@ trait TraitModule
      *
      * @param SettingsInterface $settings
      * @param string $settingsType
-     * @param int $id Site id or user id.
+     * @param int|null $id Site id or user id.
      * @param bool True if processed.
      *
      * @todo Allow to set default options for arrays (see module Reference).
      */
-    protected function initDataToPopulate(SettingsInterface $settings, string $settingsType, $id = null): bool
+    protected function initDataToPopulate(SettingsInterface $settings, string $settingsType, ?int $id = null): bool
     {
         // This method is not in the interface, but is set for config, site and
         // user settings.
@@ -901,9 +921,10 @@ trait TraitModule
      *
      * @param SettingsInterface $settings
      * @param string $settingsType
+     * @param int|null $targetId
      * @return array|null
      */
-    protected function prepareDataToPopulate(SettingsInterface $settings, string $settingsType): ?array
+    protected function prepareDataToPopulate(SettingsInterface $settings, string $settingsType, ?int $targetId = null): ?array
     {
         // TODO Explain this feature.
         // Use isset() instead of empty() to give the possibility to display a
@@ -914,6 +935,17 @@ trait TraitModule
         }
 
         $data = [];
+
+        // This check avoids to force the target id with setTargetId() for next
+        // processing, so it keeps the target id managed by omeka.
+        if ($targetId && $settings instanceof AbstractTargetSettings) {
+            foreach ($defaultSettings as $name => $value) {
+                $val = $settings->get($name, is_array($value) ? [] : null, $targetId);
+                $data[$name] = $val;
+            }
+            return $data;
+        }
+
         foreach ($defaultSettings as $name => $value) {
             $val = $settings->get($name, is_array($value) ? [] : null);
             $data[$name] = $val;
