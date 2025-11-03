@@ -445,6 +445,22 @@ var CommonDialog = (function() {
             }
         });
 
+        document.addEventListener('click', function(event) {
+            const target = event.target.closest('.jsend-action');
+            if (target && (target.tagName === 'BUTTON' || target.tagName === 'A')) {
+                event.preventDefault();
+                self.jSend(event);
+            }
+        });
+
+        document.addEventListener('submit', function(event) {
+            const target = event.target;
+            if (target.tagName === 'FORM' && target.classList.contains('jsend-action')) {
+                event.preventDefault();
+                self.jSend(event);
+            }
+        });
+
         return self;
     };
 
