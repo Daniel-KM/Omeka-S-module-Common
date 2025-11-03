@@ -101,7 +101,8 @@ var CommonDialog = (function() {
         options.nl2br = options.nl2br || false;
         options.textOk = options.textOk || Omeka.jsTranslate('OK');
         options.textCancel = options.textCancel || Omeka.jsTranslate('Cancel');
-        options.input = true;
+        options.textarea = options.textarea || false;
+        options.input = !options.textarea;
         options.defaultValue = options.defaultValue || '';
         return self.dialogGeneric(options);
     };
@@ -116,9 +117,10 @@ var CommonDialog = (function() {
      * - nl2br (bool) Convert new lines to <br/>.
      * - body (string) A body to display.
      * - input (bool) Display an input field instead of the body option.
+     * - textarea (bool) Display an textarea instead of the body option.
      * - defaultValue (string) Default value of the input field.
-    * - textOk (string) Text for the ok button.
-    * - textCancel (string) If null, the cancel button is not displayed.
+     * - textOk (string) Text for the ok button.
+     * - textCancel (string) If null, the cancel button is not displayed.
      *
      * Trigger o:dialog-opened.
      */
@@ -145,6 +147,8 @@ var CommonDialog = (function() {
             let body = options.body || '';
             if (options.input) {
                 body = `<input type="text" class="dialog-input" value="${options.defaultValue || ''}" autofocus="autofocus" />`;
+            } else if (options.textarea) {
+                body = `<textarea class="dialog-textarea" autofocus="autofocus">${options.defaultValue || ''}</textarea>`;
             }
 
             dialog.innerHTML = `
@@ -182,11 +186,18 @@ var CommonDialog = (function() {
             const okBtn = dialog.querySelector('.dialog-ok');
             const cancelBtn = dialog.querySelector('.dialog-cancel');
             const input = dialog.querySelector('.dialog-input');
+            const textarea = dialog.querySelector('.dialog-textarea');
 
             if (okBtn) {
                 okBtn.onclick = function(e) {
                     e.preventDefault();
-                    resolve(options.input ? input.value : true);
+                    if (options.input) {
+                        resolve(input.value);
+                    } else if (options.textarea) {
+                        resolve(textarea.value);
+                    } else {
+                        resolve(true);
+                    }
                     dialog.close();
                     dialog.remove();
                 };
@@ -194,14 +205,14 @@ var CommonDialog = (function() {
             if (cancelBtn) {
                 cancelBtn.onclick = function(e) {
                     e.preventDefault();
-                    resolve(options.input ? null : false);
+                    resolve(options.input || options.textarea ? null : false);
                     dialog.close();
                     dialog.remove();
                 };
             }
             dialog.querySelector('.dialog-header-close-button').onclick = function(e) {
                 e.preventDefault();
-                resolve(options.input ? null : false);
+                resolve(options.input || options.textarea ? null : false);
                 dialog.close();
                 dialog.remove();
             };
