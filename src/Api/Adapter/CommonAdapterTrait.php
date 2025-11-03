@@ -161,6 +161,15 @@ trait CommonAdapterTrait
             $value = $query[$key];
             // TODO Add type in Omeka S 4.2 with createNameParameter(). Not required anyway.
             switch ($type) {
+                case 'bool_null':
+                    if ($value === 'null') {
+                        $qb
+                            ->andWhere($expr->isNull(
+                                $entityAlias . '.' . $field
+                            ));
+                        break;
+                    }
+                    // no break;
                 case 'bool':
                     $fieldAlias = $this->createAlias();
                     if (is_scalar($value)) {
