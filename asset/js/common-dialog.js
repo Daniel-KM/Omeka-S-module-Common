@@ -277,10 +277,10 @@ var CommonDialog = (function() {
         if (isForm) {
             const button = event.submitter;
             spinnerTarget = button;
-            const hasSpinnerForm = [true, 1, '1', 'true'].includes(target.dataset.spinner);
-            const hasNoSpinnerForm = [false, 0, '0', 'false'].includes(target.dataset.spinner);
-            const hasSpinnerButton = [true, 1, '1', 'true'].includes(button.dataset.spinner);
-            const hasNoSpinnerButton = [false, 0, '0', 'false'].includes(button.dataset.spinner);
+            const hasSpinnerForm = [true, 1, '1', 'true'].includes(target.dataset.spinner || false);
+            const hasNoSpinnerForm = [false, 0, '0', 'false'].includes(target.dataset.spinner || false);
+            const hasSpinnerButton = [true, 1, '1', 'true'].includes(button.dataset.spinner || false);
+            const hasNoSpinnerButton = [false, 0, '0', 'false'].includes(button.dataset.spinner || false);
             hasSpinner = (!hasSpinnerForm && !hasNoSpinnerForm && hasNoSpinnerButton)
                 || (hasSpinnerForm && !hasNoSpinnerButton)
                 || (hasNoSpinnerForm && hasSpinnerButton);
@@ -293,7 +293,7 @@ var CommonDialog = (function() {
             formQuery = new URLSearchParams(formData).toString();
         } else if (isButton || isA) {
             spinnerTarget = target;
-            hasSpinner = [true, 1, '1', 'true'].includes(spinnerTarget.dataset.spinner);
+            hasSpinner = [true, 1, '1', 'true'].includes(spinnerTarget.dataset.spinner || false);
             url = target.dataset.url
                 || target.dataset.action
                 || (target.attributes.href?.value && target.attributes.href?.value !== '#' ? target.attributes.href.value : null);
