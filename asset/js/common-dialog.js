@@ -8,9 +8,19 @@ var CommonDialog = (function() {
      * Display the dialog when clicking the button for it.
      */
     self.dialogOpen = function (eventOrElement) {
-        const dialog = eventOrElement.target
-            ? eventOrElement.target.closest('dialog')
-            : eventOrElement.closest('dialog');
+        const isEvent = eventOrElement instanceof Event;
+        const target = isEvent ? eventOrElement.target : eventOrElement;
+        const button = target?.closest?.('button, a');
+        const dialogSelector = button?.dataset?.dialogSelector;
+        let dialog = null;
+        if (dialogSelector) {
+            dialog = document.querySelector(dialogSelector);
+            if (button.dataset.url) {
+                dialog.querySelector('form')?.setAttribute('action', button.dataset.url);
+            }
+        } else if (target?.closest) {
+            dialog = target.closest('dialog');
+        }
         if (dialog) {
             dialog.showModal();
             dialog.dispatchEvent(new Event('o:dialog-opened'));
@@ -432,15 +442,16 @@ var CommonDialog = (function() {
      */
     self.init = function () {
         document.addEventListener('click', function(event) {
-            if (event.target.matches('.button-dialog-common')) {
+            const target = event.target.closest('button, a');
+            if (target && target.matches('.button-dialog-common')) {
                 self.dialogOpen(event);
-            } else if (event.target.matches('.dialog-header-close-button, .dialog-header-close-button span')) {
+            } else if (target && target.matches('.dialog-header-close-button, .dialog-header-close-button span')) {
                 self.dialogClose(event);
             }
         });
 
         document.addEventListener('submit', function(event) {
-            if (event.target.matches('.form-jsend')) {
+            if (event.target.matches('.jsend-form')) {
                 self.jSend(event);
             }
         });
