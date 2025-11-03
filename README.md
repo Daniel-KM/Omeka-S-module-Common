@@ -205,9 +205,14 @@ Allow to send an email. All arguments are optional, except the body. The sender
 is the no-reply email of the module [Easy Admin] by default, else the
 adminstrator email defined in main setting.
 
+A quick antispam is included via the keywords set in the file /data/mailer/spam_keywords.php.
+This file can be completed if needed. This feature will be improved or moved in
+a future version.
+
 #### SendFile
 
 Send a file for download, without limit of size or memory, via a stream.
+The content disposition can be set via the parameters of via the query (download=1 for attachment, else inline).
 
 #### SpecifyMediaType
 
