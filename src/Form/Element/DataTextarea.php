@@ -39,6 +39,7 @@ class DataTextarea extends ArrayTextarea
     public function setOptions($options)
     {
         parent::setOptions($options);
+
         if (array_key_exists('data_keys', $this->options)) {
             $this->setDataKeys($this->options['data_keys']);
         }
@@ -51,6 +52,13 @@ class DataTextarea extends ArrayTextarea
         if (array_key_exists('data_text_mode', $this->options)) {
             $this->setDataTextMode($this->options['data_text_mode']);
         }
+        // For backward-compatibility: allow explicit associative keys.
+        if (array_key_exists('data_associative_keys', $this->options)
+            && is_array($this->options['data_associative_keys'])
+        ) {
+            $this->dataAssociativeKeys = $this->options['data_associative_keys'];
+        }
+
         return $this;
     }
 
@@ -145,7 +153,7 @@ class DataTextarea extends ArrayTextarea
      *     ],
      * ```
      *
-     *  @deprecated Use setDataOptions() instead.
+     * @deprecated Use setDataOptions() instead.
      */
     public function setDataArrayKeys(array $dataArrayKeys)
     {
@@ -156,7 +164,7 @@ class DataTextarea extends ArrayTextarea
     /**
      * Get the option to separate values into multiple values.
      *
-     *  @deprecated Use getDataOptions() instead.
+     * @deprecated Use getDataOptions() instead.
      */
     public function getDataArrayKeys(): array
     {
@@ -198,6 +206,7 @@ class DataTextarea extends ArrayTextarea
     {
         $this->dataOptions = $dataOptions;
         // TODO For compatibility as long as code is not updated to use dataOptions.
+        // Backward-compatible to fill deprecated structures.
         $this->dataKeys = array_fill_keys(array_keys($dataOptions), null);
         $arrayKeys = [];
         $associativeKeys = [];
@@ -389,18 +398,14 @@ class DataTextarea extends ArrayTextarea
                         $data[$arrayKey] = $asso;
                     }
                 }
-                $this->asKeyValue
-                    ? $array[reset($data)] = $data
-                    : $array[] = $data;
+                $array = $this->appendToArray($array, $data);
             }
         } else {
             $list = $this->stringToList($string);
             foreach ($list as $values) {
                 // No keys: a simple list.
                 $data = array_map('trim', explode($this->keyValueSeparator, $values));
-                $this->asKeyValue
-                    ? $array[reset($data)] = $data
-                    : $array[] = $data;
+                $array = $this->appendToArray($array, $data);
             }
         }
         return $array;
@@ -415,10 +420,10 @@ class DataTextarea extends ArrayTextarea
             $lastKey = key(array_slice($this->dataKeys, -1));
             $arrayKeys = array_intersect_key($this->dataArrayKeys, $this->dataKeys);
             if (!isset($arrayKeys[$lastKey])) {
-                return $this->stringToArrayByLine($array);
+                return $this->stringToArrayByLine($string);
             }
             // Create groups from empty lines, namely a double line break.
-            $groups = array_filter(array_map('trim', explode("\n\n", $this->fixEndOfLine($string))));
+            $groups = array_filter(array_map('trim', explode("\n\n", $this->fixEndOfLine($string))), 'strlen');
             foreach ($groups as $group) {
                 $values = array_map('trim', explode("\n", $group));
                 $firstFieldsValues = array_map('trim', explode($this->keyValueSeparator, reset($values), $countDataKeys - 1));
@@ -455,19 +460,15 @@ class DataTextarea extends ArrayTextarea
                         $data[$arrayKey] = $asso;
                     }
                 }
-                $this->asKeyValue
-                    ? $array[reset($data)] = $data
-                    : $array[] = $data;
+                $array = $this->appendToArray($array, $data);
             }
         } else {
             // Create groups from empty lines, namely a double line break.
-            $groups = array_filter(array_map('trim', explode("\n\n", $this->fixEndOfLine($string))));
+            $groups = array_filter(array_map('trim', explode("\n\n", $this->fixEndOfLine($string))), 'strlen');
             foreach ($groups as $group) {
                 // No keys: a simple list.
                 $data = array_map('trim', explode("\n", $group));
-                $this->asKeyValue
-                    ? $array[reset($data)] = $data
-                    : $array[] = $data;
+                $array = $this->appendToArray($array, $data);
             }
         }
         return $array;
@@ -480,5 +481,27 @@ class DataTextarea extends ArrayTextarea
         }
         return $array === []
             || array_keys($array) === range(0, count($array) - 1);
+    }
+
+    /**
+     * Append data to array according to asKeyValue option.
+     *
+     * This method is used to avoid issue when data is a sub array and option
+     * asKeyValue is t rue.
+     */
+    protected function appendToArray(array $array, $data): array
+    {
+        if ($this->asKeyValue) {
+            $key = reset($data);
+            if (is_scalar($key)) {
+                $array[(string) $key] = $data;
+            } else {
+                // Fallback: cannot use non-scalar key.
+                $array[] = $data;
+            }
+        } else {
+            $array[] = $data;
+        }
+        return $array;
     }
 }
