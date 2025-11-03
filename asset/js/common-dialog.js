@@ -237,6 +237,7 @@ var CommonDialog = (function() {
      *
      * For semantical reasons, it is recommended to replace fake html links <a>
      * by buttons <button>.
+     * A fallback is included in case of a span inside a button or link.
      *
      * A header for ajax / XmlHttpRequest is added to simplify the use of jSend.
      *
@@ -244,7 +245,17 @@ var CommonDialog = (function() {
      */
     self.jSend = function (event) {
         event.preventDefault();
-        const target = event.target;
+        let target = event.target;
+
+        // If target is a span, find the closest button or link.
+        if (target.tagName === 'SPAN') {
+            target = target.closest('button') || target.closest('a');
+            if (!target) {
+                console.error('Unsupported target for jSend: span without parent button or link.', event.target);
+                return null;
+            }
+        }
+
         const isForm = target.tagName === 'FORM';
         const isButton = target.tagName === 'BUTTON';
         const isA = target.tagName === 'A';
@@ -396,6 +407,7 @@ var CommonDialog = (function() {
         }
         spinner.classList.add('fa-spin');
         element.disabled = true;
+        element.classList.add('is-busy');
         element.setAttribute('aria-busy', 'true');
     };
 
@@ -411,6 +423,7 @@ var CommonDialog = (function() {
             }
         }
         element.disabled = false;
+        element.classList.remove('is-busy');
         element.removeAttribute('aria-busy');
     };
 

@@ -1,5 +1,5 @@
 /**
- * Manage dialog and messages.
+ * Manage dialog, messages and actions.
  *
  * Some parts are adapted from omeka css.
  */
@@ -11,7 +11,7 @@
         display: none;
     }
 
-    /** Messages. */
+    /** Messages */
 
     div[role="main"] > .messages {
         margin-bottom: 12px;
@@ -71,7 +71,7 @@
         color: orange;
     }
 
-    /** Dialog. */
+    /** Dialog */
 
     #content dialog {
         margin: auto;
@@ -101,12 +101,20 @@
         gap: 1em;
     }
 
+    .is-busy span.fas:not(.fa-spin):first-child {
+        display: none;
+    }
     a .spinner,
     input .spinner,
-    button .spinner {
+    button .spinner,
+    .is-busy span.fas:first-child {
         margin-left: 1em;
     }
-
+    a span span.fas:first-child + .spinner,
+    input span.fas:first-child + .spinner,
+    button span.fas:first-child + .spinner {
+        margin-left: inherit;
+    }
     .icons-only a .spinner,
     .icons-only input .spinner,
     .icons-only button .spinner,
@@ -115,6 +123,16 @@
     button .spinner.icon-only {
         margin-left: inherit;
     }
+
+    /** Actions */
+
+    /* Fix omeka text-indent -9999px for single buttons, that are not used in omeka for now. */
+    .actions .no-action,
+    .actions .single-action {
+        text-indent: initial;
+        padding-left: 8px;
+    }
+
 }
 
 @media screen and (max-width:640px) {
