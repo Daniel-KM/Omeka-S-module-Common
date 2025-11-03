@@ -76,6 +76,14 @@
     #content dialog {
         margin: auto;
     }
+    .dialog-header,
+    .dialog-contents,
+    .dialog-heading,
+    .dialog-message,
+    .dialog-body,
+	.dialog-footer {
+        margin-top: 1em;
+    }
     dialog .dialog-header-close-button {
        float: right;
     }
@@ -86,6 +94,11 @@
     }
     dialog form textarea {
        height: 240px;
+    }
+    .dialog-footer {
+        display: flex;
+        justify-content: center;
+        gap: 1em;
     }
 
     a .spinner,
