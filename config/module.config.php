@@ -131,6 +131,12 @@ return [
             ],
         ],
     ],
+    'js_translate_strings' => [
+        'An error occurred.', // @translate
+        'Cancel', // @translate
+        'Close', // @translate
+        'OK', // @translate
+    ],
     'assets' => [
         // Override internals assets. Only for Omeka assets: modules can use another filename.
         'internals' => [
