@@ -5,6 +5,43 @@ var CommonDialog = (function() {
     var self = {};
 
     /**
+     * Helper to normalize options object from string or object input.
+     */
+    var normalizeOptions = function(options, defaults) {
+        if (typeof options !== 'object') {
+            options = typeof options === 'string' ? { message: options } : {};
+        }
+        return Object.assign({}, defaults, options);
+    };
+
+    /**
+     * Helper to check if a value is truthy for data attributes.
+     */
+    var isTruthy = function(value) {
+        return [true, 1, '1', 'true'].includes(value);
+    };
+
+    /**
+     * Helper to check if a value is falsy for data attributes.
+     */
+    var isFalsy = function(value) {
+        return [false, 0, '0', 'false'].includes(value);
+    };
+
+    /**
+     * Helper to close and optionally remove a dialog.
+     */
+    var closeAndRemove = function(dialog) {
+        if (!dialog) {
+            return;
+        }
+        dialog.close();
+        if (dialog.hasAttribute('data-is-dynamic') && dialog.getAttribute('data-is-dynamic')) {
+            dialog.remove();
+        }
+    };
+
+    /**
      * Display the dialog when clicking the button for it.
      */
     self.dialogOpen = function (eventOrElement) {
@@ -36,10 +73,7 @@ var CommonDialog = (function() {
             : eventOrElement.closest('dialog');
         if (dialog) {
             dialog.dispatchEvent(new Event('o:dialog-close'));
-            dialog.close();
-            if (dialog.hasAttribute('data-is-dynamic') && dialog.getAttribute('data-is-dynamic')) {
-                dialog.remove();
-            }
+            closeAndRemove(dialog);
         }
     };
 
@@ -53,7 +87,7 @@ var CommonDialog = (function() {
         return self.dialogAlert({
             message: body,
             nl2br: nl2br,
-         });
+        });
     };
 
     /**
@@ -62,16 +96,13 @@ var CommonDialog = (function() {
      * Trigger o:dialog-opened.
      */
     self.dialogAlert = function(options = {}) {
-        if (typeof options !== 'object') {
-            options = typeof options === 'string'
-                ? { message: options }
-                : {};
-        }
-        options.message = options.message || '';
-        options.nl2br = options.nl2br || false;
-        options.textOk = options.textOk || Omeka.jsTranslate('OK');
-        options.textCancel = null;
-        options.input = false;
+        options = normalizeOptions(options, {
+            message: '',
+            nl2br: false,
+            textOk: Omeka.jsTranslate('OK'),
+            textCancel: null,
+            input: false,
+        });
         return self.dialogGeneric(options);
     };
 
@@ -82,16 +113,13 @@ var CommonDialog = (function() {
      * Trigger o:dialog-opened.
      */
     self.dialogConfirm = function(options = {}) {
-        if (typeof options !== 'object') {
-            options = typeof options === 'string'
-                ? { message: options }
-                : {};
-        }
-        options.message = options.message || '';
-        options.nl2br = options.nl2br || false;
-        options.textOk = options.textOk || Omeka.jsTranslate('OK');
-        options.textCancel = options.textCancel || Omeka.jsTranslate('Cancel');
-        options.input = false;
+        options = normalizeOptions(options, {
+            message: '',
+            nl2br: false,
+            textOk: Omeka.jsTranslate('OK'),
+            textCancel: Omeka.jsTranslate('Cancel'),
+            input: false,
+        });
         return self.dialogGeneric(options);
     };
 
@@ -102,18 +130,15 @@ var CommonDialog = (function() {
      * Trigger o:dialog-opened.
      */
     self.dialogPrompt = function(options = {}) {
-        if (typeof options !== 'object') {
-            options = typeof options === 'string'
-                ? { message: options }
-                : {};
-        }
-        options.message = options.message || '';
-        options.nl2br = options.nl2br || false;
-        options.textOk = options.textOk || Omeka.jsTranslate('OK');
-        options.textCancel = options.textCancel || Omeka.jsTranslate('Cancel');
-        options.textarea = options.textarea || false;
+        options = normalizeOptions(options, {
+            message: '',
+            nl2br: false,
+            textOk: Omeka.jsTranslate('OK'),
+            textCancel: Omeka.jsTranslate('Cancel'),
+            textarea: false,
+            defaultValue: '',
+        });
         options.input = !options.textarea;
-        options.defaultValue = options.defaultValue || '';
         return self.dialogGeneric(options);
     };
 
@@ -197,34 +222,39 @@ var CommonDialog = (function() {
             const cancelBtn = dialog.querySelector('.dialog-cancel');
             const input = dialog.querySelector('.dialog-input');
             const textarea = dialog.querySelector('.dialog-textarea');
+            const hasInput = options.input || options.textarea;
+
+            const closeDialog = function() {
+                dialog.close();
+                dialog.remove();
+            };
+
+            const getInputValue = function() {
+                return options.input ? input.value : (options.textarea ? textarea.value : true);
+            };
+
+            const getCancelValue = function() {
+                return hasInput ? null : false;
+            };
 
             if (okBtn) {
                 okBtn.onclick = function(e) {
                     e.preventDefault();
-                    if (options.input) {
-                        resolve(input.value);
-                    } else if (options.textarea) {
-                        resolve(textarea.value);
-                    } else {
-                        resolve(true);
-                    }
-                    dialog.close();
-                    dialog.remove();
+                    resolve(getInputValue());
+                    closeDialog();
                 };
             }
             if (cancelBtn) {
                 cancelBtn.onclick = function(e) {
                     e.preventDefault();
-                    resolve(options.input || options.textarea ? null : false);
-                    dialog.close();
-                    dialog.remove();
+                    resolve(getCancelValue());
+                    closeDialog();
                 };
             }
             dialog.querySelector('.dialog-header-close-button').onclick = function(e) {
                 e.preventDefault();
-                resolve(options.input || options.textarea ? null : false);
-                dialog.close();
-                dialog.remove();
+                resolve(getCancelValue());
+                closeDialog();
             };
             dialog.addEventListener('close', function() {
                 if (dialog.parentNode) dialog.remove();
@@ -277,10 +307,10 @@ var CommonDialog = (function() {
         if (isForm) {
             const button = event.submitter;
             spinnerTarget = button;
-            const hasSpinnerForm = [true, 1, '1', 'true'].includes(target.dataset.spinner || false);
-            const hasNoSpinnerForm = [false, 0, '0', 'false'].includes(target.dataset.spinner || false);
-            const hasSpinnerButton = [true, 1, '1', 'true'].includes(button.dataset.spinner || false);
-            const hasNoSpinnerButton = [false, 0, '0', 'false'].includes(button.dataset.spinner || false);
+            const hasSpinnerForm = isTruthy(target.dataset.spinner);
+            const hasNoSpinnerForm = isFalsy(target.dataset.spinner);
+            const hasSpinnerButton = isTruthy(button.dataset.spinner);
+            const hasNoSpinnerButton = isFalsy(button.dataset.spinner);
             hasSpinner = (!hasSpinnerForm && !hasNoSpinnerForm && hasNoSpinnerButton)
                 || (hasSpinnerForm && !hasNoSpinnerButton)
                 || (hasNoSpinnerForm && hasSpinnerButton);
@@ -293,7 +323,7 @@ var CommonDialog = (function() {
             formQuery = new URLSearchParams(formData).toString();
         } else if (isButton || isA) {
             spinnerTarget = target;
-            hasSpinner = [true, 1, '1', 'true'].includes(spinnerTarget.dataset.spinner || false);
+            hasSpinner = isTruthy(spinnerTarget.dataset.spinner);
             url = target.dataset.url
                 || target.dataset.action
                 || (target.attributes.href?.value && target.attributes.href?.value !== '#' ? target.attributes.href.value : null);
@@ -441,33 +471,27 @@ var CommonDialog = (function() {
      * Init events for common.
      */
     self.init = function () {
+        // Single click handler for all click events.
         document.addEventListener('click', function(event) {
             const target = event.target.closest('button, a');
-            if (target && target.matches('.button-dialog-common')) {
+            if (!target) {
+                return;
+            }
+
+            if (target.matches('.button-dialog-common')) {
                 self.dialogOpen(event);
-            } else if (target && target.matches('.dialog-header-close-button, .dialog-header-close-button span')) {
+            } else if (target.matches('.dialog-header-close-button, .dialog-header-close-button span')) {
                 self.dialogClose(event);
-            }
-        });
-
-        document.addEventListener('submit', function(event) {
-            if (event.target.matches('.jsend-form')) {
-                self.jSend(event);
-            }
-        });
-
-        document.addEventListener('click', function(event) {
-            const target = event.target.closest('.jsend-action');
-            if (target && (target.tagName === 'BUTTON' || target.tagName === 'A')) {
+            } else if (target.matches('.jsend-action')) {
                 event.preventDefault();
                 self.jSend(event);
             }
         });
 
+        // Single submit handler for all form submissions.
         document.addEventListener('submit', function(event) {
             const target = event.target;
-            if (target.tagName === 'FORM' && target.classList.contains('jsend-action')) {
-                event.preventDefault();
+            if (target.matches('.jsend-form, form.jsend-action')) {
                 self.jSend(event);
             }
         });
