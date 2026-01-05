@@ -123,6 +123,15 @@
     button .spinner.icon-only {
         margin-left: inherit;
     }
+    /* Icon-only buttons: spinner replaces icon without margin */
+    button.is-busy:has(> span.fas:only-of-type) .spinner,
+    a.is-busy:has(> span.fas:only-of-type) .spinner {
+        margin-left: 0;
+    }
+    /* Fallback for browsers without :has() support */
+    .single-action.is-busy .spinner {
+        margin-left: 0;
+    }
 
     /** Actions */
 
