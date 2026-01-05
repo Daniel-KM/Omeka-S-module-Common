@@ -52,8 +52,19 @@ class IsXml extends AbstractHelper
         // Namespaces are not managed, as the specs indicates that it can be
         // specified by the wrapper of the fragment.
         if (mb_substr($string, 0, 5) !== '<?xml') {
-            $tag = mb_substr($string, 1, min(mb_strpos($string, ' ') ?: mb_strlen($string), mb_strpos($string, '>')) - 1);
-            if (mb_substr($string, - mb_strlen($tag) - 3) !== "</$tag>") {
+            $posSpace = mb_strpos($string, ' ');
+            $posClose = mb_strpos($string, '>');
+            // If no closing bracket found, it's not valid XML.
+            if ($posClose === false) {
+                return false;
+            }
+            $tagEnd = $posSpace !== false ? min($posSpace, $posClose) : $posClose;
+            $tag = mb_substr($string, 1, $tagEnd - 1);
+            // Like "</tag>".
+            $closingTagLength = mb_strlen($tag) + 3;
+            if (mb_strlen($string) < $closingTagLength
+                || mb_substr($string, -$closingTagLength) !== "</$tag>"
+            ) {
                 return false;
             }
         }
