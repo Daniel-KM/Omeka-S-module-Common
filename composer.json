@@ -5,7 +5,8 @@
     "keywords": [
         "Omeka S",
         "Omeka S module",
-        "development"
+        "development",
+        "library"
     ],
     "license": "CECILL-2.1",
     "homepage": "https://gitlab.com/Daniel-KM/Omeka-S-module-Common",
