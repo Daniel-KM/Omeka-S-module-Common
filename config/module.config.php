@@ -70,6 +70,7 @@ return [
             Form\Element\OptionalSelect::class => Form\Element\OptionalSelect::class,
             Form\Element\OptionalUrl::class => Form\Element\OptionalUrl::class,
             Form\Element\UrlQuery::class => Form\Element\UrlQuery::class,
+            Form\SendMessageForm::class => Form\SendMessageForm::class,
         ],
         'factories' => [
             // Some elements fix or improve omeka ones: MediaIngesterSelect, MediaRendererSelect,
