@@ -18,6 +18,11 @@ return [
             'Laminas\I18n\Translator\TranslatorInterface' => [
                 __NAMESPACE__ => Service\Delegator\TranslatorDelegatorFactory::class,
             ],
+            // Allow modules to nest navigation items under existing ones
+            // using the 'parent_action' key in their navigation config.
+            'Laminas\Navigation\Site' => [
+                Service\Delegator\SiteNavigationDelegatorFactory::class,
+            ],
         ],
         'aliases' => [
             // Deprecated alias: use "Common\EasyMeta" instead.
