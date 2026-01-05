@@ -1075,12 +1075,12 @@ class ManageModuleAndResources
             if ($isStrings) {
                 foreach ($stringsOrRegex as $check) {
                     $pos = mb_strpos($phtml, $check);
-                    if ((!$invert && $pos) || ($invert && !$pos)) {
+                    if ((!$invert && $pos !== false) || ($invert && $pos === false)) {
                         $result[] = mb_substr($filepath, $start);
                     }
                 }
             } else {
-                $has = preg_match($phtml, $stringsOrRegex);
+                $has = preg_match($stringsOrRegex, $phtml);
                 if ((!$invert && $has) || ($invert && !$has)) {
                     $result[] = mb_substr($filepath, $start);
                 }
