@@ -62,6 +62,16 @@ class IniTextarea extends Textarea implements InputProviderInterface
     protected $typedMode = true;
 
     /**
+     * Flag which determines whether double quotes are allowed in values.
+     *
+     * When enabled, double quotes are escaped as &quot; internally to work
+     * around Laminas IniWriter limitation, but displayed as " to users.
+     *
+     * @var bool
+     */
+    protected $allowDoubleQuotes = false;
+
+    /**
      * Specific options:
      *
      * - ini_nest_separator (string): default is "."
@@ -70,6 +80,8 @@ class IniTextarea extends Textarea implements InputProviderInterface
      * - ini_typed_mode (bool): default is true, so the strings without double
      *   quotes "true", "on", "yes", "false", "off", "no", "none", "null" and
      *   numeric strings are converted into true, false, null and integers.
+     * - ini_allow_double_quotes (bool): default is false. When true, double
+     *   quotes in values are allowed by escaping them internally.
      *
      * {@inheritDoc}
      * @see \Laminas\Form\Element::setOptions()
@@ -88,6 +100,9 @@ class IniTextarea extends Textarea implements InputProviderInterface
         }
         if (array_key_exists('ini_typed_mode', $this->options)) {
             $this->setTypedMode($this->options['ini_typed_mode']);
+        }
+        if (array_key_exists('ini_allow_double_quotes', $this->options)) {
+            $this->setAllowDoubleQuotes($this->options['ini_allow_double_quotes']);
         }
         return $this;
     }
@@ -153,6 +168,12 @@ class IniTextarea extends Textarea implements InputProviderInterface
             return '';
         }
 
+        // Escape double quotes as HTML entity to avoid IniWriter exception.
+        // @see \Laminas\Config\Writer\Ini::prepareValue()
+        if ($this->allowDoubleQuotes) {
+            $array = $this->escapeDoubleQuotes($array);
+        }
+
         $writer = new IniWriter();
         $writer
             ->setNestSeparator($this->nestSeparator)
@@ -161,15 +182,16 @@ class IniTextarea extends Textarea implements InputProviderInterface
         try {
             $result = $writer->toString($array);
         } catch (Exception\ExceptionInterface $e) {
-            /**
-             * @todo Fix issue in IniTextarea when a "Value can not contain double quotes".
-             * @see \Laminas\Config\Writer::prepareValue()
-             */
             (new \Omeka\Mvc\Controller\Plugin\Messenger())->addError(new \Common\Stdlib\PsrMessage(
                 'The field {label} has an issue: {msg}', // @translate
                 ['label' => $this->getLabel(), 'msg' => $e->getMessage()],
             ));
             return null;
+        }
+
+        // Unescape for display so user sees actual " instead of &quot;.
+        if ($this->allowDoubleQuotes) {
+            return str_replace('&quot;', '"', (string) $result);
         }
 
         return (string) $result;
@@ -186,6 +208,11 @@ class IniTextarea extends Textarea implements InputProviderInterface
             return [];
         }
 
+        // Pre-process to escape " in values so IniReader can parse them.
+        if ($this->allowDoubleQuotes) {
+            $string = $this->escapeDoubleQuotesInIniString($string);
+        }
+
         $reader = new IniReader();
         $reader
             ->setNestSeparator($this->nestSeparator)
@@ -199,9 +226,17 @@ class IniTextarea extends Textarea implements InputProviderInterface
         }
 
         // Result may be boolean.
-        return is_array($result)
-            ? $result
-            : null;
+        if (!is_array($result)) {
+            return null;
+        }
+
+        // Unescape double quotes that were escaped when storing.
+        // @see self::escapeDoubleQuotes()
+        if ($this->allowDoubleQuotes) {
+            return $this->unescapeDoubleQuotes($result);
+        }
+
+        return $result;
     }
 
     public function validateIni($value, ?array $context = null, ?string $contextKey = null): bool
@@ -212,7 +247,9 @@ class IniTextarea extends Textarea implements InputProviderInterface
             }
             $value = $context[$contextKey];
         }
-        return (new \Common\Validator\Ini())->isValid($value);
+        $validator = new \Common\Validator\Ini();
+        $validator->setAllowDoubleQuotes($this->allowDoubleQuotes);
+        return $validator->isValid($value);
     }
 
     /**
@@ -319,5 +356,119 @@ class IniTextarea extends Textarea implements InputProviderInterface
         return $this->getTypedMode()
             ? INI_SCANNER_TYPED
             : INI_SCANNER_NORMAL;
+    }
+
+    /**
+     * Set whether double quotes are allowed in values.
+     */
+    public function setAllowDoubleQuotes($allowDoubleQuotes): self
+    {
+        $this->allowDoubleQuotes = (bool) $allowDoubleQuotes;
+        return $this;
+    }
+
+    /**
+     * Get whether double quotes are allowed in values.
+     */
+    public function getAllowDoubleQuotes(): bool
+    {
+        return $this->allowDoubleQuotes;
+    }
+
+    /**
+     * Escape double quotes inside values of an INI-formatted string.
+     *
+     * This pre-processes the raw INI string before IniReader parses it,
+     * distinguishing between quote delimiters and quotes inside values.
+     */
+    protected function escapeDoubleQuotesInIniString(string $string): string
+    {
+        $lines = explode("\n", $string);
+        $result = [];
+
+        foreach ($lines as $line) {
+            $trimmed = trim($line);
+
+            // Keep empty lines, comments, and section headers as-is.
+            if ($trimmed === '' || $trimmed[0] === ';' || $trimmed[0] === '#' || $trimmed[0] === '[') {
+                $result[] = $line;
+                continue;
+            }
+
+            // Find the = separator.
+            $eqPos = strpos($line, '=');
+            if ($eqPos === false) {
+                $result[] = $line;
+                continue;
+            }
+
+            $key = substr($line, 0, $eqPos + 1);
+            $value = substr($line, $eqPos + 1);
+            $valueTrimmed = ltrim($value);
+            $leadingSpace = substr($value, 0, strlen($value) - strlen($valueTrimmed));
+
+            // Check if value is quoted.
+            if (strlen($valueTrimmed) > 0 && $valueTrimmed[0] === '"') {
+                // Quoted value: find the closing quote and escape " inside.
+                // Remove leading quote.
+                $inner = substr($valueTrimmed, 1);
+                // Find last quote (closing delimiter).
+                $lastQuotePos = strrpos($inner, '"');
+                if ($lastQuotePos !== false) {
+                    $content = substr($inner, 0, $lastQuotePos);
+                    $trailing = substr($inner, $lastQuotePos + 1);
+                    // Escape any " inside the content.
+                    $content = str_replace('"', '&quot;', $content);
+                    $result[] = $key . $leadingSpace . '"' . $content . '"' . $trailing;
+                } else {
+                    // No closing quote found, escape all " except the first.
+                    $inner = str_replace('"', '&quot;', $inner);
+                    $result[] = $key . $leadingSpace . '"' . $inner;
+                }
+            } else {
+                // Unquoted value: escape all ".
+                $value = str_replace('"', '&quot;', $value);
+                $result[] = $key . $value;
+            }
+        }
+
+        return implode("\n", $result);
+    }
+
+    /**
+     * Recursively escape double quotes as HTML entity in array values.
+     *
+     * This is needed because Laminas IniWriter throws an exception when a
+     * value contains double quotes.
+     *
+     * @see \Laminas\Config\Writer\Ini::prepareValue()
+     */
+    protected function escapeDoubleQuotes(array $array): array
+    {
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $array[$key] = $this->escapeDoubleQuotes($value);
+            } elseif (is_string($value)) {
+                $array[$key] = str_replace('"', '&quot;', $value);
+            }
+        }
+        return $array;
+    }
+
+    /**
+     * Recursively unescape HTML entity back to double quotes in array values.
+     *
+     * @see self::escapeDoubleQuotes()
+     */
+    protected function unescapeDoubleQuotes(array $array): array
+    {
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $array[$key] = $this->unescapeDoubleQuotes($value);
+            } elseif (is_string($value)) {
+                $array[$key] = str_replace('&quot;', '"', $value);
+            }
+        }
+        return $array;
     }
 }
