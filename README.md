@@ -25,10 +25,12 @@ copy-paste common code between modules.
   - JSend to manage exchanges between a module and js part.
   - MatchedRouteName
   - SendEmail to send email with default values, in particular sender.
+  - PrepareMessage to validate and fill messages with placeholders.
   - SpecifyMediaType
 
 - Form elements
 
+  - SendMessageForm (base form for sending messages with placeholders)
   - Array Text
   - Custom Vocab MultiCheckbox
   - Custom Vocab Radio
@@ -213,6 +215,136 @@ a future version.
 
 Send a file for download, without limit of size or memory, via a stream.
 The content disposition can be set via the parameters of via the query (download=1 for attachment, else inline).
+
+#### PrepareMessage
+
+This controller plugin provides helper functions for preparing messages with
+validation and placeholder support. It is designed to be used with modules like
+[Contact Us], [Contribute], and [Selection].
+
+Features:
+- Validate message body and subject with configurable max lengths
+- Fill messages with placeholders using moustache-style syntax (`{placeholder}`)
+- Common placeholders are automatically available
+- Extensible placeholder system for module-specific values
+
+Common placeholders:
+- `{ip}`: Client IP address
+- `{main_title}`: Installation title
+- `{main_url}`: Main URL
+- `{site_title}`: Current site title
+- `{site_url}`: Current site URL
+- `{site_slug}`: Current site slug
+- `{user_name}`: Current user name
+- `{user_email}`: Current user email
+- `{owner_name}`: Owner/recipient name
+- `{owner_email}`: Owner/recipient email
+- `{resource_id}`: Resource ID
+- `{resource_title}`: Resource title
+- `{resource_url}`: Resource public URL
+- `{resource_url_admin}`: Resource admin URL
+
+Resource property placeholders (when a resource is in context):
+- `{prefix:localName}`: Value of any resource property (e.g. `{dcterms:title}`,
+  `{dcterms:creator}`, `{dcterms:date}`). The first value is used if multiple
+  values exist for the property.
+
+Usage in a controller:
+
+```php
+// Validate message body.
+$result = $this->prepareMessage()->validateBody($body);
+if (!$result['valid']) {
+    // Handle error: $result['error']
+}
+
+// Validate message subject.
+$result = $this->prepareMessage()->validateSubject($subject);
+
+// Fill a message template with placeholders.
+$message = $this->prepareMessage()->fillMessage(
+    'Hello {user_name}, your {resource_title} has been updated.',
+    ['custom_field' => 'value'],  // Additional placeholders
+    ['site' => $site, 'user' => $user, 'resource' => $resource]  // Context
+);
+
+// Add custom placeholders for all subsequent calls.
+$this->prepareMessage()
+    ->addPlaceholders(['custom_key' => 'custom_value'])
+    ->fillMessage($template);
+
+// Get default subject from settings with fallback.
+$subject = $this->prepareMessage()->getDefaultSubject(
+    'mymodule_email_subject',
+    'Default subject for {site_title}',
+    $placeholders,
+    $context
+);
+
+// Process "myself" options for cc/bcc/reply-to.
+$cc = $bcc = $replyTo = [];
+$this->prepareMessage()->processMyselfOptions(
+    ['cc', 'bcc'],  // Values from "myself" checkbox
+    $user,
+    $cc,
+    $bcc,
+    $replyTo
+);
+```
+
+#### SendMessageForm
+
+A base form class for sending messages that can be extended by modules.
+It provides common fields (subject, body) and optional fields (cc, bcc, reply-to,
+resource_id, reject checkbox, "myself" multi-checkbox).
+
+Form options:
+- `has_resource_id` (bool): Add a hidden resource_id field
+- `resource_id_name` (string): Name of the resource id field (default: `resource_id`)
+- `has_cc` (bool): Add cc email field
+- `has_bcc` (bool): Add bcc email field
+- `has_reply_to` (bool): Add reply-to email field
+- `has_myself` (bool): Add "myself" multi-checkbox for cc/bcc/reply
+- `has_reject` (bool): Add reject checkbox (for moderation workflows)
+- `subject_value` (string): Default value for subject
+- `body_value` (string): Default value for body
+
+Usage in a module:
+
+```php
+// Option 1: Use directly with options.
+$form = $this->getForm(\Common\Form\SendMessageForm::class);
+$form->setFormOptions([
+    'has_cc' => true,
+    'has_bcc' => true,
+    'has_myself' => true,
+    'subject_value' => 'Your contribution',
+    'body_value' => 'Dear {name}, thank you for your contribution.',
+]);
+$form->init();
+
+// Option 2: Extend in your module.
+namespace MyModule\Form;
+
+use Common\Form\SendMessageForm as BaseSendMessageForm;
+
+class SendMessageForm extends BaseSendMessageForm
+{
+    protected $formOptions = [
+        'has_resource_id' => true,
+        'resource_id_name' => 'contribution_id',
+        'has_cc' => true,
+        'has_myself' => true,
+        'has_reject' => true,
+    ];
+
+    public function init(): void
+    {
+        parent::init();
+        // Add custom fields here.
+    }
+}
+```
 
 #### SpecifyMediaType
 
@@ -436,7 +568,7 @@ altered, and that no provisions are either added or removed herefrom.
 Copyright
 ---------
 
-* Copyright Daniel Berthereau, 2017-2025 (see [Daniel-KM] on GitLab)
+* Copyright Daniel Berthereau, 2017-2026 (see [Daniel-KM] on GitLab)
 
 
 [Common module]: https://gitlab.com/Daniel-KM/Omeka-S-module-Common
