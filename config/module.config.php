@@ -112,6 +112,7 @@ return [
         'factories' => [
             'easyMeta' => Service\ControllerPlugin\EasyMetaFactory::class,
             'sendEmail' => Service\ControllerPlugin\SendEmailFactory::class,
+            'prepareMessage' => Service\ControllerPlugin\PrepareMessageFactory::class,
             'specifyMediaType' => Service\ControllerPlugin\SpecifyMediaTypeFactory::class,
             'translator' => Service\ControllerPlugin\TranslatorFactory::class,
         ],
