@@ -24,10 +24,6 @@ return [
                 Service\Delegator\SiteNavigationDelegatorFactory::class,
             ],
         ],
-        'aliases' => [
-            // Deprecated alias: use "Common\EasyMeta" instead.
-            'EasyMeta' => 'Common\EasyMeta',
-        ],
     ],
     'view_manager' => [
         'template_path_stack' => [
