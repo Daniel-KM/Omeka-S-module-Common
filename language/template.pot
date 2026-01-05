@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-03 00:00+0000\n"
+"POT-Creation-Date: 2026-01-06 08:27+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -69,6 +69,18 @@ msgstr ""
 msgid ""
 "Warning: some files contain invalid unicode characters and cannot be "
 "processed directly."
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/PrepareMessage.php:106
+msgid "Empty message."
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/PrepareMessage.php:113
+msgid "Too long message."
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/PrepareMessage.php:140
+msgid "Too long subject."
 msgstr ""
 
 #: src/Mvc/Controller/Plugin/SendEmail.php:82
@@ -146,19 +158,23 @@ msgstr ""
 msgid "Successfully added {count} database indexes: {list}"
 msgstr ""
 
-#: src/Validator/Ini.php:32
+#: src/Validator/Ini.php:38
 msgid "The string is not formatted as ini"
 msgstr ""
 
-#: src/Validator/Ini.php:33
+#: src/Validator/Ini.php:39
 msgid "The string is incorrectly formatted"
 msgstr ""
 
-#: src/Validator/Ini.php:34
-msgid "The string contains double quotes or invalid characters"
+#: src/Validator/Ini.php:40
+msgid "The string contains invalid characters like double quotes"
 msgstr ""
 
-#: src/Validator/Ini.php:35
+#: src/Validator/Ini.php:41
+msgid "The string contains invalid characters"
+msgstr ""
+
+#: src/Validator/Ini.php:42
 msgid "Invalid type given. String expected"
 msgstr ""
 
@@ -182,16 +198,60 @@ msgstr ""
 msgid "The path is not inside the restricted path"
 msgstr ""
 
-#: src/Form/Element/AbstractGroupBySiteSelect.php:152
+#: src/Form/Element/AbstractGroupBySiteSelect.php:151
 msgid "[No site]"
 msgstr ""
 
-#: src/Form/Element/IniTextarea.php:127
+#: src/Form/Element/IniTextarea.php:142
 msgid "Invalid ini string or values with double quotes"
 msgstr ""
 
-#: src/Form/Element/IniTextarea.php:169
+#: src/Form/Element/IniTextarea.php:186
 msgid "The field {label} has an issue: {msg}"
+msgstr ""
+
+#: src/Form/SendMessageForm.php:87
+msgid "Message"
+msgstr ""
+
+#: src/Form/SendMessageForm.php:107
+msgid "Mark not submitted"
+msgstr ""
+
+#: src/Form/SendMessageForm.php:122
+msgid "Add myself as"
+msgstr ""
+
+#: src/Form/SendMessageForm.php:124
+msgid "cc"
+msgstr ""
+
+#: src/Form/SendMessageForm.php:125
+msgid "bcc"
+msgstr ""
+
+#: src/Form/SendMessageForm.php:126
+msgid "Reply to"
+msgstr ""
+
+#: src/Form/SendMessageForm.php:142
+msgid "Add specific emails as cc"
+msgstr ""
+
+#: src/Form/SendMessageForm.php:143
+msgid "Use \"=\" to separate multiple emails."
+msgstr ""
+
+#: src/Form/SendMessageForm.php:159
+msgid "Add specific emails as bcc"
+msgstr ""
+
+#: src/Form/SendMessageForm.php:175
+msgid "Add specific emails as reply-to"
+msgstr ""
+
+#: src/Form/SendMessageForm.php:190
+msgid "Send message"
 msgstr ""
 
 #: src/File/Validator.php:29
@@ -294,112 +354,112 @@ msgid ""
 "installing this module."
 msgstr ""
 
-#: ManageModuleAndResources.php:325
+#: ManageModuleAndResources.php:326
 msgid "The vocabulary \"{vocabulary}\" was already installed and was kept."
 msgstr ""
 
-#: ManageModuleAndResources.php:335
+#: ManageModuleAndResources.php:336
 msgid ""
 "An error occured when adding the prefix \"{prefix}\": another vocabulary "
 "exists with the same prefix. Resolve the conflict before installing this "
 "module."
 msgstr ""
 
-#: ManageModuleAndResources.php:347
+#: ManageModuleAndResources.php:348
 msgid ""
 "An error occured when adding the prefix \"{prefix}\" and the associated "
 "properties: {message}"
 msgstr ""
 
-#: ManageModuleAndResources.php:426 ManageModuleAndResources.php:435
+#: ManageModuleAndResources.php:427 ManageModuleAndResources.php:436
 msgid ""
 "An error occured when updating vocabulary \"{prefix}\" and the associated "
 "properties: {message}"
 msgstr ""
 
-#: ManageModuleAndResources.php:530
+#: ManageModuleAndResources.php:531
 msgid ""
 "The following \"{name}\" of the vocabulary \"{label}\" were replaced: "
 "{members}"
 msgstr ""
 
-#: ManageModuleAndResources.php:540
+#: ManageModuleAndResources.php:541
 msgid ""
 "Resources, values and templates were updated, but you may check settings "
 "where the old ones were used."
 msgstr ""
 
-#: ManageModuleAndResources.php:567
+#: ManageModuleAndResources.php:568
 msgid ""
 "The resource template named \"{template}\" is already available and is "
 "skipped."
 msgstr ""
 
-#: ManageModuleAndResources.php:770
+#: ManageModuleAndResources.php:766
 msgid "The custom vocab named \"{custom_vocab}\" is not available."
 msgstr ""
 
-#: ManageModuleAndResources.php:962
+#: ManageModuleAndResources.php:975
 msgid "No file or url set for the vocabulary."
 msgstr ""
 
-#: ManageModuleAndResources.php:972
+#: ManageModuleAndResources.php:984
 msgid "The file \"{file}\" cannot be read. Check the url."
 msgstr ""
 
-#: ManageModuleAndResources.php:982
+#: ManageModuleAndResources.php:995
 msgid "The file \"{file}\" cannot be read. Check the file."
 msgstr ""
 
-#: ManageModuleAndResources.php:1003
+#: ManageModuleAndResources.php:1016
 msgid "A vocabulary must have a namespace uri and a prefix."
 msgstr ""
 
-#: TraitModule.php:117 TraitModule.php:1026
+#: TraitModule.php:125 TraitModule.php:1037
 msgid "This module requires the module \"{module}\"."
 msgstr ""
 
-#: TraitModule.php:122
+#: TraitModule.php:130
 msgid "This module requires modules \"{modules}\"."
 msgstr ""
 
-#: TraitModule.php:131
+#: TraitModule.php:139
 msgid "This module has resources that cannot be installed."
 msgstr ""
 
-#: TraitModule.php:139
+#: TraitModule.php:147
 msgid ""
 "This module cannot install its tables, because they exist already. Try to "
 "remove them first."
 msgstr ""
 
-#: TraitModule.php:468
+#: TraitModule.php:477
 msgid "The module removed tables \"{tables}\" from a previous broken install."
 msgstr ""
 
-#: TraitModule.php:1021
+#: TraitModule.php:1032
 msgid ""
 "This module requires the module \"{module}\", version {version} or above."
 msgstr ""
 
-#: TraitModule.php:1139
+#: TraitModule.php:1144
 msgid ""
 "The module \"{module}\" was automatically deactivated because the "
 "dependencies are unavailable."
 msgstr ""
 
-#: TraitModule.php:1161
+#: TraitModule.php:1166
 msgid "The directory \"{path}\" is not writeable."
 msgstr ""
 
-#: TraitModule.php:1172
+#: TraitModule.php:1177
 msgid "The directory \"{path}\" is not writeable: {error}."
 msgstr ""
 
-#: config/module.config.php:135
+#: config/module.config.php:142
 msgid "An error occurred."
 msgstr ""
 
-#: config/module.config.php:138
+#: config/module.config.php:145
 msgid "OK"
 msgstr ""
