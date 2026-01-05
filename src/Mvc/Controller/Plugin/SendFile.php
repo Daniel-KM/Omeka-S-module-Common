@@ -137,8 +137,7 @@ class SendFile extends AbstractPlugin
                 }
             }
             // Check valid range to avoid hack.
-            $hasRange = ($start < $filesize && $end < $filesize && $start < $end)
-                && ($start > 0 || $end < ($filesize - 1));
+            $hasRange = $start >= 0 && $start <= $end && $end < $filesize;
         }
 
         // $header = new Header\ContentLength();
@@ -171,6 +170,9 @@ class SendFile extends AbstractPlugin
 
         if ($hasRange) {
             $fp = @fopen($filepath, 'rb');
+            if ($fp === false) {
+                return null;
+            }
             $buffer = 1024 * 8;
             $pointer = $start;
             fseek($fp, $start, SEEK_SET);
