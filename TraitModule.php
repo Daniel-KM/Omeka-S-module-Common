@@ -67,6 +67,14 @@ trait TraitModule
     }
 
     /**
+     * Check if a file exists, is readable, and is not empty.
+     */
+    protected function isFileReadable(string $filepath): bool
+    {
+        return file_exists($filepath) && filesize($filepath) && is_readable($filepath);
+    }
+
+    /**
      * Get the settings of the current module.
      *
      * The settings are the default config of config, settings, site settings,
@@ -328,10 +336,11 @@ trait TraitModule
 
     protected function postInstallAuto(): void
     {
-        $services = $this->getServiceLocator();
         $filepath = $this->modulePath() . '/data/scripts/install.php';
-        if (file_exists($filepath) && filesize($filepath) && is_readable($filepath)) {
-            $this->setServiceLocator($services);
+        if ($this->isFileReadable($filepath)) {
+            // Required for the file install.
+            /** @var \Laminas\ServiceManager\ServiceLocatorInterface $services */
+            $services = $this->getServiceLocator();
             require_once $filepath;
         }
     }
@@ -350,7 +359,7 @@ trait TraitModule
     protected function postUninstallAuto(): void
     {
         $filepath = $this->modulePath() . '/data/scripts/uninstall.php';
-        if (file_exists($filepath) && filesize($filepath) && is_readable($filepath)) {
+        if ($this->isFileReadable($filepath)) {
             // Required for the file uninstall.
             /** @var \Laminas\ServiceManager\ServiceLocatorInterface $services */
             $services = $this->getServiceLocator();
@@ -372,7 +381,7 @@ trait TraitModule
     protected function postUpgradeAuto(?string $oldVersion, ?string $newVersion): void
     {
         $filepath = $this->modulePath() . '/data/scripts/upgrade.php';
-        if (file_exists($filepath) && filesize($filepath) && is_readable($filepath)) {
+        if ($this->isFileReadable($filepath)) {
             // Required for the file upgrade.
             /** @var \Laminas\ServiceManager\ServiceLocatorInterface $services */
             $services = $this->getServiceLocator();
@@ -425,7 +434,7 @@ trait TraitModule
      */
     protected function checkNewTablesFromFile(string $filepath): bool
     {
-        if (!file_exists($filepath) || !filesize($filepath) || !is_readable($filepath)) {
+        if (!$this->isFileReadable($filepath)) {
             return true;
         }
 
@@ -483,7 +492,7 @@ trait TraitModule
      */
     protected function execSqlFromFile(string $filepath): ?int
     {
-        if (!file_exists($filepath) || !filesize($filepath) || !is_readable($filepath)) {
+        if (!$this->isFileReadable($filepath)) {
             return null;
         }
 
@@ -495,6 +504,7 @@ trait TraitModule
         // See core commit #2689ce92f.
         $sql = file_get_contents($filepath);
         $sqls = array_filter(array_map('trim', explode(";\n", $sql)));
+        $result = null;
         foreach ($sqls as $sql) {
             $result = $connection->executeStatement($sql);
         }
@@ -541,25 +551,7 @@ trait TraitModule
      */
     protected function manageSiteSettings(string $process, array $values = []): self
     {
-        $settingsType = 'site_settings';
-        $defaultSettings = $this->getModuleConfig($settingsType);
-        if (!$defaultSettings) {
-            return $this;
-        }
-        $services = $this->getServiceLocator();
-        $settings = $services->get('Omeka\Settings\Site');
-        $api = $services->get('Omeka\ApiManager');
-        $ids = $api->search('sites', [], ['returnScalar' => 'id'])->getContent();
-        foreach ($ids as $id) {
-            $this->manageAnySettings(
-                $settings,
-                $settingsType,
-                $process,
-                $values[$id] ?? [],
-                (int) $id
-            );
-        }
-        return $this;
+        return $this->manageTargetSettings('site_settings', 'Omeka\Settings\Site', 'sites', $process, $values);
     }
 
     /**
@@ -573,15 +565,34 @@ trait TraitModule
      */
     protected function manageUserSettings(string $process, array $values = []): self
     {
-        $settingsType = 'user_settings';
+        return $this->manageTargetSettings('user_settings', 'Omeka\Settings\User', 'users', $process, $values);
+    }
+
+    /**
+     * Set, delete or update settings for all targets (sites or users).
+     *
+     * @param string $settingsType
+     * @param string $settingsService
+     * @param string $resourceName
+     * @param string $process
+     * @param array $values Values to use when process is update, by target id.
+     * @return self
+     */
+    protected function manageTargetSettings(
+        string $settingsType,
+        string $settingsService,
+        string $resourceName,
+        string $process,
+        array $values = []
+    ): self {
         $defaultSettings = $this->getModuleConfig($settingsType);
         if (!$defaultSettings) {
             return $this;
         }
         $services = $this->getServiceLocator();
-        $settings = $services->get('Omeka\Settings\User');
+        $settings = $services->get($settingsService);
         $api = $services->get('Omeka\ApiManager');
-        $ids = $api->search('users', [], ['returnScalar' => 'id'])->getContent();
+        $ids = $api->search($resourceName, [], ['returnScalar' => 'id'])->getContent();
         foreach ($ids as $id) {
             $this->manageAnySettings(
                 $settings,
@@ -1080,12 +1091,7 @@ trait TraitModule
      */
     protected function isModuleActive(string $module): bool
     {
-        $services = $this->getServiceLocator();
-        /** @var \Omeka\Module\Manager $moduleManager */
-        $moduleManager = $services->get('Omeka\ModuleManager');
-        $module = $moduleManager->getModule($module);
-        return $module
-            && $module->getState() === ModuleManager::STATE_ACTIVE;
+        return $this->areModulesActive([$module]);
     }
 
     /**
@@ -1099,8 +1105,8 @@ trait TraitModule
         $services = $this->getServiceLocator();
         /** @var \Omeka\Module\Manager $moduleManager */
         $moduleManager = $services->get('Omeka\ModuleManager');
-        foreach ($modules as $module) {
-            $module = $moduleManager->getModule($module);
+        foreach ($modules as $moduleName) {
+            $module = $moduleManager->getModule($moduleName);
             if (!$module || $module->getState() !== ModuleManager::STATE_ACTIVE) {
                 return false;
             }
@@ -1133,7 +1139,6 @@ trait TraitModule
         $managedModule = $moduleManager->getModule($module);
         $moduleManager->deactivate($managedModule);
 
-        $translator = $services->get(TranslatorInterface::class);
         $this->ensurePsrMessage();
         $message = new PsrMessage(
             'The module "{module}" was automatically deactivated because the dependencies are unavailable.', // @translate
