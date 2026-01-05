@@ -1215,4 +1215,71 @@ trait TraitModule
         }
         return $this;
     }
+
+    /**
+     * Get service config to protect navigation against missing routes.
+     *
+     * During module upgrades, routes defined by modules may not be available,
+     * causing RuntimeException when navigation is rendered. This method returns
+     * service config that modules can merge into their getServiceConfig() to
+     * register a delegator that catches these errors.
+     *
+     * This is particularly useful when a module using TraitModule needs
+     * protection during the upgrade of the Common module, when Common's services
+     * are not yet fully available but TraitModule is loaded directly via
+     * require_once.
+     *
+     * Usage in Module.php:
+     * ```php
+     * public function getServiceConfig(): array
+     * {
+     *     return $this->getNavigationProtectionServiceConfig();
+     * }
+     * ```
+     *
+     * Or merged with other config:
+     * ```php
+     * public function getServiceConfig(): array
+     * {
+     *     return array_merge_recursive(
+     *         $this->getNavigationProtectionServiceConfig(),
+     *         [
+     *             'factories' => [
+     *                 // other factories...
+     *             ],
+     *         ]
+     *     );
+     * }
+     * ```
+     *
+     * @return array Service manager configuration array with delegator.
+     */
+    protected function getNavigationProtectionServiceConfig(): array
+    {
+        // TODO Add a version check when Omeka S integrates the fix (PR #xxxx):
+        // if (version_compare(\Omeka\Module::VERSION, '4.x.x', '>=')) {
+        //     return [];
+        // }
+
+        // Load the delegator class if not already loaded.
+        // __DIR__ refers to the Common module directory since TraitModule.php
+        // is located there.
+        if (!class_exists('Common\Service\Delegator\NavigationTranslatorDelegatorFactory', false)) {
+            $delegatorFile = __DIR__ . '/src/Service/Delegator/NavigationTranslatorDelegatorFactory.php';
+            if (file_exists($delegatorFile)) {
+                require_once $delegatorFile;
+            } else {
+                // Fallback: the module may be in a different location.
+                return [];
+            }
+        }
+
+        return [
+            'delegators' => [
+                'Omeka\Site\NavigationTranslator' => [
+                    \Common\Service\Delegator\NavigationTranslatorDelegatorFactory::class,
+                ],
+            ],
+        ];
+    }
 }
