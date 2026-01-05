@@ -56,13 +56,11 @@ class ReadableDirectory extends AbstractValidator
             return false;
         }
 
-        $path = $value;
         if (!is_dir($path)) {
             $this->error(self::NOT_DIRECTORY);
             return false;
         }
 
-        $path = $value;
         if (!is_readable($path)) {
             $this->error(self::NOT_READABLE);
             return false;

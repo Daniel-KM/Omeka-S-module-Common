@@ -637,7 +637,7 @@ class DataTextarea extends ArrayTextarea
     protected function castToIntegerArray(string $key, array $values): array
     {
         return isset($this->dataIntegerKeys[$key])
-            ? array_map(fn($v) => is_numeric($v) ? (int) $v : $v, $values)
+            ? array_map(fn ($v) => is_numeric($v) ? (int) $v : $v, $values)
             : $values;
     }
 }

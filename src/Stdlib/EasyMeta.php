@@ -205,7 +205,7 @@ class EasyMeta
         'Omeka\Controller\Site\ValueAnnotationController' => 'value_annotations',
         'Omeka\Controller\Site\Index' => 'sites',
         'Omeka\Controller\Site\IndexController' => 'sites',
-        'Omeka\Controller\Site\SitePage' => 'sites_pages',
+        'Omeka\Controller\Site\SitePage' => 'site_pages',
         'Omeka\Controller\Site\SitePageController' => 'site_pages',
         // Capitalized name found in route __controller__.
         'Annotation' => 'annotations',

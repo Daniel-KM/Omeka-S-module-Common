@@ -22,7 +22,8 @@ class TempFile extends \Omeka\File\TempFile
         if (isset($this->mediaType)) {
             return $this->mediaType;
         }
-        parent::getMediaType();
+        // Parent sets $this->mediaType, then refine it.
+        $this->mediaType = parent::getMediaType();
         $this->mediaType = $this->specifyMediaType->__invoke($this->getTempPath(), $this->mediaType);
         return $this->mediaType;
     }

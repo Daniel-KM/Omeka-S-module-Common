@@ -47,7 +47,7 @@ class ArrayQueriesTextarea extends ArrayTextarea
                 $strings[] = strlen((string) $value) ? "$key $this->keyValueSeparator $value" : $key;
             }
         } else {
-            foreach ($array  as $key => $value) {
+            foreach ($array as $key => $value) {
                 if (is_array($value)) {
                     $value = urldecode((string) http_build_query($value, '', '&', PHP_QUERY_RFC3986));
                 }

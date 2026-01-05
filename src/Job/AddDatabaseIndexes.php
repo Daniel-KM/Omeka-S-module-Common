@@ -7,7 +7,7 @@ use Omeka\Job\AbstractJob;
 /**
  * Add indices to speed up omeka.
  */
- class AddDatabaseIndexes extends AbstractJob
+class AddDatabaseIndexes extends AbstractJob
 {
     public function perform(): void
     {
