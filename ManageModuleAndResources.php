@@ -251,6 +251,7 @@ class ManageModuleAndResources
             return false;
         }
 
+        // Loose comparison: null and "" should be considered equal.
         if ($data['o:lang'] != $customVocab->lang()) {
             return null;
         }
@@ -647,13 +648,8 @@ class ManageModuleAndResources
             foreach ($dataTypesNameLabels ?? [] as $index => $dataTypeNameLabel) {
                 // Manage associative array name / label, even if it should not exist.
                 if (is_string($dataTypeNameLabel)) {
-                    if (is_numeric($index)) {
-                        $result[$dataTypeNameLabel] = is_numeric($index)
-                            ? ['name' => $dataTypeNameLabel, 'label' => $dataTypeNameLabel]
-                            : ['name' => $index, 'label' => $dataTypeNameLabel];
-                    } else {
-                        // TODO Finalize here?
-                    }
+                    $name = is_numeric($index) ? $dataTypeNameLabel : $index;
+                    $result[$name] = ['name' => $name, 'label' => $dataTypeNameLabel];
                 } else {
                     $result[$dataTypeNameLabel['name']] = $dataTypeNameLabel;
                 }
@@ -778,121 +774,144 @@ class ManageModuleAndResources
         $newTerms = $data['o:terms'] ?? [];
 
         $isV4 = version_compare(\Omeka\Module::VERSION, '4', '>=');
-        if (!$isV4) {
-            if ($newItemSet) {
-                $this->api->update('custom_vocabs', $customVocab->id(), [
-                    'o:label' => $label,
-                    'o:item_set' => $newItemSet,
-                    'o:terms' => '',
-                    'o:uris' => '',
-                ], [], ['isPartial' => true]);
-            } elseif ($newUris) {
-                $existingUris = $customVocab->uris();
-                if (!is_array($existingUris)) {
-                    $nu = [];
-                    foreach (explode("\n", $existingUris) as $existingUri) {
-                        [$uri, $uriLabel] = array_map('trim', explode("=", $existingUri, 2));
-                        $nu[$uri] = $uriLabel ?: $uri;
-                    }
-                    $existingUris = $nu;
-                }
-                if (!is_array($newUris)) {
-                    $nu = [];
-                    foreach (array_filter(explode("\n", $newUris)) as $newUri) {
-                        [$uri, $uriLabel] = array_map('trim', explode("=", $newUri, 2));
-                        $nu[$uri] = $uriLabel ?: $uri;
-                    }
-                    $newUris = $nu;
-                }
-                $newUris = array_replace($newUris, $existingUris, $newUris);
-                $newUrisString = '';
-                foreach ($newUris as $uri => $uriLabel) {
-                    $newUrisString .= $uri . ' = ' . $uriLabel . "\n";
-                }
-                $newUrisString = trim($newUrisString);
-                $this->api->update('custom_vocabs', $customVocab->id(), [
-                    'o:label' => $label,
-                    'o:item_set' => null,
-                    'o:terms' => '',
-                    'o:uris' => $newUrisString,
-                ], [], ['isPartial' => true]);
-            } elseif ($newTerms) {
-                $existingTerms = $customVocab->terms();
-                if (!is_array($existingTerms)) {
-                    $existingTerms = explode("\n", $existingTerms);
-                }
-                if (!is_array($newTerms)) {
-                    $newTerms = explode("\n", $newTerms);
-                }
-                $termsToStore = array_values(array_merge($existingTerms, $newTerms));
-                $this->api->update('custom_vocabs', $customVocab->id(), [
-                    'o:label' => $label,
-                    'o:item_set' => null,
-                    'o:terms' => implode("\n", $termsToStore),
-                    'o:uris' => '',
-                ], [], ['isPartial' => true]);
-            }
+
+        // Prepare update data based on type (item set, uris, or terms).
+        $updateData = ['o:label' => $label];
+
+        if ($newItemSet) {
+            $updateData['o:item_set'] = $newItemSet;
+            $updateData['o:terms'] = $isV4 ? [] : '';
+            $updateData['o:uris'] = $isV4 ? [] : '';
+        } elseif ($newUris) {
+            $updateData['o:item_set'] = null;
+            $updateData['o:terms'] = $isV4 ? [] : '';
+            $updateData['o:uris'] = $this->mergeCustomVocabUris($customVocab->uris(), $newUris, $isV4);
+        } elseif ($newTerms) {
+            $updateData['o:item_set'] = null;
+            $updateData['o:uris'] = $isV4 ? [] : '';
+            $updateData['o:terms'] = $this->mergeCustomVocabTerms($customVocab->terms(), $newTerms, $isV4);
+        } else {
+            // Nothing to update.
             return $customVocab;
         }
 
-        if ($newItemSet) {
-            $this->api->update('custom_vocabs', $customVocab->id(), [
-                'o:label' => $label,
-                'o:item_set' => $newItemSet,
-                'o:terms' => [],
-                'o:uris' => [],
-            ], [], ['isPartial' => true]);
-        } elseif ($newUris) {
-            $this->api->update('custom_vocabs', $customVocab->id(), [
-                'o:label' => $label,
-                'o:item_set' => null,
-                'o:terms' => [],
-                'o:uris' => array_replace($newUris, $customVocab->uris(), $newUris),
-            ], [], ['isPartial' => true]);
-        } elseif ($newTerms) {
-            $this->api->update('custom_vocabs', $customVocab->id(), [
-                'o:label' => $label,
-                'o:item_set' => null,
-                'o:terms' => array_values(array_merge($customVocab->terms(), $newTerms)),
-                'o:uris' => [],
-            ], [], ['isPartial' => true]);
-        }
+        $this->api->update('custom_vocabs', $customVocab->id(), $updateData, [], ['isPartial' => true]);
 
         return $customVocab;
     }
 
     /**
-     * Remove a vocabulary by its prefix.
+     * Merge existing and new uris for custom vocab.
      *
-     * @param string $prefix
-     * @return self
+     * The handling of v3 and v4 formats allows to manage old exports.
+     *
+     * @param array|string $existingUris
+     * @param array|string $newUris
+     * @param bool $isV4
+     * @return array|string
+     */
+    protected function mergeCustomVocabUris($existingUris, $newUris, bool $isV4)
+    {
+        // Normalize to array format.
+        $existingUris = $this->normalizeCustomVocabUris($existingUris);
+        $newUris = $this->normalizeCustomVocabUris($newUris);
+
+        // Merge: new values override existing.
+        $merged = array_replace($existingUris, $newUris);
+
+        if ($isV4) {
+            return $merged;
+        }
+
+        // Convert back to string format for v3.
+        $result = '';
+        foreach ($merged as $uri => $uriLabel) {
+            $result .= $uri . ' = ' . $uriLabel . "\n";
+        }
+        return trim($result);
+    }
+
+    /**
+     * Normalize custom vocab uris to array format.
+     *
+     * @param array|string $uris
+     * @return array
+     */
+    protected function normalizeCustomVocabUris($uris): array
+    {
+        if (is_array($uris)) {
+            return $uris;
+        }
+        $result = [];
+        foreach (array_filter(explode("\n", $uris)) as $line) {
+            $parts = array_map('trim', explode('=', $line, 2));
+            $uri = $parts[0];
+            $uriLabel = $parts[1] ?? $uri;
+            $result[$uri] = $uriLabel ?: $uri;
+        }
+        return $result;
+    }
+
+    /**
+     * Merge existing and new terms for custom vocab.
+     *
+     * The handling of v3 and v4 formats allows to manage old exports.
+     *
+     * @param array|string $existingTerms
+     * @param array|string $newTerms
+     * @param bool $isV4
+     * @return array|string
+     */
+    protected function mergeCustomVocabTerms($existingTerms, $newTerms, bool $isV4)
+    {
+        // Normalize to array format.
+        if (!is_array($existingTerms)) {
+            $existingTerms = explode("\n", $existingTerms);
+        }
+        if (!is_array($newTerms)) {
+            $newTerms = explode("\n", $newTerms);
+        }
+
+        $merged = array_values(array_unique(array_merge($existingTerms, $newTerms)));
+
+        return $isV4 ? $merged : implode("\n", $merged);
+    }
+
+    /**
+     * Remove a vocabulary by its prefix.
      */
     public function removeVocabulary(string $prefix): self
     {
-        // The vocabulary may have been removed manually before.
-        $resource = $this->apiRead('vocabularies', ['prefix' => $prefix]);
-        if ($resource) {
-            try {
-                $this->api->delete('vocabularies', $resource->id());
-            } catch (\Exception $e) {
-            }
-        }
-        return $this;
+        return $this->removeResource('vocabularies', 'prefix', $prefix);
     }
 
     /**
      * Remove a resource template by its label.
-     *
-     * @param string $label
-     * @return self
      */
     public function removeResourceTemplate(string $label): self
     {
-        // The resource template may be renamed or removed manually before.
-        $resource = $this->apiRead('resource_templates', ['label' => $label]);
+        return $this->removeResource('resource_templates', 'label', $label);
+    }
+
+    /**
+     * Remove a custom vocab by its label.
+     */
+    public function removeCustomVocab(string $label): self
+    {
+        return $this->removeResource('custom_vocabs', 'label', $label);
+    }
+
+    /**
+     * Remove a resource by a criteria.
+     *
+     * The resource may have been renamed or removed manually before.
+     */
+    protected function removeResource(string $resourceName, string $key, string $value): self
+    {
+        $resource = $this->apiRead($resourceName, [$key => $value]);
         if ($resource) {
             try {
-                $this->api->delete('resource_templates', $resource->id());
+                $this->api->delete($resourceName, $resource->id());
             } catch (\Exception $e) {
             }
         }
@@ -900,22 +919,20 @@ class ManageModuleAndResources
     }
 
     /**
-     * Remove a custom vocab by its label.
-     *
-     * @param string $label
-     * @return self
+     * Check if a string is a url (starts with http:// or https://).
      */
-    public function removeCustomVocab(string $label): self
+    protected function isUrl(string $string): bool
     {
-        // The custom vocab may be renamed or removed manually before.
-        $resource = $this->apiRead('custom_vocabs', ['label' => $label]);
-        if ($resource) {
-            try {
-                $this->api->delete('custom_vocabs', $resource->id());
-            } catch (\Exception $e) {
-            }
-        }
-        return $this;
+        return strncmp($string, 'https://', 8) === 0
+            || strncmp($string, 'http://', 7) === 0;
+    }
+
+    /**
+     * Check if a file exists, is readable, and is not empty.
+     */
+    protected function isFileReadable(string $filepath): bool
+    {
+        return file_exists($filepath) && filesize($filepath) && is_readable($filepath);
     }
 
     /**
@@ -928,13 +945,13 @@ class ManageModuleAndResources
         }
 
         $fileOrUrl = trim($fileOrUrl);
-        if (strpos($fileOrUrl, 'https://') !== false || strpos($fileOrUrl, 'http://') !== false) {
+        if ($this->isUrl($fileOrUrl)) {
             return $fileOrUrl;
         }
 
         // Check if this is already the full path.
         $modulesPath = OMEKA_PATH . '/modules/';
-        if (strpos($fileOrUrl, $modulesPath) === 0) {
+        if (strncmp($fileOrUrl, $modulesPath, strlen($modulesPath)) === 0) {
             $filepath = $fileOrUrl;
         } elseif (!$module) {
             return null;
@@ -942,11 +959,7 @@ class ManageModuleAndResources
             $filepath = $modulesPath . $module . '/data/' . ($dataDirectory ? $dataDirectory . '/' : '') . $fileOrUrl;
         }
 
-        if (file_exists($filepath) && filesize($filepath) && is_readable($filepath)) {
-            return $filepath;
-        }
-
-        return null;
+        return $this->isFileReadable($filepath) ? $filepath : null;
     }
 
     protected function prepareVocabularyData(array $vocabularyData, ?string $module = null): array
@@ -964,23 +977,23 @@ class ManageModuleAndResources
         }
 
         $filepath = trim($filepath);
-        $isUrl = strpos($filepath, 'http:/') === 0 || strpos($filepath, 'https:/') === 0;
-        if ($isUrl) {
+        if ($this->isUrl($filepath)) {
             $fileContent = file_get_contents($filepath);
             if (empty($fileContent)) {
                 throw new RuntimeException((string) new PsrMessage(
                     'The file "{file}" cannot be read. Check the url.', // @translate
-                    ['file' => strpos($filepath, '/') === 0 ? basename($filepath) : $filepath]
+                    ['file' => $filepath]
                 ));
             }
             $vocabularyData['strategy'] = 'url';
             $vocabularyData['options']['url'] = $filepath;
         } else {
+            $originalFilepath = $filepath;
             $filepath = $this->fileDataPath($filepath, $module, 'vocabularies');
             if (!$filepath) {
                 throw new RuntimeException((string) new PsrMessage(
                     'The file "{file}" cannot be read. Check the file.', // @translate
-                    ['file' => strpos($filepath, '/') === 0 ? basename($filepath) : $filepath]
+                    ['file' => $originalFilepath]
                 ));
             }
             $vocabularyData['strategy'] = 'file';
@@ -1053,9 +1066,9 @@ class ManageModuleAndResources
             return null;
         }
 
-        $start = mb_strlen(OMEKA_PATH . '/');
-        if (mb_substr($globPath, 0, 1) === '/') {
-            if (strpos($globPath, $start) !== 0) {
+        $basePathLength = strlen(OMEKA_PATH) + 1;
+        if ($globPath[0] === '/') {
+            if (strncmp($globPath, OMEKA_PATH . '/', $basePathLength) !== 0) {
                 return null;
             }
         } else {
@@ -1063,26 +1076,26 @@ class ManageModuleAndResources
         }
 
         $result = [];
-
         $isStrings = is_array($stringsOrRegex);
 
         $paths = glob($globPath, GLOB_BRACE);
         foreach ($paths as $filepath) {
-            if (!is_file($filepath) || !is_readable($filepath) || !filesize($filepath)) {
+            if (!is_file($filepath) || !$this->isFileReadable($filepath)) {
                 continue;
             }
             $phtml = file_get_contents($filepath);
+            $relativePath = substr($filepath, $basePathLength);
             if ($isStrings) {
                 foreach ($stringsOrRegex as $check) {
                     $pos = mb_strpos($phtml, $check);
                     if ((!$invert && $pos !== false) || ($invert && $pos === false)) {
-                        $result[] = mb_substr($filepath, $start);
+                        $result[] = $relativePath;
                     }
                 }
             } else {
                 $has = preg_match($stringsOrRegex, $phtml);
                 if ((!$invert && $has) || ($invert && !$has)) {
-                    $result[] = mb_substr($filepath, $start);
+                    $result[] = $relativePath;
                 }
             }
         }
