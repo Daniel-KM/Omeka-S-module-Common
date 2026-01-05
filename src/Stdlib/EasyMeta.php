@@ -882,9 +882,16 @@ class EasyMeta
         if (!isset(static::$propertyIdsByTermsAndIds[$termOrId])) {
             return null;
         }
-        return is_numeric($termOrId)
-            ? array_search($termOrId, static::$propertyIdsByTerms)
-            : $termOrId;
+        if (!is_numeric($termOrId)) {
+            return $termOrId;
+        }
+        // Use cached reverse lookup instead of array_search.
+        if (static::$propertyTermsByTermsAndIds === null) {
+            $propertyTermsByIds = array_flip(static::$propertyIdsByTerms);
+            static::$propertyTermsByTermsAndIds = array_combine($propertyTermsByIds, $propertyTermsByIds)
+                + $propertyTermsByIds;
+        }
+        return static::$propertyTermsByTermsAndIds[$termOrId] ?? null;
     }
 
     /**
@@ -959,8 +966,9 @@ class EasyMeta
             $result = static::$propertyLabelsByTermsAndIds[$termsOrIds] ?? null;
             return $result ? [$termsOrIds => $result] : [];
         }
-        // TODO Keep original order.
-        return array_intersect_key(static::$propertyLabelsByTermsAndIds, array_flip($termsOrIds));
+        $searchKeys = array_flip($termsOrIds);
+        $result = array_intersect_key(static::$propertyLabelsByTermsAndIds, $searchKeys);
+        return array_replace(array_intersect_key($searchKeys, $result), $result);
     }
 
     /**
@@ -1050,9 +1058,16 @@ class EasyMeta
         if (!isset(static::$resourceClassIdsByTermsAndIds[$termOrId])) {
             return null;
         }
-        return is_numeric($termOrId)
-            ? array_search($termOrId, static::$resourceClassIdsByTerms)
-            : $termOrId;
+        if (!is_numeric($termOrId)) {
+            return $termOrId;
+        }
+        // Use cached reverse lookup instead of array_search.
+        if (static::$resourceClassTermsByTermsAndIds === null) {
+            $resourceClassTermsByIds = array_flip(static::$resourceClassIdsByTerms);
+            static::$resourceClassTermsByTermsAndIds = array_combine($resourceClassTermsByIds, $resourceClassTermsByIds)
+                + $resourceClassTermsByIds;
+        }
+        return static::$resourceClassTermsByTermsAndIds[$termOrId] ?? null;
     }
 
     /**
@@ -1127,8 +1142,9 @@ class EasyMeta
             $result = static::$resourceClassLabelsByTermsAndIds[$termsOrIds] ?? null;
             return $result ? [$termsOrIds => $result] : [];
         }
-        // TODO Keep original order.
-        return array_intersect_key(static::$resourceClassLabelsByTermsAndIds, array_flip($termsOrIds));
+        $searchKeys = array_flip($termsOrIds);
+        $result = array_intersect_key(static::$resourceClassLabelsByTermsAndIds, $searchKeys);
+        return array_replace(array_intersect_key($searchKeys, $result), $result);
     }
 
     /**
@@ -1240,8 +1256,9 @@ class EasyMeta
             $result = static::$resourceTemplateIdsByLabelsAndIds[$labelsOrIds] ?? null;
             return $result ? [$labelsOrIds => $result] : [];
         }
-        // TODO Keep original order.
-        return array_intersect_key(static::$resourceTemplateLabelsByLabelsAndIds, array_flip($labelsOrIds));
+        $searchKeys = array_flip($labelsOrIds);
+        $result = array_intersect_key(static::$resourceTemplateLabelsByLabelsAndIds, $searchKeys);
+        return array_replace(array_intersect_key($searchKeys, $result), $result);
     }
 
     /**
@@ -1271,12 +1288,12 @@ class EasyMeta
      */
     public function resourceTemplateClassIds($labelsOrIds = null): array
     {
-        if (static::resourceTemplateClassesByIds === null) {
+        if (static::$resourceTemplateClassesByIds === null) {
             $this->initResourceTemplateClasses();
         }
         if (!$labelsOrIds) {
             return $labelsOrIds === null
-                ? static::resourceTemplateClassesByIds
+                ? static::$resourceTemplateClassesByIds
                 : [];
         }
         if (is_scalar($labelsOrIds)) {
@@ -1286,8 +1303,10 @@ class EasyMeta
         if (!$templateIds) {
             return [];
         }
-        // TODO Keep original order.
-        return array_intersect_key(static::resourceTemplateClassesByIds, array_flip($labelsOrIds));
+        // Use template ids for lookup since cache is indexed by id.
+        $searchKeys = array_flip($templateIds);
+        $result = array_intersect_key(static::$resourceTemplateClassesByIds, $searchKeys);
+        return array_replace(array_intersect_key($searchKeys, $result), $result);
     }
 
     /**
@@ -1340,14 +1359,7 @@ class EasyMeta
         if (static::$vocabularyIdsByPrefixesAndUrisAndIds === null) {
             $this->initVocabularies();
         }
-        if (!isset(static::$vocabularyIdsByPrefixesAndUrisAndIds[$prefixOrUriOrId])) {
-            return null;
-        }
-        if (is_numeric($prefixOrUriOrId)) {
-            return array_search($prefixOrUriOrId, static::$vocabularyIdsByPrefixes);
-        }
-        $id = static::$vocabularyIdsByPrefixesAndUrisAndIds[$prefixOrUriOrId];
-        return array_search($id, static::$vocabularyIdsByPrefixes);
+        return static::$vocabularyPrefixesByPrefixesAndUrisAndIds[$prefixOrUriOrId] ?? null;
     }
 
     /**
@@ -1372,8 +1384,9 @@ class EasyMeta
         if (is_scalar($prefixesOrUrisOrIds)) {
             $prefixesOrUrisOrIds = [$prefixesOrUrisOrIds];
         }
-        // TODO Keep original order.
-        return array_intersect_key(static::$vocabularyPrefixesByPrefixesAndUrisAndIds, array_flip($prefixesOrUrisOrIds));
+        $searchKeys = array_flip($prefixesOrUrisOrIds);
+        $result = array_intersect_key(static::$vocabularyPrefixesByPrefixesAndUrisAndIds, $searchKeys);
+        return array_replace(array_intersect_key($searchKeys, $result), $result);
     }
 
     /**
@@ -1387,14 +1400,8 @@ class EasyMeta
         if (static::$vocabularyIdsByPrefixesAndUrisAndIds === null) {
             $this->initVocabularies();
         }
-        if (!isset(static::$vocabularyIdsByPrefixesAndUrisAndIds[$prefixOrUriOrId])) {
-            return null;
-        }
-        if (is_numeric($prefixOrUriOrId)) {
-            return array_search($prefixOrUriOrId, static::$vocabularyIdsByUris);
-        }
-        $id = static::$vocabularyIdsByPrefixesAndUrisAndIds[$prefixOrUriOrId];
-        return array_search($id, static::$vocabularyIdsByUris);
+        // Use O(1) cached reverse lookup instead of array_search O(n).
+        return static::$vocabularyUrisByPrefixesAndUrisAndIds[$prefixOrUriOrId] ?? null;
     }
 
     /**
@@ -1419,8 +1426,9 @@ class EasyMeta
         if (is_scalar($prefixesOrUrisOrIds)) {
             $prefixesOrUrisOrIds = [$prefixesOrUrisOrIds];
         }
-        // TODO Keep original order.
-        return array_intersect_key(static::$vocabularyUrisByPrefixesAndUrisAndIds, array_flip($prefixesOrUrisOrIds));
+        $searchKeys = array_flip($prefixesOrUrisOrIds);
+        $result = array_intersect_key(static::$vocabularyUrisByPrefixesAndUrisAndIds, $searchKeys);
+        return array_replace(array_intersect_key($searchKeys, $result), $result);
     }
 
     /**
