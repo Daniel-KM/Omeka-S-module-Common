@@ -28,6 +28,11 @@
             "Common\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "CommonTest\\": "test/CommonTest/"
+        }
+    },
     "repositories": [
         {
             "type": "package",
