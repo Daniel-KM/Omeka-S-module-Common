@@ -152,12 +152,8 @@ class ManageModuleAndResourcesTest extends AbstractTestCase
 
     public function testCheckResourceTemplateWithNonExistentFile(): void
     {
-        // Note: checkResourceTemplate() doesn't handle non-existent files gracefully.
-        // It calls file_get_contents() directly which triggers a PHP error.
-        // This test verifies the current behavior produces an error.
-        $this->markTestSkipped(
-            'checkResourceTemplate() does not handle non-existent files - triggers PHP error.'
-        );
+        $result = $this->manager->checkResourceTemplate('/nonexistent/path/template.json');
+        $this->assertFalse($result);
     }
 
     // =========================================================================
