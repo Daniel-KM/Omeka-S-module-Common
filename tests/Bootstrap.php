@@ -13,21 +13,15 @@ use Omeka\Test\DbTestCase;
  * Provide simple way for modules depending on Common to init test environment.
  * Uses \Omeka\Test\DbTestCase to handle database schema management.
  *
- * The Bootstrap automatically registers:
- * - CommonTest\ namespace (test utilities like AbstractHttpControllerTestCase)
- * - Module namespaces from composer.json (autoload and autoload-dev sections)
+ * The Bootstrap automatically:
+ * - Loads Omeka's vendor autoloader
+ * - Loads module's vendor autoloader if present (for module-specific dependencies)
+ * - Registers CommonTest\ namespace (test utilities like AbstractHttpControllerTestCase)
+ * - Registers module namespaces from composer.json (autoload and autoload-dev sections)
  *
  * Usage in a module test/bootstrap.php:
  * ```php
  * <?php
- * require dirname(__DIR__, 3) . '/vendor/autoload.php';
- *
- * // Optional: load module's vendor autoloader for dependencies.
- * $moduleAutoload = dirname(__DIR__) . '/vendor/autoload.php';
- * if (file_exists($moduleAutoload)) {
- *     require $moduleAutoload;
- * }
- *
  * require dirname(__DIR__, 3) . '/modules/Common/test/Bootstrap.php';
  *
  * \CommonTest\Bootstrap::bootstrap(
@@ -88,6 +82,12 @@ class Bootstrap
         if ($testNamespace && $testPath) {
             // test/MapperTest → module root
             $moduleRoot = dirname($testPath, 2);
+
+            // Load module's vendor autoloader if present (for module-specific dependencies).
+            $moduleVendorAutoload = $moduleRoot . '/vendor/autoload.php';
+            if (file_exists($moduleVendorAutoload)) {
+                require_once $moduleVendorAutoload;
+            }
 
             // Try to load autoload from module's composer.json.
             $composerFile = $moduleRoot . '/composer.json';
