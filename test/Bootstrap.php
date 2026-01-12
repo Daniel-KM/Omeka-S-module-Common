@@ -13,34 +13,42 @@ use Omeka\Test\DbTestCase;
  * Provide simple way for modules depending on Common to init test environment.
  * Uses \Omeka\Test\DbTestCase to handle database schema management.
  *
+ * The Bootstrap automatically registers:
+ * - CommonTest\ namespace (test utilities like AbstractHttpControllerTestCase)
+ * - Module namespaces from composer.json (autoload and autoload-dev sections)
+ *
  * Usage in a module test/bootstrap.php:
  * ```php
  * <?php
- * require_once dirname(__DIR__, 3) . '/modules/Common/test/Bootstrap.php';
- * \CommonTest\Bootstrap::bootstrap(['Common', 'YourModule']);
- * ```
+ * require dirname(__DIR__, 3) . '/vendor/autoload.php';
  *
- * Or with a custom test namespace:
- * ```php
- * <?php
- * require_once dirname(__DIR__, 3) . '/modules/Common/test/Bootstrap.php';
+ * // Optional: load module's vendor autoloader for dependencies.
+ * $moduleAutoload = dirname(__DIR__) . '/vendor/autoload.php';
+ * if (file_exists($moduleAutoload)) {
+ *     require $moduleAutoload;
+ * }
+ *
+ * require dirname(__DIR__, 3) . '/modules/Common/test/Bootstrap.php';
+ *
  * \CommonTest\Bootstrap::bootstrap(
- *     ['Common', 'ValueSuggest', 'Mapper', 'MyModule'],
- *     'MyModuleTest',
+ *     ['Common', 'YourModule'],
+ *     'YourModuleTest',
  *     __DIR__ . '/YourModuleTest'
  * );
  * ```
  *
  * Optional modules can be prefixed with "?" to install only if present:
  * ```php
- * <?php
- * require_once dirname(__DIR__, 3) . '/modules/Common/test/Bootstrap.php';
  * \CommonTest\Bootstrap::bootstrap(
  *     ['Common', '?Reference', 'AdvancedSearch'],
  *     'AdvancedSearchTest',
  *     __DIR__ . '/AdvancedSearchTest'
  * );
  * ```
+ *
+ * Requirements:
+ * - Module must have composer.json with autoload/autoload-dev PSR-4 sections
+ * - Test directory structure: modules/YourModule/test/YourModuleTest/
  */
 class Bootstrap
 {
@@ -71,12 +79,49 @@ class Bootstrap
         // Load Omeka bootstrap (defines OMEKA_PATH, loads autoloader).
         require_once dirname(__DIR__, 3) . '/bootstrap.php';
 
-        // Register test namespace autoloader if provided.
+        // Register CommonTest namespace for test utilities (with prepend to ensure priority).
+        // __DIR__ is the test/ directory where this Bootstrap.php file is located.
+        $loader = new \Composer\Autoload\ClassLoader();
+        $loader->addPsr4('CommonTest\\', __DIR__ . '/CommonTest/');
+
+        // Register test namespace and module namespace if provided.
         if ($testNamespace && $testPath) {
-            $loader = new \Composer\Autoload\ClassLoader();
-            $loader->addPsr4($testNamespace . '\\', $testPath);
-            $loader->register();
+            // test/MapperTest → module root
+            $moduleRoot = dirname($testPath, 2);
+
+            // Try to load autoload from module's composer.json.
+            $composerFile = $moduleRoot . '/composer.json';
+            if (file_exists($composerFile)) {
+                $composer = json_decode(file_get_contents($composerFile), true);
+
+                // Register PSR-4 autoload from composer.json.
+                if (!empty($composer['autoload']['psr-4'])) {
+                    foreach ($composer['autoload']['psr-4'] as $ns => $path) {
+                        $loader->addPsr4($ns, $moduleRoot . '/' . $path);
+                    }
+                }
+
+                // Register PSR-4 autoload-dev from composer.json.
+                if (!empty($composer['autoload-dev']['psr-4'])) {
+                    foreach ($composer['autoload-dev']['psr-4'] as $ns => $path) {
+                        $loader->addPsr4($ns, $moduleRoot . '/' . $path);
+                    }
+                }
+            } else {
+                // Fallback: derive namespace from test namespace.
+                $loader->addPsr4($testNamespace . '\\', $testPath);
+
+                $moduleNamespace = preg_replace('/Test$/', '', $testNamespace);
+                if ($moduleNamespace !== $testNamespace) {
+                    $modulePath = $moduleRoot . '/src/';
+                    if (is_dir($modulePath)) {
+                        $loader->addPsr4($moduleNamespace . '\\', $modulePath);
+                    }
+                }
+            }
         }
+
+        $loader->register(true);
 
         // Make sure error reporting is on for testing.
         error_reporting(E_ALL);
