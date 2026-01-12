@@ -153,12 +153,17 @@ class Module extends AbstractModule
         foreach ($tableColumns as $key => $tableColumn) {
             $table = key($tableColumn);
             $column = reset($tableColumn);
-            $stmt = $connection->executeQuery("SHOW INDEX FROM `$table` WHERE `column_name` = '$column';");
-            $result = $stmt->fetchOne();
-            if ($result) {
+            try {
+                $stmt = $connection->executeQuery("SHOW INDEX FROM `$table` WHERE `column_name` = '$column';");
+                $result = $stmt->fetchOne();
+                if ($result) {
+                    unset($tableColumns[$key]);
+                } else {
+                    $newIndices[] = "$table/$column";
+                }
+            } catch (\Exception $e) {
+                // Table does not exist yet (e.g., during test bootstrap).
                 unset($tableColumns[$key]);
-            } else {
-                $newIndices[] = "$table/$column";
             }
         }
 
