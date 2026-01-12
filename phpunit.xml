@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         bootstrap="bootstrap.php"
+         bootstrap="./tests/bootstrap.php"
          colors="true"
          backupGlobals="false"
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
     <coverage>
         <include>
-            <directory suffix=".php">../src</directory>
+            <directory suffix=".php">./src</directory>
         </include>
         <exclude>
             <directory suffix=".php">../src/Service</directory>
@@ -14,7 +14,7 @@
     </coverage>
     <testsuites>
         <testsuite name="Common">
-            <directory>./CommonTest</directory>
+            <directory suffix="Test.php">./tests/CommonTest</directory>
         </testsuite>
     </testsuites>
 </phpunit>

@@ -10,6 +10,7 @@
 /.sass-cache/
 /.settings/
 /test/.phpunit.result.cache
+/tests/.phpunit.cache/
 /tests/.phpunit.result.cache
 .buildpath
 .bundle
