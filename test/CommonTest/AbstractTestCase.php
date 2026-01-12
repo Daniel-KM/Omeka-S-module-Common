@@ -3,12 +3,12 @@
 namespace CommonTest;
 
 use Laminas\ServiceManager\ServiceManager;
-use Omeka\Test\AbstractHttpControllerTestCase;
 
 /**
  * Abstract base class for Common module tests.
  *
- * Provides helper methods for accessing services and creating test fixtures.
+ * Extends AbstractHttpControllerTestCase which provides authentication helpers.
+ * Adds convenience methods for accessing services and creating test fixtures.
  */
 abstract class AbstractTestCase extends AbstractHttpControllerTestCase
 {
