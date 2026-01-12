@@ -30,6 +30,17 @@ use Omeka\Test\DbTestCase;
  *     __DIR__ . '/YourModuleTest'
  * );
  * ```
+ *
+ * Optional modules can be prefixed with "?" to install only if present:
+ * ```php
+ * <?php
+ * require_once dirname(__DIR__, 3) . '/modules/Common/test/Bootstrap.php';
+ * \CommonTest\Bootstrap::bootstrap(
+ *     ['Common', '?Reference', 'AdvancedSearch'],
+ *     'AdvancedSearchTest',
+ *     __DIR__ . '/AdvancedSearchTest'
+ * );
+ * ```
  */
 class Bootstrap
 {
@@ -145,12 +156,22 @@ class Bootstrap
     /**
      * Install modules in order.
      *
+     * Module names prefixed with "?" are optional and will be skipped silently
+     * if not found. Required modules (without "?") will show a warning if not
+     * found.
+     *
      * @param array $modules Module names in dependency order.
      * @param bool $verbose Output progress messages.
      */
     public static function installModules(array $modules, bool $verbose = true): void
     {
         foreach ($modules as $moduleName) {
+            // Check if module is optional (prefixed with "?").
+            $isOptional = str_starts_with($moduleName, '?');
+            if ($isOptional) {
+                $moduleName = substr($moduleName, 1);
+            }
+
             // Reinitialize with Omeka Application to load active module services.
             $application = Application::init(self::getConfig());
             $serviceLocator = $application->getServiceManager();
@@ -168,20 +189,23 @@ class Bootstrap
             $module = $moduleManager->getModule($moduleName);
             if ($module && $module->getState() === ModuleManager::STATE_NOT_INSTALLED) {
                 if ($verbose) {
-                    self::log("  Installing module: $moduleName");
+                    $optionalLabel = $isOptional ? ' (optional)' : '';
+                    self::log("  Installing module: $moduleName$optionalLabel");
                 }
                 $moduleManager->install($module);
                 $entityManager->flush();
                 $entityManager->clear();
             } elseif ($module && $module->getState() === ModuleManager::STATE_NOT_ACTIVE) {
                 if ($verbose) {
-                    self::log("  Activating module: $moduleName");
+                    $optionalLabel = $isOptional ? ' (optional)' : '';
+                    self::log("  Activating module: $moduleName$optionalLabel");
                 }
                 $moduleManager->activate($module);
                 $entityManager->flush();
                 $entityManager->clear();
             } elseif (!$module) {
-                if ($verbose) {
+                // Only warn for required modules, skip silently for optional.
+                if ($verbose && !$isOptional) {
                     self::log("  Warning: Module $moduleName not found");
                 }
             }
