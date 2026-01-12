@@ -34,6 +34,7 @@ class JSend extends AbstractPlugin
     public function __invoke(
         ?string $status = null,
         ?array $data = null,
+        // TODO Use stringable for Omeka omeka 4.2 (php 8.2) and add translator for PsrMessage, but keep compatibility with omeka 4.0.
         // Message is null, string or stringable.
         $message = null,
         ?int $httpStatusCode = null,
