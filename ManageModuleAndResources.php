@@ -217,6 +217,10 @@ class ManageModuleAndResources
      */
     public function checkResourceTemplate(string $filepath): bool
     {
+        if (!$this->isFileReadable($filepath)) {
+            return false;
+        }
+
         $data = json_decode(file_get_contents($filepath), true);
         if (!$data || empty($data['label'])) {
             return false;
