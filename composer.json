@@ -23,10 +23,6 @@
     "_require (not set until Omeka S merges PR #2412)": {
         "omeka/omeka-s-core": "^4.0"
     },
-    "require": {
-        "daniel-km/jquery-autocomplete": "^1.5",
-        "oomphinc/composer-installers-extender": "^2.0"
-    },
     "autoload": {
         "psr-4": {
             "Common\\": "src/"
@@ -40,17 +36,11 @@
     "config": {
         "platform": {
             "php": "7.4"
-        },
-        "allow-plugins": {
-            "composer/installers": true,
-            "oomphinc/composer-installers-extender": true
         }
     },
     "extra": {
-        "installer-paths": {
-            "asset/vendor/jquery-autocomplete/": [
-                "daniel-km/jquery-autocomplete"
-            ]
+        "omeka-assets": {
+            "asset/vendor/jquery-autocomplete/jquery.autocomplete.min.js": "https://gitlab.com/Daniel-KM/jQuery-Autocomplete/-/raw/master/dist/jquery.autocomplete.min.js"
         }
     }
 }
