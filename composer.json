@@ -1,7 +1,7 @@
 {
     "name": "daniel-km/omeka-s-module-common",
-    "description": "Module for Omeka S that manages internal features used in various modules: bulk functions, form elements, view helpers, one-time methods for install, etc.",
-    "type": "library",
+    "type": "omeka-s-module",
+    "description": "Module for Omeka S: Manage internal features used in various modules: bulk functions, form elements, view helpers, one-time methods for install, etc.",
     "keywords": [
         "Omeka S",
         "Omeka S module",
@@ -19,6 +19,9 @@
     "support": {
         "issues": "https://gitlab.com/Daniel-KM/Omeka-S-module-Common/-/issues",
         "forum": "https://forum.omeka.org/"
+    },
+    "_require (not set until Omeka S merges PR #2412)": {
+        "omeka/omeka-s-core": "^4.0"
     },
     "require": {
         "devbridge/jquery-autocomplete": "^1.4.11",
@@ -50,19 +53,22 @@
         }
     ],
     "config": {
-        "platform": {"php": "7.4"},
+        "platform": {
+            "php": "7.4"
+        },
         "allow-plugins": {
             "composer/installers": true,
             "oomphinc/composer-installers-extender": true
         }
     },
     "extra": {
-        "installer-types": ["omeka-addon-asset"],
+        "installer-types": [
+            "omeka-addon-asset"
+        ],
         "installer-paths": {
             "asset/vendor/{$name}/": [
                 "type:omeka-addon-asset"
             ]
-        },
-        "installer-name" : "Common"
+        }
     }
 }
