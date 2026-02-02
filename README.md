@@ -1,7 +1,6 @@
 Common Module (module for Omeka S)
 ===================================
 
-
 > __New versions of this module and support for Omeka S version 3.0 and above
 > are available on [GitLab], which seems to respect users and privacy better
 > than the previous repository.__
@@ -100,21 +99,36 @@ Installation
 
 See general end user documentation for [installing a module].
 
-The module uses an external library [jQuery-Autocomplete], so use the release
-zip to install it, or use and init the source.
+**IMPORTANT**: As long as [PR #2412] is not merged, use the Zip method or use
+version 3.4.76.
+
+* With composer (recommended, requires Omeka S with [PR #2412])
+
+From the root of Omeka S, install the module:
+
+```sh
+composer require daniel-km/omeka-s-module-common
+```
+
+The module is automatically downloaded in `addons/modules/` and ready to be
+enabled in the admin interface.
 
 * From the zip
 
-Download the last release [Common.zip] from the list of releases (the master
-does not contain the dependency), and uncompress it in the `modules` directory.
+Download the last release [Common.zip] from the list of releases, and uncompress
+it in the `modules` directory.
 
-* From the source and for development:
+* From the sources and for development
 
-If the module was installed from the source, rename the name of the folder of
-the module to `Common`, and go to the root module, and run:
+Install the sources in directory `modules`, rename the directory as `Common`, go
+to the root of the module, run composer install, then :
 
 ```sh
+cd modules
+git clone https://gitlab.com/Daniel-KM/Omeka-S-module-Common.git Common
+cd Common
 composer install --no-dev
+php ../../application/data/scripts/install-omeka-assets.php Common
 ```
 
 * For test
@@ -484,8 +498,8 @@ with this class with the trait:
 ```php
 namespace MyModule;
 
-if (!class_exists(\Common\TraitModule::class)) {
-    require_once dirname(__DIR__) . '/Common/TraitModule.php';
+if (!trait_exists(\Common\TraitModule::class, false)) {
+    require_once dirname(__DIR__) . '/Common/src/TraitModule.php';
 }
 
 use Common\TraitModule;
@@ -499,11 +513,11 @@ class Module extends AbstractModule
 }
 ```
 
-Or extend the abstract class (not recommended):
+The class AbstractModule is still provided, but deprecated. You may extend it:
 
 ```php
-if (!class_exists(\Common\AbstractModule::class)) {
-    require_once dirname(__DIR__) . '/Common/AbstractModule.php';
+if (!class_exists(\Common\AbstractModule::class, false)) {
+    require_once dirname(__DIR__) . '/Common/src/AbstractModule.php';
 }
 
 use Common\AbstractModule;
@@ -514,6 +528,13 @@ class Module extends AbstractModule
 }
 ```
 
+**Note**: When Common is installed via composer, classes and traits are
+autoloaded via PSR-4 (`Common\TraitModule`, `Common\AbstractModule`, etc.). The
+`require_once` with `class_exists()`/`trait_exists()` check ensures backward
+compatibility with manual (zip) installations in the directory modules/ and is
+needed during upgrades of module Common. This check will be useless for the next
+major upgrade of Omeka.
+
 **WARNING**: with an abstract class, `parent::method()` in the module calls the
 method of the abstract class (`Common\AbstractModule`), but with a trait,
 `parent::method()` is the method of `Omeka\AbstractModule` if it exists.
@@ -523,10 +544,16 @@ be used in such a case.
 
 ### Installing resources
 
-To install resources, the class `ManageModuleAndResources.php` can be used. It
-is callable via the module `$this->getManageModuleAndResources()`. It contains
+To install resources, the class `ManageModuleAndResources` can be used. It is
+callable via the module `$this->getManageModuleAndResources()`. It contains
 tools to manage and update vocabs, custom vocabs, and templates via files
 located inside `data/`, that will be automatically imported.
+
+```php
+if (!class_exists(\Common\ManageModuleAndResources::class, false)) {
+    require_once dirname(__DIR__) . '/Common/src/ManageModuleAndResources.php';
+}
+```
 
 
 TODO
@@ -554,6 +581,8 @@ See online issues on the [module issues] page on GitLab.
 License
 -------
 
+### Module
+
 This module is published under the [CeCILL v2.1] license, compatible with
 [GNU/GPL] and approved by [FSF] and [OSI].
 
@@ -574,10 +603,16 @@ This Agreement may be freely reproduced and published, provided it is not
 altered, and that no provisions are either added or removed herefrom.
 
 
+### Libraries
+
+- jQuery-Autocomplete : [MIT]
+
+
 Copyright
 ---------
 
 * Copyright Daniel Berthereau, 2017-2026 (see [Daniel-KM] on GitLab)
+* Copyright Tomas Kirda 2017 (library [jQuery-Autocomplete])
 
 
 [Common module]: https://gitlab.com/Daniel-KM/Omeka-S-module-Common
@@ -586,6 +621,7 @@ Copyright
 [PSR-3]: http://www.php-fig.org/psr/psr-3
 [PHP-FIG]: http://www.php-fig.org
 [installing a module]: https://omeka.org/s/docs/user-manual/modules/
+[PR #2412]: https://github.com/omeka/omeka-s/pull/2412
 [Common.zip]: https://github.com/Daniel-KM/Omeka-S-module-Common/releases
 [jSend]: https://github.com/omniti-labs/jsend
 [Contact Us]: https://gitlab.com/Daniel-KM/Omeka-S-module-ContactUs
@@ -593,6 +629,7 @@ Copyright
 [Easy Admin]: https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin
 [Selection]: https://gitlab.com/Daniel-KM/Omeka-S-module-Selection
 [Two Factor Authentication]: https://gitlab.com/Daniel-KM/Omeka-S-module-TwoFactAuth
+[jQuery-Autocomplete]: https://github.com/devbridge/jQuery-Autocomplete
 [module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-Common/-/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
