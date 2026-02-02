@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-06 08:27+0100\n"
-"PO-Revision-Date: 2026-01-06 08:36+0100\n"
+"POT-Creation-Date: 2026-02-02 00:00+0000\n"
+"PO-Revision-Date: 2026-02-02 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -17,20 +17,20 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.6\n"
 
-#: src/Mvc/Controller/Plugin/JSend.php:77
+#: src/Mvc/Controller/Plugin/JSend.php:78
 msgid "Check your input for invalid data."
 msgstr "Vérifiez votre saisie ou des données incorrectes."
 
-#: src/Mvc/Controller/Plugin/JSend.php:96
+#: src/Mvc/Controller/Plugin/JSend.php:97
 msgid "An internal error has occurred."
 msgstr "Une erreur interne s’est produite."
 
-#: src/Mvc/Controller/Plugin/JSend.php:111
+#: src/Mvc/Controller/Plugin/JSend.php:112
 #, php-format
 msgid "The status \"%s\" is not supported by jSend."
 msgstr "Le statut « %s » n’est pas pris en charge par jSend."
 
-#: src/Mvc/Controller/Plugin/JSend.php:155
+#: src/Mvc/Controller/Plugin/JSend.php:156
 msgid "Not found."
 msgstr "Non trouvé."
 
@@ -48,13 +48,13 @@ msgstr ""
 "gérer les caractères diacritiques et non-latin et pour traduire les dates, "
 "les nombres et plus."
 
-#: Module.php:172
+#: Module.php:177
 msgid "A background job has been started to add database indexes."
 msgstr ""
 "Une tâche en arrière plan a été lancée pour ajouter des index à la base de "
 "données."
 
-#: Module.php:194
+#: Module.php:199
 msgid "The module Generic is no longer needed and can be removed."
 msgstr "Le module Generic n’est plus nécessaire et peux être supprimé."
 
@@ -298,6 +298,161 @@ msgstr ""
 "Erreur lors de la validation de « {filename} ». Il est impossible "
 "d’enregistrer les fichiers avec l’extension « {extension} »."
 
+#: src/ManageModuleAndResources.php:93
+msgid ""
+"An error occured when loading vocabulary \"{vocabulary}\": file has no json "
+"content."
+msgstr ""
+"Une erreur est survenue en chargeant le vocabulaire « {vocabulary} » : le "
+"fichier n’a pas de contenu json."
+
+#: src/ManageModuleAndResources.php:100
+msgid ""
+"An error occured when adding the prefix \"{prefix}\": another vocabulary "
+"exists. Resolve the conflict before installing this module."
+msgstr ""
+"Une erreur est survenue en ajoutant le préfixe « {prefix} » : un autre "
+"vocabulaire existe. Merci de résoudre le conflit avant d’installer ce module."
+
+#: src/ManageModuleAndResources.php:112
+msgid ""
+"A custom vocab exists for \"{name}\". Remove it or rename it before "
+"installing this module."
+msgstr ""
+"Un vocabulaire personnalisé existe pour « {name} » : renommez-le ou "
+"supprimez-le avant d’installer ce module."
+
+#: src/ManageModuleAndResources.php:123
+msgid ""
+"A resource template exists for {template}. Rename it or remove it before "
+"installing this module."
+msgstr ""
+"Un modèle de ressource nommé « {template} » existe : renommez ou supprimez-"
+"le avant d’installer ce module."
+
+#: src/ManageModuleAndResources.php:330
+msgid "The vocabulary \"{vocabulary}\" was already installed and was kept."
+msgstr "Le vocabulaire « {vocabulary} » a déjà été installé et a été conservé."
+
+#: src/ManageModuleAndResources.php:340
+msgid ""
+"An error occured when adding the prefix \"{prefix}\": another vocabulary "
+"exists with the same prefix. Resolve the conflict before installing this "
+"module."
+msgstr ""
+"Une erreur est survenue lors de l’ajout du préfixe « {prefix} » : un autre "
+"vocabulaire existe avec le même préfixe. Merci de résoudre le conflit avant "
+"d’installer ce module."
+
+#: src/ManageModuleAndResources.php:352
+msgid ""
+"An error occured when adding the prefix \"{prefix}\" and the associated "
+"properties: {message}"
+msgstr ""
+"Une erreur est survenue en ajoutant le préfixe « {prefix} » et les "
+"propriétés associées : {message}"
+
+#: src/ManageModuleAndResources.php:431 src/ManageModuleAndResources.php:440
+msgid ""
+"An error occured when updating vocabulary \"{prefix}\" and the associated "
+"properties: {message}"
+msgstr ""
+"Une erreur est survenue lors de la mise à jour du vocabulaire « {prefix} » "
+"et les propriétés associées : {message}"
+
+#: src/ManageModuleAndResources.php:535
+msgid ""
+"The following \"{name}\" of the vocabulary \"{label}\" were replaced: "
+"{members}"
+msgstr ""
+"Les « {name} » suivants du vocabulaire « {label} » ont été remplacés : "
+"{members}"
+
+#: src/ManageModuleAndResources.php:545
+msgid ""
+"Resources, values and templates were updated, but you may check settings "
+"where the old ones were used."
+msgstr ""
+"Les ressources, valeurs et modèles ont été mis à jour, mais vous pouvez "
+"vérifier les paramètres où les anciennes valeurs étaient utilisées."
+
+#: src/ManageModuleAndResources.php:572
+msgid ""
+"The resource template named \"{template}\" is already available and is "
+"skipped."
+msgstr ""
+"Le modèle de ressource nommé « {template} » est déjà disponible et a été "
+"conservé."
+
+#: src/ManageModuleAndResources.php:770
+msgid "The custom vocab named \"{custom_vocab}\" is not available."
+msgstr ""
+"Le vocabulaire personnalisé nommé « {custom_vocab} » n’est pas disponible."
+
+#: src/ManageModuleAndResources.php:979
+msgid "No file or url set for the vocabulary."
+msgstr "Pas de fichier ou d’url pour le vocabulaire."
+
+#: src/ManageModuleAndResources.php:988
+msgid "The file \"{file}\" cannot be read. Check the url."
+msgstr "Le fichier « {file} » ne peut pas être lu. Merci de vérifier l’url."
+
+#: src/ManageModuleAndResources.php:999
+msgid "The file \"{file}\" cannot be read. Check the file."
+msgstr ""
+"Le fichier « {file} » ne peut pas être lu. Merci de vérifier le fichier."
+
+#: src/ManageModuleAndResources.php:1020
+msgid "A vocabulary must have a namespace uri and a prefix."
+msgstr "Un vocabulaire doit avoir une uri pour l’espace de nom et un préfixe."
+
+#: src/TraitModule.php:123 src/TraitModule.php:1035
+msgid "This module requires the module \"{module}\"."
+msgstr "Ce module requiert le module « {module} »."
+
+#: src/TraitModule.php:128
+msgid "This module requires modules \"{modules}\"."
+msgstr "Ce module requiert les modules « {modules} »."
+
+#: src/TraitModule.php:137
+msgid "This module has resources that cannot be installed."
+msgstr "Ce module a des ressources qui ne peuvent pas être installées."
+
+#: src/TraitModule.php:145
+msgid ""
+"This module cannot install its tables, because they exist already. Try to "
+"remove them first."
+msgstr ""
+"Ce module ne peut pas installer ses tables car elles existent déjà. Essayez "
+"de les supprimer manuellement."
+
+#: src/TraitModule.php:475
+msgid "The module removed tables \"{tables}\" from a previous broken install."
+msgstr ""
+"Le module a supprimé les tables \"{tables}\" depuis une installation échouée."
+
+#: src/TraitModule.php:1030
+msgid ""
+"This module requires the module \"{module}\", version {version} or above."
+msgstr ""
+"Ce module requiert le module « {module} », version {version} ou supérieure."
+
+#: src/TraitModule.php:1142
+msgid ""
+"The module \"{module}\" was automatically deactivated because the "
+"dependencies are unavailable."
+msgstr ""
+"Le module « {module} » a été automatiquement désactivé car ses dépendances "
+"ne sont plus disponibles."
+
+#: src/TraitModule.php:1164
+msgid "The directory \"{path}\" is not writeable."
+msgstr "Le dossier « {path} » n’est pas inscriptible."
+
+#: src/TraitModule.php:1175
+msgid "The directory \"{path}\" is not writeable: {error}."
+msgstr "Le dossier « {path} » n’est pas inscriptible : {error}"
+
 #: src/Service/Form/Element/MediaIngesterSelectFactory.php:26
 msgid "Select media ingesters…"
 msgstr "Choisir un ingéreur de média…"
@@ -362,166 +517,11 @@ msgstr "vocabulaires"
 msgid "sites"
 msgstr "sites"
 
-#: ManageModuleAndResources.php:93
-msgid ""
-"An error occured when loading vocabulary \"{vocabulary}\": file has no json "
-"content."
-msgstr ""
-"Une erreur est survenue en chargeant le vocabulaire « {vocabulary} » : le "
-"fichier n’a pas de contenu json."
-
-#: ManageModuleAndResources.php:100
-msgid ""
-"An error occured when adding the prefix \"{prefix}\": another vocabulary "
-"exists. Resolve the conflict before installing this module."
-msgstr ""
-"Une erreur est survenue en ajoutant le préfixe « {prefix} » : un autre "
-"vocabulaire existe. Merci de résoudre le conflit avant d’installer ce module."
-
-#: ManageModuleAndResources.php:112
-msgid ""
-"A custom vocab exists for \"{name}\". Remove it or rename it before "
-"installing this module."
-msgstr ""
-"Un vocabulaire personnalisé existe pour « {name} » : renommez-le ou "
-"supprimez-le avant d’installer ce module."
-
-#: ManageModuleAndResources.php:123
-msgid ""
-"A resource template exists for {template}. Rename it or remove it before "
-"installing this module."
-msgstr ""
-"Un modèle de ressource nommé « {template} » existe : renommez ou supprimez-"
-"le avant d’installer ce module."
-
-#: ManageModuleAndResources.php:326
-msgid "The vocabulary \"{vocabulary}\" was already installed and was kept."
-msgstr "Le vocabulaire « {vocabulary} » a déjà été installé et a été conservé."
-
-#: ManageModuleAndResources.php:336
-msgid ""
-"An error occured when adding the prefix \"{prefix}\": another vocabulary "
-"exists with the same prefix. Resolve the conflict before installing this "
-"module."
-msgstr ""
-"Une erreur est survenue lors de l’ajout du préfixe « {prefix} » : un autre "
-"vocabulaire existe avec le même préfixe. Merci de résoudre le conflit avant "
-"d’installer ce module."
-
-#: ManageModuleAndResources.php:348
-msgid ""
-"An error occured when adding the prefix \"{prefix}\" and the associated "
-"properties: {message}"
-msgstr ""
-"Une erreur est survenue en ajoutant le préfixe « {prefix} » et les "
-"propriétés associées : {message}"
-
-#: ManageModuleAndResources.php:427 ManageModuleAndResources.php:436
-msgid ""
-"An error occured when updating vocabulary \"{prefix}\" and the associated "
-"properties: {message}"
-msgstr ""
-"Une erreur est survenue lors de la mise à jour du vocabulaire « {prefix} » "
-"et les propriétés associées : {message}"
-
-#: ManageModuleAndResources.php:531
-msgid ""
-"The following \"{name}\" of the vocabulary \"{label}\" were replaced: "
-"{members}"
-msgstr ""
-"Les « {name} » suivants du vocabulaire « {label} » ont été remplacés : "
-"{members}"
-
-#: ManageModuleAndResources.php:541
-msgid ""
-"Resources, values and templates were updated, but you may check settings "
-"where the old ones were used."
-msgstr ""
-"Les ressources, valeurs et modèles ont été mis à jour, mais vous pouvez "
-"vérifier les paramètres où les anciennes valeurs étaient utilisées."
-
-#: ManageModuleAndResources.php:568
-msgid ""
-"The resource template named \"{template}\" is already available and is "
-"skipped."
-msgstr ""
-"Le modèle de ressource nommé « {template} » est déjà disponible et a été "
-"conservé."
-
-#: ManageModuleAndResources.php:766
-msgid "The custom vocab named \"{custom_vocab}\" is not available."
-msgstr ""
-"Le vocabulaire personnalisé nommé « {custom_vocab} » n’est pas disponible."
-
-#: ManageModuleAndResources.php:975
-msgid "No file or url set for the vocabulary."
-msgstr "Pas de fichier ou d’url pour le vocabulaire."
-
-#: ManageModuleAndResources.php:984
-msgid "The file \"{file}\" cannot be read. Check the url."
-msgstr "Le fichier « {file} » ne peut pas être lu. Merci de vérifier l’url."
-
-#: ManageModuleAndResources.php:995
-msgid "The file \"{file}\" cannot be read. Check the file."
-msgstr ""
-"Le fichier « {file} » ne peut pas être lu. Merci de vérifier le fichier."
-
-#: ManageModuleAndResources.php:1016
-msgid "A vocabulary must have a namespace uri and a prefix."
-msgstr "Un vocabulaire doit avoir une uri pour l’espace de nom et un préfixe."
-
-#: TraitModule.php:125 TraitModule.php:1037
-msgid "This module requires the module \"{module}\"."
-msgstr "Ce module requiert le module « {module} »."
-
-#: TraitModule.php:130
-msgid "This module requires modules \"{modules}\"."
-msgstr "Ce module requiert les modules « {modules} »."
-
-#: TraitModule.php:139
-msgid "This module has resources that cannot be installed."
-msgstr "Ce module a des ressources qui ne peuvent pas être installées."
-
-#: TraitModule.php:147
-msgid ""
-"This module cannot install its tables, because they exist already. Try to "
-"remove them first."
-msgstr ""
-"Ce module ne peut pas installer ses tables car elles existent déjà. Essayez "
-"de les supprimer manuellement."
-
-#: TraitModule.php:477
-msgid "The module removed tables \"{tables}\" from a previous broken install."
-msgstr ""
-"Le module a supprimé les tables \"{tables}\" depuis une installation échouée."
-
-#: TraitModule.php:1032
-msgid ""
-"This module requires the module \"{module}\", version {version} or above."
-msgstr ""
-"Ce module requiert le module « {module} », version {version} ou supérieure."
-
-#: TraitModule.php:1144
-msgid ""
-"The module \"{module}\" was automatically deactivated because the "
-"dependencies are unavailable."
-msgstr ""
-"Le module « {module} » a été automatiquement désactivé car ses dépendances "
-"ne sont plus disponibles."
-
-#: TraitModule.php:1166
-msgid "The directory \"{path}\" is not writeable."
-msgstr "Le dossier « {path} » n’est pas inscriptible."
-
-#: TraitModule.php:1177
-msgid "The directory \"{path}\" is not writeable: {error}."
-msgstr "Le dossier « {path} » n’est pas inscriptible : {error}"
-
-#: config/module.config.php:142
+#: config/module.config.php:138
 msgid "An error occurred."
 msgstr "Une erreur est survenue."
 
-#: config/module.config.php:145
+#: config/module.config.php:141
 msgid "OK"
 msgstr "OK"
 
