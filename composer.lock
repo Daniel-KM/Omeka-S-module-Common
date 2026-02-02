@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "27deb9c72596fe4baf21350b3dcf7b28",
+    "content-hash": "d680f37c2a366c83aeaadd4375d1dd0e",
     "packages": [
         {
             "name": "composer/installers",
@@ -153,14 +153,46 @@
             "time": "2024-06-24T20:46:46+00:00"
         },
         {
-            "name": "devbridge/jquery-autocomplete",
-            "version": "1.4.11",
-            "dist": {
-                "type": "file",
-                "url": "https://github.com/Daniel-KM/Omeka-S-module-Common/releases/download/3.4.71/jquery.autocomplete.min.js",
-                "reference": ""
+            "name": "daniel-km/jquery-autocomplete",
+            "version": "1.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://gitlab.com/Daniel-KM/jQuery-Autocomplete.git",
+                "reference": "fc17a5b86e70adbb5c8dcd2c981d97339784516a"
             },
-            "type": "omeka-addon-asset"
+            "dist": {
+                "type": "zip",
+                "url": "https://gitlab.com/api/v4/projects/Daniel-KM%2FjQuery-Autocomplete/repository/archive.zip?sha=fc17a5b86e70adbb5c8dcd2c981d97339784516a",
+                "reference": "fc17a5b86e70adbb5c8dcd2c981d97339784516a",
+                "shasum": ""
+            },
+            "type": "library",
+            "extra": {
+                "assets": [
+                    "dist/jquery.autocomplete.min.js"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Tomas Kirda",
+                    "email": "tomas.kirda@devbridge.com"
+                }
+            ],
+            "description": "Ajax Autocomplete for jQuery",
+            "keywords": [
+                "ajax",
+                "autocomplete",
+                "jquery"
+            ],
+            "support": {
+                "issues": "https://gitlab.com/Daniel-KM/jQuery-Autocomplete/-/issues",
+                "source": "https://gitlab.com/Daniel-KM/jQuery-Autocomplete/-/tree/1.5.0"
+            },
+            "time": "2026-02-02T00:00:00+00:00"
         },
         {
             "name": "oomphinc/composer-installers-extender",

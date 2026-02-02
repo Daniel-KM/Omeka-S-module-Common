@@ -24,7 +24,7 @@
         "omeka/omeka-s-core": "^4.0"
     },
     "require": {
-        "devbridge/jquery-autocomplete": "^1.4.11",
+        "daniel-km/jquery-autocomplete": "^1.5",
         "oomphinc/composer-installers-extender": "^2.0"
     },
     "autoload": {
@@ -37,21 +37,6 @@
             "CommonTest\\": "tests/CommonTest/"
         }
     },
-    "repositories": [
-        {
-            "type": "package",
-            "package": {
-                "name": "devbridge/jquery-autocomplete",
-                "version": "1.4.11",
-                "type": "omeka-addon-asset",
-                "dist": {
-                    "type": "file",
-                    "url": "https://github.com/Daniel-KM/Omeka-S-module-Common/releases/download/3.4.71/jquery.autocomplete.min.js",
-                    "reference": ""
-                }
-            }
-        }
-    ],
     "config": {
         "platform": {
             "php": "7.4"
@@ -62,12 +47,9 @@
         }
     },
     "extra": {
-        "installer-types": [
-            "omeka-addon-asset"
-        ],
         "installer-paths": {
-            "asset/vendor/{$name}/": [
-                "type:omeka-addon-asset"
+            "asset/vendor/jquery-autocomplete/": [
+                "daniel-km/jquery-autocomplete"
             ]
         }
     }
