@@ -1,0 +1,89 @@
+/**
+ * Manage dialog and actions for admin.
+ *
+ * Unlike common-dialog.css, this version does not include messages and status
+ * styles (.success, .error, .warning, .messages), which are already managed by
+ * the Omeka admin css.
+ *
+ * @see common-dialog.css for the full public version.
+ */
+
+@media all {
+
+    [hidden],
+    .hidden {
+        display: none;
+    }
+
+    /** Dialog */
+
+    #content dialog {
+        margin: auto;
+    }
+    .dialog-header,
+    .dialog-contents,
+    .dialog-heading,
+    .dialog-message,
+    .dialog-body,
+	.dialog-footer {
+        margin-top: 1em;
+    }
+    dialog .dialog-header-close-button {
+       float: right;
+    }
+    dialog form input,
+    dialog form select,
+    dialog form textarea {
+       width: 100%;
+    }
+    dialog form textarea {
+       height: 240px;
+    }
+    .dialog-footer {
+        display: flex;
+        justify-content: center;
+        gap: 1em;
+    }
+
+    .is-busy span.fas:not(.fa-spin):first-child {
+        display: none;
+    }
+    a .spinner,
+    input .spinner,
+    button .spinner,
+    .is-busy span.fas:first-child {
+        margin-left: 1em;
+    }
+    a span span.fas:first-child + .spinner,
+    input span.fas:first-child + .spinner,
+    button span.fas:first-child + .spinner {
+        margin-left: inherit;
+    }
+    .icons-only a .spinner,
+    .icons-only input .spinner,
+    .icons-only button .spinner,
+    a .spinner.icon-only,
+    input .spinner.icon-only,
+    button .spinner.icon-only {
+        margin-left: inherit;
+    }
+    /* Icon-only buttons: spinner replaces icon without margin */
+    button.is-busy:has(> span.fas:only-of-type) .spinner,
+    a.is-busy:has(> span.fas:only-of-type) .spinner {
+        margin-left: 0;
+    }
+    /* Fallback for browsers without :has() support */
+    .single-action.is-busy .spinner {
+        margin-left: 0;
+    }
+
+    /** Actions */
+
+    /* Fix omeka text-indent -9999px for single buttons, that are not used in omeka for now. */
+    .actions .no-action,
+    .actions .single-action {
+        text-indent: initial;
+        padding-left: 8px;
+    }
+
+}
