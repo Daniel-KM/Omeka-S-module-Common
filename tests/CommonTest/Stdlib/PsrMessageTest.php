@@ -174,4 +174,50 @@ class PsrMessageTest extends TestCase
         $result = $message->setEscapeHtml(false);
         $this->assertSame($message, $result);
     }
+
+    public function testInstanceOfOmekaPsrMessage(): void
+    {
+        $message = new PsrMessage('Test');
+        $this->assertInstanceOf(\Omeka\Stdlib\PsrMessage::class, $message);
+    }
+
+    public function testInstanceOfMessageInterface(): void
+    {
+        $message = new PsrMessage('Test');
+        $this->assertInstanceOf(\Omeka\Stdlib\MessageInterface::class, $message);
+    }
+
+    public function testTranslateWithTranslatorInterface(): void
+    {
+        $translator = $this->createMock(\Laminas\I18n\Translator\TranslatorInterface::class);
+        $translator->method('translate')
+            ->with('Hello {name}', 'default', null)
+            ->willReturn('Bonjour {name}');
+
+        $message = new PsrMessage('Hello {name}', ['name' => 'World']);
+        $this->assertSame('Bonjour World', $message->translate($translator));
+    }
+
+    public function testTranslateSprintfWithTranslatorInterface(): void
+    {
+        $translator = $this->createMock(\Laminas\I18n\Translator\TranslatorInterface::class);
+        $translator->method('translate')
+            ->with('Value: %d', 'default', null)
+            ->willReturn('Valeur : %d');
+
+        $message = new PsrMessage('Value: %d', 123);
+        $this->assertSame('Valeur : 123', $message->translate($translator));
+    }
+
+    public function testTranslateWithInternalTranslator(): void
+    {
+        $translator = $this->createMock(\Laminas\I18n\Translator\TranslatorInterface::class);
+        $translator->method('translate')
+            ->with('Hello {name}', 'default', null)
+            ->willReturn('Bonjour {name}');
+
+        $message = new PsrMessage('Hello {name}', ['name' => 'World']);
+        $message->setTranslator($translator);
+        $this->assertSame('Bonjour World', $message->translate());
+    }
 }

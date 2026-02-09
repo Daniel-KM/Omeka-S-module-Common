@@ -1269,8 +1269,6 @@ trait TraitModule
     protected function ensurePsrMessage(): self
     {
         if (!class_exists('Common\Stdlib\PsrMessage', false)) {
-            require_once __DIR__ . '/Stdlib/PsrInterpolateInterface.php';
-            require_once __DIR__ . '/Stdlib/PsrInterpolateTrait.php';
             require_once __DIR__ . '/Stdlib/PsrMessage.php';
         }
         return $this;
