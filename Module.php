@@ -49,6 +49,13 @@ class Module extends AbstractModule
      */
     protected function preparePsrMessage(): void
     {
+        // Polyfill core PsrMessage classes for Omeka S < 4.2.
+        if (version_compare(\Omeka\Module::VERSION, '4.2', '<')) {
+            require_once __DIR__ . '/data/compat/MessageInterface.php';
+            require_once __DIR__ . '/data/compat/PsrInterpolateInterface.php';
+            require_once __DIR__ . '/data/compat/PsrInterpolateTrait.php';
+            require_once __DIR__ . '/data/compat/PsrMessage.php';
+        }
         require_once __DIR__ . '/src/Stdlib/PsrInterpolateInterface.php';
         require_once __DIR__ . '/src/Stdlib/PsrInterpolateTrait.php';
         require_once __DIR__ . '/src/Stdlib/PsrMessage.php';

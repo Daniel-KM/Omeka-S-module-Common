@@ -28,6 +28,14 @@
 
 namespace Common;
 
+// Polyfill core PsrMessage classes for Omeka S < 4.2.
+if (version_compare(\Omeka\Module::VERSION, '4.2', '<')) {
+    require_once dirname(__DIR__) . '/data/compat/MessageInterface.php';
+    require_once dirname(__DIR__) . '/data/compat/PsrInterpolateInterface.php';
+    require_once dirname(__DIR__) . '/data/compat/PsrInterpolateTrait.php';
+    require_once dirname(__DIR__) . '/data/compat/PsrMessage.php';
+}
+
 use Common\Stdlib\PsrMessage;
 use Laminas\EventManager\Event;
 use Laminas\I18n\Translator\TranslatorInterface;
