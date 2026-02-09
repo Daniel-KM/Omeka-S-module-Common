@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-02 00:00+0000\n"
+"POT-Creation-Date: 2026-02-09 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -34,22 +34,22 @@ msgstr ""
 msgid "Not found."
 msgstr ""
 
-#: src/Stdlib/PsrMessage.php:205
+#: src/Stdlib/PsrMessage.php:165
 msgid "default"
 msgstr ""
 
-#: Module.php:64
+#: Module.php:70
 msgid ""
 "The php extension \"intl\" is not available. It is recommended to install it "
 "to manage diacritics and non-latin characters and to translate dates, "
 "numbers and more."
 msgstr ""
 
-#: Module.php:177
+#: Module.php:183
 msgid "A background job has been started to add database indexes."
 msgstr ""
 
-#: Module.php:199
+#: Module.php:205
 msgid "The module Generic is no longer needed and can be removed."
 msgstr ""
 
@@ -83,50 +83,50 @@ msgstr ""
 msgid "Too long subject."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/SendEmail.php:82
+#: src/Mvc/Controller/Plugin/SendEmail.php:87
 msgid "Email not sent: the content is missing (subject: {subject})."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/SendEmail.php:94
+#: src/Mvc/Controller/Plugin/SendEmail.php:99
 msgid "Email not sent: there is no recipient (subject: {subject})."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/SendEmail.php:123
+#: src/Mvc/Controller/Plugin/SendEmail.php:128
 msgid ""
 "Email not sent: the sender \"{sender}\" is not valid (subject: {subject})."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/SendEmail.php:130
+#: src/Mvc/Controller/Plugin/SendEmail.php:135
 msgid ""
 "Email not sent: the sender email \"{sender}\" is invalid (subject: "
 "{subject})."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/SendEmail.php:143
+#: src/Mvc/Controller/Plugin/SendEmail.php:151
 msgid ""
 "Email not sent: this is a spam with \"{keyword}\" (To: {to}; From: {from}): "
 "{body}"
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/SendEmail.php:190
+#: src/Mvc/Controller/Plugin/SendEmail.php:198
 msgid "Email not sent: the cc emails {list} are invalid (subject: {subject})."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/SendEmail.php:202
+#: src/Mvc/Controller/Plugin/SendEmail.php:210
 msgid "Email not sent: the bcc emails {list} are invalid (subject: {subject})."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/SendEmail.php:214
+#: src/Mvc/Controller/Plugin/SendEmail.php:222
 msgid ""
 "Email not sent: the reply-to emails {list} are invalid (subject: {subject})."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/SendEmail.php:230
+#: src/Mvc/Controller/Plugin/SendEmail.php:238
 msgid "An email was sent to {recipients} with subject: {subject}"
 msgstr ""
 
 #: src/View/Helper/MediaTypeSelect.php:40
-#: src/Service/Form/Element/MediaTypeSelectFactory.php:28
+#: src/Service/Form/Element/MediaTypeSelectFactory.php:35
 msgid "Select media type…"
 msgstr ""
 
@@ -351,44 +351,44 @@ msgstr ""
 msgid "A vocabulary must have a namespace uri and a prefix."
 msgstr ""
 
-#: src/TraitModule.php:123 src/TraitModule.php:1035
+#: src/TraitModule.php:141 src/TraitModule.php:1091
 msgid "This module requires the module \"{module}\"."
 msgstr ""
 
-#: src/TraitModule.php:128
+#: src/TraitModule.php:146
 msgid "This module requires modules \"{modules}\"."
 msgstr ""
 
-#: src/TraitModule.php:137
+#: src/TraitModule.php:155
 msgid "This module has resources that cannot be installed."
 msgstr ""
 
-#: src/TraitModule.php:145
+#: src/TraitModule.php:163
 msgid ""
 "This module cannot install its tables, because they exist already. Try to "
 "remove them first."
 msgstr ""
 
-#: src/TraitModule.php:475
+#: src/TraitModule.php:493
 msgid "The module removed tables \"{tables}\" from a previous broken install."
 msgstr ""
 
-#: src/TraitModule.php:1030
+#: src/TraitModule.php:1086
 msgid ""
 "This module requires the module \"{module}\", version {version} or above."
 msgstr ""
 
-#: src/TraitModule.php:1142
+#: src/TraitModule.php:1198
 msgid ""
 "The module \"{module}\" was automatically deactivated because the "
 "dependencies are unavailable."
 msgstr ""
 
-#: src/TraitModule.php:1164
+#: src/TraitModule.php:1220
 msgid "The directory \"{path}\" is not writeable."
 msgstr ""
 
-#: src/TraitModule.php:1175
+#: src/TraitModule.php:1231
 msgid "The directory \"{path}\" is not writeable: {error}."
 msgstr ""
 

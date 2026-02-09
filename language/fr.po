@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-02 00:00+0000\n"
-"PO-Revision-Date: 2026-02-02 00:00+0000\n"
+"POT-Creation-Date: 2026-02-09 00:00+0000\n"
+"PO-Revision-Date: 2026-02-09 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -34,11 +34,11 @@ msgstr "Le statut « %s » n’est pas pris en charge par jSend."
 msgid "Not found."
 msgstr "Non trouvé."
 
-#: src/Stdlib/PsrMessage.php:205
+#: src/Stdlib/PsrMessage.php:165
 msgid "default"
 msgstr "défaut"
 
-#: Module.php:64
+#: Module.php:70
 msgid ""
 "The php extension \"intl\" is not available. It is recommended to install it "
 "to manage diacritics and non-latin characters and to translate dates, "
@@ -48,15 +48,15 @@ msgstr ""
 "gérer les caractères diacritiques et non-latin et pour traduire les dates, "
 "les nombres et plus."
 
-#: Module.php:177
+#: Module.php:183
 msgid "A background job has been started to add database indexes."
 msgstr ""
 "Une tâche en arrière plan a été lancée pour ajouter des index à la base de "
 "données."
 
-#: Module.php:199
+#: Module.php:205
 msgid "The module Generic is no longer needed and can be removed."
-msgstr "Le module Generic n’est plus nécessaire et peux être supprimé."
+msgstr "Le module Generic n’est plus nécessaire et peut être supprimé."
 
 #: src/Mvc/Controller/Plugin/SpecifyMediaType.php:150
 msgid ""
@@ -95,21 +95,21 @@ msgstr "Message trop long."
 msgid "Too long subject."
 msgstr "Sujet trop long."
 
-#: src/Mvc/Controller/Plugin/SendEmail.php:82
+#: src/Mvc/Controller/Plugin/SendEmail.php:87
 msgid "Email not sent: the content is missing (subject: {subject})."
 msgstr "Mail non envoyé : pas de contenu (sujet : {subject})."
 
-#: src/Mvc/Controller/Plugin/SendEmail.php:94
+#: src/Mvc/Controller/Plugin/SendEmail.php:99
 msgid "Email not sent: there is no recipient (subject: {subject})."
 msgstr "Mail non envoyé : pas de destinataire (sujet : {subject})."
 
-#: src/Mvc/Controller/Plugin/SendEmail.php:123
+#: src/Mvc/Controller/Plugin/SendEmail.php:128
 msgid ""
 "Email not sent: the sender \"{sender}\" is not valid (subject: {subject})."
 msgstr ""
 "Mail non envoyé : l’expéditeur « {sender} » est invalide (sujet : {subject})."
 
-#: src/Mvc/Controller/Plugin/SendEmail.php:130
+#: src/Mvc/Controller/Plugin/SendEmail.php:135
 msgid ""
 "Email not sent: the sender email \"{sender}\" is invalid (subject: "
 "{subject})."
@@ -117,7 +117,7 @@ msgstr ""
 "Mail non envoyé : le mail de l’expéditeur « {sender} » est invalide (sujet : "
 "{subject})."
 
-#: src/Mvc/Controller/Plugin/SendEmail.php:143
+#: src/Mvc/Controller/Plugin/SendEmail.php:151
 msgid ""
 "Email not sent: this is a spam with \"{keyword}\" (To: {to}; From: {from}): "
 "{body}"
@@ -125,31 +125,31 @@ msgstr ""
 "Mail non envoyé : c’est un spam avec « {keyword} » (pour : {to}, de : "
 "{from}) : {body}"
 
-#: src/Mvc/Controller/Plugin/SendEmail.php:190
+#: src/Mvc/Controller/Plugin/SendEmail.php:198
 msgid "Email not sent: the cc emails {list} are invalid (subject: {subject})."
 msgstr ""
 "Mail non envoyé : les mails en copie « {list} » sont invalides (sujet : "
 "{subject})."
 
-#: src/Mvc/Controller/Plugin/SendEmail.php:202
+#: src/Mvc/Controller/Plugin/SendEmail.php:210
 msgid "Email not sent: the bcc emails {list} are invalid (subject: {subject})."
 msgstr ""
 "Mail non envoyé : les mails en copie cachée « {list} » sont invalides "
 "(sujet : {subject})."
 
-#: src/Mvc/Controller/Plugin/SendEmail.php:214
+#: src/Mvc/Controller/Plugin/SendEmail.php:222
 msgid ""
 "Email not sent: the reply-to emails {list} are invalid (subject: {subject})."
 msgstr ""
 "Mail non envoyé : les mails répondre-à « {list} » sont invalides (sujet : "
 "{subject})."
 
-#: src/Mvc/Controller/Plugin/SendEmail.php:230
+#: src/Mvc/Controller/Plugin/SendEmail.php:238
 msgid "An email was sent to {recipients} with subject: {subject}"
 msgstr "Un mail a été envoyé à {recipients} avec le sujet : {subject}."
 
 #: src/View/Helper/MediaTypeSelect.php:40
-#: src/Service/Form/Element/MediaTypeSelectFactory.php:28
+#: src/Service/Form/Element/MediaTypeSelectFactory.php:35
 msgid "Select media type…"
 msgstr "Choisir un type de média…"
 
@@ -406,19 +406,19 @@ msgstr ""
 msgid "A vocabulary must have a namespace uri and a prefix."
 msgstr "Un vocabulaire doit avoir une uri pour l’espace de nom et un préfixe."
 
-#: src/TraitModule.php:123 src/TraitModule.php:1035
+#: src/TraitModule.php:141 src/TraitModule.php:1091
 msgid "This module requires the module \"{module}\"."
 msgstr "Ce module requiert le module « {module} »."
 
-#: src/TraitModule.php:128
+#: src/TraitModule.php:146
 msgid "This module requires modules \"{modules}\"."
 msgstr "Ce module requiert les modules « {modules} »."
 
-#: src/TraitModule.php:137
+#: src/TraitModule.php:155
 msgid "This module has resources that cannot be installed."
 msgstr "Ce module a des ressources qui ne peuvent pas être installées."
 
-#: src/TraitModule.php:145
+#: src/TraitModule.php:163
 msgid ""
 "This module cannot install its tables, because they exist already. Try to "
 "remove them first."
@@ -426,18 +426,18 @@ msgstr ""
 "Ce module ne peut pas installer ses tables car elles existent déjà. Essayez "
 "de les supprimer manuellement."
 
-#: src/TraitModule.php:475
+#: src/TraitModule.php:493
 msgid "The module removed tables \"{tables}\" from a previous broken install."
 msgstr ""
 "Le module a supprimé les tables \"{tables}\" depuis une installation échouée."
 
-#: src/TraitModule.php:1030
+#: src/TraitModule.php:1086
 msgid ""
 "This module requires the module \"{module}\", version {version} or above."
 msgstr ""
 "Ce module requiert le module « {module} », version {version} ou supérieure."
 
-#: src/TraitModule.php:1142
+#: src/TraitModule.php:1198
 msgid ""
 "The module \"{module}\" was automatically deactivated because the "
 "dependencies are unavailable."
@@ -445,11 +445,11 @@ msgstr ""
 "Le module « {module} » a été automatiquement désactivé car ses dépendances "
 "ne sont plus disponibles."
 
-#: src/TraitModule.php:1164
+#: src/TraitModule.php:1220
 msgid "The directory \"{path}\" is not writeable."
 msgstr "Le dossier « {path} » n’est pas inscriptible."
 
-#: src/TraitModule.php:1175
+#: src/TraitModule.php:1231
 msgid "The directory \"{path}\" is not writeable: {error}."
 msgstr "Le dossier « {path} » n’est pas inscriptible : {error}"
 
