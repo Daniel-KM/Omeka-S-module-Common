@@ -4,8 +4,121 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0dbf5a39a0bc252d008a00c2dbc2751b",
-    "packages": [],
+    "content-hash": "74ab689c002769a444550873a32fa5e3",
+    "packages": [
+        {
+            "name": "sempia/common-symlink",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://gitlab.com/Sempia/composer-plugin-common-symlink.git",
+                "reference": "5797d3dbe5c11fa238f37b20e28aa82c6089d513"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://gitlab.com/api/v4/projects/Sempia%2Fcomposer-plugin-common-symlink/repository/archive.zip?sha=5797d3dbe5c11fa238f37b20e28aa82c6089d513",
+                "reference": "5797d3dbe5c11fa238f37b20e28aa82c6089d513",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^2.0",
+                "php": ">=7.4"
+            },
+            "require-dev": {
+                "composer/composer": "^2.0"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "Sempia\\CommonSymlink\\CommonSymlinkPlugin"
+            },
+            "autoload": {
+                "psr-4": {
+                    "Sempia\\CommonSymlink\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "CECILL-2.1"
+            ],
+            "authors": [
+                {
+                    "name": "Daniel Berthereau",
+                    "email": "Daniel.fr@Berthereau.net"
+                }
+            ],
+            "description": "Composer plugin to create symlink for Omeka S module Common (backward compatibility with old modules)",
+            "homepage": "https://gitlab.com/sempia/composer-plugin-common-symlink",
+            "keywords": [
+                "common",
+                "composer-plugin",
+                "omeka-s",
+                "symlink"
+            ],
+            "support": {
+                "issues": "https://gitlab.com/Sempia/composer-plugin-common-symlink/-/issues",
+                "source": "https://gitlab.com/Sempia/composer-plugin-common-symlink/-/tree/1.0.0"
+            },
+            "time": "2026-02-09T00:00:00+00:00"
+        },
+        {
+            "name": "sempia/external-assets",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://gitlab.com/Sempia/composer-plugin-external-assets.git",
+                "reference": "3c101e7edb043daabfcc45871a3b048bf8a38e96"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://gitlab.com/api/v4/projects/Sempia%2Fcomposer-plugin-external-assets/repository/archive.zip?sha=3c101e7edb043daabfcc45871a3b048bf8a38e96",
+                "reference": "3c101e7edb043daabfcc45871a3b048bf8a38e96",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^2.0",
+                "php": ">=7.2.5"
+            },
+            "require-dev": {
+                "composer/composer": "^2.0",
+                "phpunit/phpunit": "^8.5 || ^9.6"
+            },
+            "bin": [
+                "bin/external-assets"
+            ],
+            "type": "composer-plugin",
+            "extra": {
+                "class": "Sempia\\ExternalAssets\\ExternalAssetsPlugin"
+            },
+            "autoload": {
+                "psr-4": {
+                    "Sempia\\ExternalAssets\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "CECILL-2.1"
+            ],
+            "authors": [
+                {
+                    "name": "Daniel Berthereau",
+                    "email": "Daniel.fr@Berthereau.net"
+                }
+            ],
+            "description": "Composer plugin to download external assets (JS, CSS, fonts, images) for any PHP project",
+            "homepage": "https://gitlab.com/sempia/composer-plugin-external-assets",
+            "keywords": [
+                "assets",
+                "composer-plugin",
+                "download",
+                "external"
+            ],
+            "support": {
+                "issues": "https://gitlab.com/Sempia/composer-plugin-external-assets/-/issues",
+                "source": "https://gitlab.com/Sempia/composer-plugin-external-assets/-/tree/1.0.1"
+            },
+            "time": "2026-02-09T00:00:00+00:00"
+        }
+    ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
