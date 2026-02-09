@@ -26,6 +26,11 @@ class DataTypeSelect extends Select
      */
     protected $dataDataTypes = [];
 
+    /**
+     * @var ?array Static cache shared across all instances.
+     */
+    protected static $dataDataTypesCache;
+
     public function getValueOptions(): array
     {
         // Set a flag to fix recursive methods when a validator is set or to use
@@ -87,10 +92,14 @@ class DataTypeSelect extends Select
     }
 
     /**
-     * Create the list of data types one time early.
+     * Create the list of data types one time, shared across all instances.
      */
     protected function prepareDataDataTypes(): self
     {
+        if (static::$dataDataTypesCache !== null) {
+            $this->dataDataTypes = static::$dataDataTypesCache;
+            return $this;
+        }
         $this->dataDataTypes = [];
         foreach ($this->dataTypeManager->getRegisteredNames() as $dataTypeName) {
             /** @var \Omeka\DataType\DataTypeInterface $dataType */
@@ -101,6 +110,7 @@ class DataTypeSelect extends Select
                 'opt_group_label' => $dataType->getOptgroupLabel(),
             ];
         }
+        static::$dataDataTypesCache = $this->dataDataTypes;
         return $this;
     }
 }
