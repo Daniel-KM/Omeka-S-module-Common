@@ -27,6 +27,11 @@ class SendEmail extends AbstractPlugin
      */
     protected $settings;
 
+    /**
+     * @var ?array
+     */
+    protected static $spamKeywords;
+
     public function __construct(Logger $logger, Mailer $mailer, Settings $settings)
     {
         $this->logger = $logger;
@@ -134,7 +139,10 @@ class SendEmail extends AbstractPlugin
             }
         }
 
-        $spamKeywords = include dirname(__DIR__, 4) . '/data/mailer/spam_keywords.php';
+        if (static::$spamKeywords === null) {
+            static::$spamKeywords = include dirname(__DIR__, 4) . '/data/mailer/spam_keywords.php';
+        }
+        $spamKeywords = static::$spamKeywords;
         $bodyLower = mb_strtolower($body);
         foreach ($spamKeywords as $spamKeyword) {
             // str_contains() is not always utf-8 safe with ascii keywords.
