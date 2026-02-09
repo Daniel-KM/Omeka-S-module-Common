@@ -711,12 +711,12 @@ class EasyMeta
         if (!$dataType) {
             return null;
         }
-        $name = mb_strtolower($dataType);
+        $dataType = mb_strtolower($dataType);
         if (isset(static::DATA_TYPES_MAIN[$dataType])) {
             return static::DATA_TYPES_MAIN[$dataType];
         }
         // Manage an exception in ValueSuggest: geonames features has no uri.
-        if ($name === 'valuesuggestall:geonames:features') {
+        if ($dataType === 'valuesuggestall:geonames:features') {
             return 'literal';
         }
         // Module ValueSuggest.
@@ -1231,7 +1231,7 @@ class EasyMeta
         if (static::$resourceTemplateIdsByLabelsAndIds === null) {
             $this->initResourceTemplates();
         }
-        return static::$resourceTemplateIdsByLabelsAndIds[$labelOrId] ?? null;
+        return static::$resourceTemplateLabelsByLabelsAndIds[$labelOrId] ?? null;
     }
 
     /**
@@ -1675,7 +1675,7 @@ class EasyMeta
             ->orderBy('resource_template.id', 'asc')
         ;
         $result = $this->connection->executeQuery($qb)->fetchAllKeyValue();
-        static::$resourceTemplateClassesByIds = array_map(fn ($v) => $v ? null : (int) $v, $result);
+        static::$resourceTemplateClassesByIds = array_map(fn ($v) => $v !== null ? (int) $v : null, $result);
     }
 
     protected function initVocabularies(): void
