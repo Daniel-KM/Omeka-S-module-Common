@@ -13,7 +13,7 @@ class MediaTypeSelectFactory implements FactoryInterface
      */
     protected static $mediaTypes;
 
-    public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $services, $requestedName, ?array $options = null)
     {
         if (static::$mediaTypes === null) {
             /** @var \Doctrine\DBAL\Connection $connection */

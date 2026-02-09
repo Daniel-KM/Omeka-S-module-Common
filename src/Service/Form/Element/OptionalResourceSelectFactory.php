@@ -8,7 +8,7 @@ use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class OptionalResourceSelectFactory implements FactoryInterface
 {
-    public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $services, $requestedName, ?array $options = null)
     {
         $element = new OptionalResourceSelect(null, $options ?? []);
         $element->setApiManager($services->get('Omeka\ApiManager'));

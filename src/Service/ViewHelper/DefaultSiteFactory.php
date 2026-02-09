@@ -16,7 +16,7 @@ class DefaultSiteFactory implements FactoryInterface
      *
      * @return DefaultSite
      */
-    public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $services, $requestedName, ?array $options = null)
     {
         // Pass a lazy resolver closure so DB/API queries only run when the
         // helper is actually invoked, not at construction time.

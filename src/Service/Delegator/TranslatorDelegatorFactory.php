@@ -12,7 +12,7 @@ use Laminas\ServiceManager\Factory\DelegatorFactoryInterface;
 class TranslatorDelegatorFactory implements DelegatorFactoryInterface
 {
     public function __invoke(ContainerInterface $container, $name,
-        callable $callback, array $options = null
+        callable $callback, ?array $options = null
     ) {
         /**
          * The callback is processed via Omeka TranslatorDelegatorFactory, so it

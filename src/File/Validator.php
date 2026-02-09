@@ -11,7 +11,7 @@ use Omeka\Stdlib\ErrorStore;
  */
 class Validator extends \Omeka\File\Validator
 {
-    public function validate(TempFile $tempFile, ErrorStore $errorStore = null)
+    public function validate(TempFile $tempFile, ?ErrorStore $errorStore = null)
     {
         $isValid = true;
         if ($this->disable) {

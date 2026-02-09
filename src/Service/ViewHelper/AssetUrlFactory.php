@@ -23,7 +23,7 @@ class AssetUrlFactory implements FactoryInterface
      *
      * @return AssetUrl
      */
-    public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $services, $requestedName, ?array $options = null)
     {
         $assetConfig = $services->get('Config')['assets'];
         return new AssetUrl(

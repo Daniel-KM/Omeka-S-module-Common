@@ -8,7 +8,7 @@ use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class MatchedRouteNameFactory implements FactoryInterface
 {
-    public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $services, $requestedName, ?array $options = null)
     {
         return new MatchedRouteName(
             $services->get('Application')->getMvcEvent()->getRouteMatch()->getMatchedRouteName()
