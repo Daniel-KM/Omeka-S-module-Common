@@ -4,15 +4,35 @@ namespace Common\Stdlib;
 
 use Laminas\I18n\Translator\TranslatorAwareInterface;
 use Laminas\I18n\Translator\TranslatorAwareTrait;
+use Laminas\I18n\Translator\TranslatorInterface;
 
 /**
- * Manage a message with a context list of placeholders formatted as psr-3.
+ * Manage message with context placeholders formatted as psr-3 or as sprintf.
  *
- * Copy of Omeka Message, except the constructor, that requires an array, and
- * the possibility to translate automatically when the translator is enabled.
- * Generally, the translator is not set, as it is usually managed internally.
+ * PsrMessage was integrated in Omeka S v4.2, so this new version is no more
+ * standalone and extends it to be recognized natively, in particular by the
+ * core translator delegator (\Omeka\I18n\Translator).
+ *
+ * Additional features:
+ * - TranslatorAwareInterface: set translator then use translate() without args.
+ * - Variadic constructor: supports both PSR-3 array context and sprintf-style
+ *   positional arguments for backward compatibility with \Omeka\Stdlib\Message.
+ * - Polymorphic translate(): accepts TranslatorInterface as first arg (core) or
+ *   translator interface aware signature (no args).
  *
  * ```
+ * // PSR-3 style (recommended):
+ * $message = new PsrMessage('Hello {name}', ['name' => 'World']);
+ *
+ * // Sprintf style (backward compatibility):
+ * $message = new PsrMessage('Hello %s', 'World');
+ *
+ * // With internal translator (set translator if needed):
+ * echo $message->setTranslator($translator)->translate();
+ *
+ * // With explicit translator (Omeka core style):
+ * echo $message->translate($translator);
+ *
  * // To get a translator in a controller:
  * $translator = $this->getEvent()->getApplication()->getServiceManager()->get(\Laminas\I18n\Translator\TranslatorInterface::class);
  * // or (deprecated):
@@ -33,41 +53,18 @@ use Laminas\I18n\Translator\TranslatorAwareTrait;
  * $psrMessage->setTranslatorEnabled(false);
  * ```
  *
- * Should not be an extension of \Omeka\Stdlib\Message currently, because
- * another delegator cannot be set for the translator simply.
- * So when the PsrMessage is used in uncommon places (not with messenger or
- * logs), and as long as \Omeka\I18n\Translator doesn't manage PSR-3, the
- * message is interpolated directly, with translation if possible.
- *
  * Warning: When used with messenger, a PsrMessage must not contain another
- * PsrMessage as context. because messages are stored in the session that does
+ * PsrMessage as context, because messages are stored in the session that does
  * not support closures.
  *
- * @todo Set translator on construct.
- * @todo Move PsrMessage into core.
- * @fixme When a translator is set to a message during upgrade, it cannot be displayed via messenger because it cannot be serialized in session: PHP Fatal error:  Uncaught Exception: Serialization of 'Closure' is not allowed in /vendor/laminas/laminas-session/src/SessionManager.php:240.
+ * @fixme When a translator is set to a message during upgrade, it cannot be displayed via messenger because it cannot be serialized in session. See if it is still the case.
  *
+ * @see \Omeka\Stdlib\PsrMessage
  * @see \Omeka\Stdlib\Message
  */
-class PsrMessage implements \JsonSerializable, PsrInterpolateInterface, TranslatorAwareInterface
+class PsrMessage extends \Omeka\Stdlib\PsrMessage implements TranslatorAwareInterface
 {
-    use PsrInterpolateTrait;
     use TranslatorAwareTrait;
-
-    /**
-     * @var string
-     */
-    protected $message = '';
-
-    /**
-     * @var array
-     */
-    protected $context = [];
-
-    /**
-     * @var bool
-     */
-    protected $escapeHtml = true;
 
     /**
      * @var bool
@@ -97,33 +94,9 @@ class PsrMessage implements \JsonSerializable, PsrInterpolateInterface, Translat
     }
 
     /**
-     * Get the message string.
-     */
-    public function getMessage(): string
-    {
-        return $this->message;
-    }
-
-    /**
-     * Get the message context.
-     */
-    public function getContext(): array
-    {
-        return $this->context;
-    }
-
-    /**
-     * Does this message have context?
-     */
-    public function hasContext(): bool
-    {
-        return (bool) $this->context;
-    }
-
-    /**
      * Get the message arguments for compatibility purpose only.
      *
-     * @deprecated Use hasContext() instead.
+     * @deprecated Use getContext() instead.
      * @return array Non-associative array in order to comply with sprintf.
      */
     public function getArgs()
@@ -143,26 +116,10 @@ class PsrMessage implements \JsonSerializable, PsrInterpolateInterface, Translat
         return (bool) $this->context;
     }
 
-    public function setEscapeHtml($escapeHtml): self
-    {
-        $this->escapeHtml = (bool) $escapeHtml;
-        return $this;
-    }
-
     /**
      * Get the flag escapeHtml.
      */
     public function getEscapeHtml(): bool
-    {
-        return $this->escapeHtml;
-    }
-
-    /**
-     * Get the flag escapeHtml. Kept for compatibility.
-     *
-     * @deprecated This is a getter, so use getEscapeHtml().
-     */
-    public function escapeHtml(): bool
     {
         return $this->escapeHtml;
     }
@@ -179,14 +136,11 @@ class PsrMessage implements \JsonSerializable, PsrInterpolateInterface, Translat
      * Get the contextualized final message, translated if translator is set.
      *
      * The translation is not done automatically for non-PSR messages, managed
-     * with sprintf(), for compatibiity with Message(). Use translate() to force
-     * it in that case.
-     *
-     * @return string
+     * with sprintf(), for compatibility with Message(). Use translate() to
+     * force it in that case.
      */
     public function __toString()
     {
-        // isSprintf is a compatibility with Message, so no translation is done.
         if ($this->isSprintf) {
             return $this->context
                 ? (string) vsprintf($this->message, array_values($this->context))
@@ -200,12 +154,31 @@ class PsrMessage implements \JsonSerializable, PsrInterpolateInterface, Translat
     /**
      * Translate the message with the context.
      *
-     * Same as TranslatorInterface::translate(), but the message is the current one.
+     * Supports both signatures:
+     * - Omeka core (MessageInterface): translate(TranslatorInterface $translator, $textDomain, $locale)
+     * - Common with TranslatorInterface: translate($textDomain, $locale) using translator set via interface
+     *
+     * @param TranslatorInterface|string $translatorOrTextDomain
+     * @param string|null $textDomainOrLocale
+     * @param string|null $locale
      */
-    public function translate($textDomain = 'default', $locale = null): string
+    public function translate($translatorOrTextDomain = 'default', $textDomainOrLocale = null, $locale = null): string
     {
-        // Check isTranslatorEnabled here? No: the check should be done outside
-        // of translate. Anyway, the default value is true and is never checked.
+        // Omeka core signature: first argument is a TranslatorInterface.
+        if ($translatorOrTextDomain instanceof TranslatorInterface) {
+            $translator = $translatorOrTextDomain;
+            $textDomain = $textDomainOrLocale ?? 'default';
+            if ($this->isSprintf) {
+                return $this->context
+                    ? (string) vsprintf($translator->translate($this->message, $textDomain, $locale), array_values($this->context))
+                    : (string) $this->message;
+            }
+            return $this->interpolate($translator->translate($this->message, $textDomain, $locale), $this->context);
+        }
+
+        // Internal translator set via setTranslator().
+        $textDomain = $translatorOrTextDomain;
+        $locale = $textDomainOrLocale;
         if ($this->hasTranslator()) {
             if ($this->isSprintf) {
                 return $this->context
@@ -213,14 +186,14 @@ class PsrMessage implements \JsonSerializable, PsrInterpolateInterface, Translat
                     : (string) $this->message;
             }
             return $this->interpolate($this->translator->translate($this->message, $textDomain, $locale), $this->context);
-        } else {
-            if ($this->isSprintf) {
-                return $this->context
-                    ? (string) vsprintf($this->message, array_values($this->context))
-                    : (string) $this->message;
-            }
-            return $this->interpolate($this->message, $this->context);
         }
+
+        if ($this->isSprintf) {
+            return $this->context
+                ? (string) vsprintf($this->message, array_values($this->context))
+                : (string) $this->message;
+        }
+        return $this->interpolate($this->message, $this->context);
     }
 
     public function jsonSerialize(): string
