@@ -41,8 +41,11 @@ class SendFile extends AbstractPlugin
      */
     public function __invoke(string $filepath, array $params): ?HttpResponse
     {
-        // A security. Don't check the realpath to avoid issue on some configs.
-        if (strpos($filepath, '../') !== false
+        // Security check: reject path traversal and null bytes.
+        // Don't use realpath() to avoid issues with some server configs
+        // (symlinks, mount points).
+        if (strpos($filepath, '..') !== false
+            || strpos($filepath, "\0") !== false
             || !file_exists($filepath)
             || !is_readable($filepath)
             || is_dir($filepath)
@@ -77,6 +80,8 @@ class SendFile extends AbstractPlugin
         $filename = isset($params['filename']) && strlen(trim($params['filename']))
             ? trim($params['filename'])
             : basename($filepath);
+        // Sanitize filename to prevent header injection via CRLF.
+        $filename = str_replace(["\r", "\n", "\0", '"'], '', $filename);
 
         $dispositionMode = $params['disposition_mode'] ?? 'inline';
         if ($dispositionMode === 'query') {

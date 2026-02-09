@@ -35,7 +35,7 @@ class ReadableDirectory extends AbstractValidator
 
         $path = $value;
 
-        if (strpos($value, '../') !== false || strpos($value, '/.') !== false) {
+        if (strpos($value, '..') !== false || strpos($value, '/.') !== false || strpos($value, "\0") !== false) {
             $this->error(self::NOT_RAW);
             return false;
         }
