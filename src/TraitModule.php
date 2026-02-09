@@ -560,8 +560,6 @@ trait TraitModule
     /**
      * Set, delete or update settings of all sites.
      *
-     * @todo Replace by a single query (for install, uninstall, main, setting, user).
-     *
      * @param string $process
      * @param array $values Values to use when process is update, by site id.
      * @return self
@@ -574,8 +572,6 @@ trait TraitModule
     /**
      * Set, delete or update settings of all users.
      *
-     * @todo Replace by a single query (for install, uninstall, main, setting, user).
-     *
      * @param string $process
      * @param array $values Values to use when process is update, by user id.
      * @return self
@@ -587,6 +583,10 @@ trait TraitModule
 
     /**
      * Set, delete or update settings for all targets (sites or users).
+     *
+     * For install and uninstall, batch SQL is used to avoid N×M individual
+     * queries (N targets × M settings). For update, per-target logic is kept
+     * because values differ by target.
      *
      * @param string $settingsType
      * @param string $settingsService
@@ -606,7 +606,45 @@ trait TraitModule
         if (!$defaultSettings) {
             return $this;
         }
+
         $services = $this->getServiceLocator();
+
+        // Use batch SQL for install/uninstall to avoid N×M individual queries.
+        if ($process === 'uninstall') {
+            /** @var \Doctrine\DBAL\Connection $connection */
+            $connection = $services->get('Omeka\Connection');
+            $table = $resourceName === 'sites' ? 'site_setting' : 'user_setting';
+            $settingNames = array_keys($defaultSettings);
+            if ($settingNames) {
+                $placeholders = implode(', ', array_fill(0, count($settingNames), '?'));
+                $connection->executeStatement(
+                    "DELETE FROM `$table` WHERE `id` IN ($placeholders)",
+                    $settingNames
+                );
+            }
+            return $this;
+        }
+
+        if ($process === 'install') {
+            /** @var \Doctrine\DBAL\Connection $connection */
+            $connection = $services->get('Omeka\Connection');
+            $table = $resourceName === 'sites' ? 'site_setting' : 'user_setting';
+            $targetColumn = $resourceName === 'sites' ? 'site_id' : 'user_id';
+            $targetTable = $resourceName === 'sites' ? '`site`' : '`user`';
+            $translator = $services->get(TranslatorInterface::class);
+            foreach ($defaultSettings as $name => $value) {
+                $value = $this->isSettingTranslatable($settingsType, $name)
+                    ? $translator->translate($value) : $value;
+                $connection->executeStatement(
+                    "INSERT INTO `$table` (`id`, `$targetColumn`, `value`)"
+                        . " SELECT ?, `id`, ? FROM $targetTable",
+                    [$name, json_encode($value)]
+                );
+            }
+            return $this;
+        }
+
+        // For "update", keep per-target logic since values differ by target.
         $settings = $services->get($settingsService);
         $api = $services->get('Omeka\ApiManager');
         $ids = $api->search($resourceName, [], ['returnScalar' => 'id'])->getContent();
