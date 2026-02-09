@@ -50,7 +50,11 @@ class AssetUrl extends \Omeka\View\Helper\AssetUrl
         }
 
         // Get current theme dynamically (may be set after helper creation).
-        $this->currentTheme = $this->themeManager->getCurrentTheme();
+        // Cache once resolved to avoid repeated calls (helper is invoked many
+        // times per page).
+        if ($this->currentTheme === null) {
+            $this->currentTheme = $this->themeManager->getCurrentTheme();
+        }
 
         return parent::__invoke($file, $module, $override, $versioned, $absolute);
     }
