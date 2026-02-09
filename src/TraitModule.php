@@ -36,6 +36,17 @@ if (version_compare(\Omeka\Module::VERSION, '4.2', '<')) {
     require_once dirname(__DIR__) . '/data/compat/PsrMessage.php';
 }
 
+// PsrMessage may not be autoloaded when Common is upgrading.
+if (!class_exists('Common\Stdlib\PsrMessage', false)) {
+    if (!interface_exists('Common\Stdlib\PsrInterpolateInterface', false)) {
+        require_once __DIR__ . '/Stdlib/PsrInterpolateInterface.php';
+    }
+    if (!trait_exists('Common\Stdlib\PsrInterpolateTrait', false)) {
+        require_once __DIR__ . '/Stdlib/PsrInterpolateTrait.php';
+    }
+    require_once __DIR__ . '/Stdlib/PsrMessage.php';
+}
+
 use Common\Stdlib\PsrMessage;
 use Laminas\EventManager\Event;
 use Laminas\I18n\Translator\TranslatorInterface;
