@@ -50,7 +50,10 @@ class NavigationTranslatorDelegatorFactory implements DelegatorFactoryInterface
                 $manager = $this->container->get('Omeka\Site\NavigationLinkManager');
                 $i18n = $this->container->get('MvcTranslator');
 
-                $buildLinks = function ($linksIn) use (&$buildLinks, $site, $manager, $urlHelper, $i18n) {
+                // Cache route validity to avoid calling $urlHelper() for every link.
+                $validRoutes = [];
+
+                $buildLinks = function ($linksIn) use (&$buildLinks, $site, $manager, $urlHelper, $i18n, &$validRoutes) {
                     $linksOut = [];
                     foreach ($linksIn as $key => $data) {
                         // Skip links whose type is not available (module not active).
@@ -63,10 +66,16 @@ class NavigationTranslatorDelegatorFactory implements DelegatorFactoryInterface
 
                         // Skip links with routes that don't exist (module being upgraded).
                         if (isset($linkZend['route'])) {
-                            try {
-                                $urlHelper($linkZend['route'], $linkZend['params'] ?? []);
-                            } catch (\Laminas\Router\Exception\RuntimeException $e) {
-                                // Route doesn't exist, skip this link.
+                            $route = $linkZend['route'];
+                            if (!isset($validRoutes[$route])) {
+                                try {
+                                    $urlHelper($route, $linkZend['params'] ?? []);
+                                    $validRoutes[$route] = true;
+                                } catch (\Laminas\Router\Exception\RuntimeException $e) {
+                                    $validRoutes[$route] = false;
+                                }
+                            }
+                            if (!$validRoutes[$route]) {
                                 continue;
                             }
                         }
