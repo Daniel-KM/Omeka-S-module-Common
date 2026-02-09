@@ -64,8 +64,9 @@ copy-paste common code between modules.
 - [PSR-3]
 
   - The logger can log messages in a standard, simple and translatable way.
-  - The class PsrMessage allows to use PSR-3 messages and is compliant with
-    C-style messages (with sprintf: %s, %d, etc.).
+  - The class PsrMessage extends core `\Omeka\Stdlib\PsrMessage` since Omeka S 4.2,
+    with translator awareness, PSR-3 and sprintf support. A polyfill is provided
+    for version before Omeka S 4.2.
 
 - One-Time tasks
 
@@ -110,8 +111,8 @@ From the root of Omeka S, install the module:
 composer require daniel-km/omeka-s-module-common
 ```
 
-The module is automatically downloaded in `addons/modules/` and ready to be
-enabled in the admin interface.
+The module is automatically downloaded in `composer-addons/modules/` and ready to
+be enabled in the admin interface.
 
 * From the zip
 
@@ -434,9 +435,32 @@ $message = new \Common\Stdlib\PsrMessage(
 );
 $this->logger()->info($message->getMessage(), $message->getContext());
 echo $message;
-// With translation.
-echo $message->setTranslator($translator);
+// Or with internal translator (laminas translator style).
+echo $message->setTranslator($translator)->translate();
+// With translator (Omeka core style, translator as first argument).
+echo $message->translate($translator);
 ```
+
+Since Omeka S v4.2, the core provides `\Omeka\Stdlib\PsrMessage`, which
+implements `MessageInterface` and is natively recognized by the core translator
+delegator. `Common\Stdlib\PsrMessage` extends it with additional features:
+
+- TranslatorAwareInterface: set translator then use translate() without args.
+- Variadic constructor: supports both PSR-3 array context and sprintf-style
+  positional arguments for backward compatibility with \Omeka\Stdlib\Message.
+- Polymorphic translate(): accepts TranslatorInterface as first arg (core) or
+  translator interface aware signature (no args).
+
+```php
+// PSR-3 style (recommended):
+$message = new \Common\Stdlib\PsrMessage('Hello {name}', ['name' => 'World']);
+
+// Sprintf style (backward compatibility with \Omeka\Stdlib\Message):
+$message = new \Common\Stdlib\PsrMessage('Hello %s', 'World');
+```
+
+For Omeka S < 4.2, a polyfill is provided in `data/compat/` that is loaded
+automatically.
 
 #### Translator
 
@@ -444,6 +468,12 @@ The translator to set in PsrMessage() is available through `$this->translator()`
 in controller and view.
 
 #### Compatibility
+
+* Compatibility with core
+
+`Common\Stdlib\PsrMessage` extends `\Omeka\Stdlib\PsrMessage`, so it implements
+`MessageInterface` and is recognized natively by the core translator delegator,
+the messenger, and the logger. No special handling is needed.
 
 * Compatibility with messenger
 
