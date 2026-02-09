@@ -455,6 +455,44 @@ class EasyMeta
     }
 
     /**
+     * Reset all static caches.
+     *
+     * Useful for long-running CLI jobs (bulk imports, etc.) where the database
+     * may change during execution (new properties, vocabularies, etc.).
+     */
+    public function resetCache(): self
+    {
+        static::$dataTypesByNames = null;
+        static::$dataTypesByNamesUsed = null;
+        static::$dataTypeLabelsByNames = null;
+        static::$dataTypesMainCustomVocabs = null;
+        static::$propertyIdsByTerms = null;
+        static::$propertyIdsByTermsAndIds = null;
+        static::$propertyIdsByTermsAndIdsUsed = null;
+        static::$propertyTermsByTermsAndIds = null;
+        static::$propertyLabelsByTerms = null;
+        static::$propertyLabelsByTermsAndIds = null;
+        static::$resourceClassIdsByTerms = null;
+        static::$resourceClassIdsByTermsAndIds = null;
+        static::$resourceClassIdsByTermsAndIdsUsed = null;
+        static::$resourceClassTermsByTermsAndIds = null;
+        static::$resourceClassLabelsByTerms = null;
+        static::$resourceClassLabelsByTermsAndIds = null;
+        static::$resourceTemplateIdsByLabels = null;
+        static::$resourceTemplateIdsByLabelsAndIds = null;
+        static::$resourceTemplateIdsByLabelsAndIdsUsed = null;
+        static::$resourceTemplateLabelsByLabelsAndIds = null;
+        static::$resourceTemplateClassesByIds = null;
+        static::$vocabularyIdsByPrefixes = null;
+        static::$vocabularyIdsByUris = null;
+        static::$vocabularyIdsByPrefixesAndUrisAndIds = null;
+        static::$vocabularyLabelsByPrefixesAndUrisAndIds = null;
+        static::$vocabularyPrefixesByPrefixesAndUrisAndIds = null;
+        static::$vocabularyUrisByPrefixesAndUrisAndIds = null;
+        return $this;
+    }
+
+    /**
      * Get the entity class from any class, type or name.
      *
      * For now, only entity classes for resources, asset, site and pages are output.
