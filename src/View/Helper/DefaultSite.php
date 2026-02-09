@@ -25,17 +25,27 @@ class DefaultSite extends AbstractHelper
      */
     protected $defaultSiteSlug = null;
 
-    public function __construct(?SiteRepresentation $site)
+    /**
+     * @var ?\Closure
+     */
+    protected $resolver;
+
+    /**
+     * @var bool
+     */
+    protected $resolved = false;
+
+    public function __construct(\Closure $resolver)
     {
-        $this->defaultSite = $site;
-        if ($site) {
-            $this->defaultSiteId = $site->id();
-            $this->defaultSiteSlug = $site->slug();
-        }
+        $this->resolver = $resolver;
     }
 
     public function __invoke(?string $metadata = null)
     {
+        if (!$this->resolved) {
+            $this->resolve();
+        }
+
         if ($metadata === 'slug') {
             return $this->defaultSiteSlug;
         } elseif ($metadata === 'id') {
@@ -50,6 +60,19 @@ class DefaultSite extends AbstractHelper
                 : [];
         } else {
             return $this->defaultSite;
+        }
+    }
+
+    protected function resolve(): void
+    {
+        $this->resolved = true;
+        $site = ($this->resolver)();
+        // Free the closure and its captured services.
+        $this->resolver = null;
+        if ($site) {
+            $this->defaultSite = $site;
+            $this->defaultSiteId = $site->id();
+            $this->defaultSiteSlug = $site->slug();
         }
     }
 }
