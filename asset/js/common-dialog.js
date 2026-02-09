@@ -29,6 +29,16 @@ var CommonDialog = (function() {
     };
 
     /**
+     * Helper to escape HTML special characters to prevent XSS.
+     */
+    var escapeHtml = function(str) {
+        if (!str) return '';
+        var div = document.createElement('div');
+        div.appendChild(document.createTextNode(str));
+        return div.innerHTML;
+    };
+
+    /**
      * Helper to close and optionally remove a dialog.
      */
     var closeAndRemove = function(dialog) {
@@ -162,6 +172,13 @@ var CommonDialog = (function() {
     self.dialogGeneric = function(options) {
         return new Promise(function(resolve) {
             let dialog = document.querySelector('dialog.dialog-generic');
+            // Don't remove an interactive prompt (input/textarea) for
+            // an unrelated alert or confirm.
+            if (dialog && dialog.querySelector('.dialog-input, .dialog-textarea')
+                && !options.input && !options.textarea
+            ) {
+                dialog = null;
+            }
             if (dialog) {
                 dialog.remove();
             }
@@ -172,18 +189,18 @@ var CommonDialog = (function() {
             // Build footer buttons according to options.
             let footerHtml = '';
             if (options.textCancel !== null) {
-                footerHtml += `<button type="button" class="dialog-button dialog-cancel">${options.textCancel || Omeka.jsTranslate('Cancel')}</button>`;
+                footerHtml += `<button type="button" class="dialog-button dialog-cancel">${escapeHtml(options.textCancel) || Omeka.jsTranslate('Cancel')}</button>`;
             }
             if (options.textOk) {
-                footerHtml += `<button type="submit" class="dialog-button dialog-ok">${options.textOk || Omeka.jsTranslate('OK')}</button>`;
+                footerHtml += `<button type="submit" class="dialog-button dialog-ok">${escapeHtml(options.textOk) || Omeka.jsTranslate('OK')}</button>`;
             }
 
             // Build input field if needed.
             let body = options.body || '';
             if (options.input) {
-                body = `<input type="text" class="dialog-input" value="${options.defaultValue || ''}" autofocus="autofocus" />`;
+                body = `<input type="text" class="dialog-input" value="${escapeHtml(options.defaultValue)}" autofocus="autofocus" />`;
             } else if (options.textarea) {
-                body = `<textarea class="dialog-textarea" autofocus="autofocus">${options.defaultValue || ''}</textarea>`;
+                body = `<textarea class="dialog-textarea" autofocus="autofocus">${escapeHtml(options.defaultValue)}</textarea>`;
             }
 
             dialog.innerHTML = `
@@ -211,11 +228,12 @@ var CommonDialog = (function() {
             const heading = options.heading || '';
             dialog.querySelector('.dialog-heading').textContent = heading;
 
-            // Set message with optional nl2br.
-            const msg = options.nl2br
-                ? options.message.replace(/(?:\r\n|\r|\n)/g, '<br/>')
-                : options.message;
-            dialog.querySelector('.dialog-message').innerHTML = msg;
+            // Set message: escape HTML first, then optionally convert newlines.
+            if (options.nl2br) {
+                dialog.querySelector('.dialog-message').innerHTML = escapeHtml(options.message).replace(/(?:\r\n|\r|\n)/g, '<br/>');
+            } else {
+                dialog.querySelector('.dialog-message').textContent = options.message;
+            }
 
             // Button handlers.
             const okBtn = dialog.querySelector('.dialog-ok');
@@ -378,8 +396,9 @@ var CommonDialog = (function() {
         if (!data.status || data.status !== 'success') {
             self.jSendFail(data, context);
         } else {
+            // Close only non-interactive dialogs (no input/textarea prompt).
             const dialog = document.querySelector('dialog.dialog-common');
-            if (dialog) {
+            if (dialog && !dialog.querySelector('.dialog-input, .dialog-textarea')) {
                 dialog.close();
             }
             const msg = self.jSendMessage(data);
@@ -388,6 +407,7 @@ var CommonDialog = (function() {
             }
             document.dispatchEvent(new CustomEvent('o:jsend-success', { detail: { data, context } }));
         }
+        return data;
     };
 
     /**
