@@ -9,6 +9,11 @@ use Omeka\Api\Representation\SiteRepresentation;
 class IsHomePage extends AbstractHelper
 {
     /**
+     * @var array Cache of results keyed by page id or '' for current page.
+     */
+    protected $cache = [];
+
+    /**
      * Check if a page or the current one is the home page.
      *
      * The main page is the one set in the config of the navigation of the site
@@ -18,6 +23,18 @@ class IsHomePage extends AbstractHelper
      * navigation the home page may be a resource page.
      */
     public function __invoke(?SitePageRepresentation $page = null): bool
+    {
+        $cacheKey = $page ? $page->id() : '';
+        if (array_key_exists($cacheKey, $this->cache)) {
+            return $this->cache[$cacheKey];
+        }
+
+        $result = $this->isHomePage($page);
+        $this->cache[$cacheKey] = $result;
+        return $result;
+    }
+
+    protected function isHomePage(?SitePageRepresentation $page): bool
     {
         $view = $this->getView();
 
