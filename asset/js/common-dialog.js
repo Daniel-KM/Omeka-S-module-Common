@@ -240,6 +240,7 @@ var CommonDialog = (function() {
                         <div class="dialog-header">
                             <button type="button" class="dialog-header-close-button" title="${Omeka.jsTranslate('Close')}">
                                 <span class="dialog-close">🗙</span>
+                                <span class="dialog-close-label">${Omeka.jsTranslate('Close')}</span>
                             </button>
                         </div>
                         <div class="dialog-contents">
