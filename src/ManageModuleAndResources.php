@@ -1113,17 +1113,44 @@ class ManageModuleAndResources
      * This method may be used when updating the schema of an entity, in which
      * case the cache may need to be refreshed.
      *
+     * When a module path is provided, only its php and phtml files are
+     * invalidated to avoid a race condition in apache when multiple modules are
+     * upgraded quickly and the general cache has no time to be rebuilt.
+     *
+     * @see https://github.com/php/php-src/issues/20818
+     * @see https://github.com/php/php-src/issues/13508
+     *
      * TODO Clear doctrine caches. See https://github.com/doctrine/orm/issues/11133
      */
-    public function clearCaches(): void
+    public function clearCaches(?string $modulePath = null): void
     {
-        if (function_exists('opcache_reset')) {
+        if ($modulePath && function_exists('opcache_invalidate')) {
+            $this->opcacheInvalidateDirectory($modulePath);
+        } elseif (function_exists('opcache_reset')) {
             opcache_reset();
         }
         if (function_exists('apcu_clear_cache')) {
             apcu_clear_cache();
         }
         @clearstatcache(true);
+    }
+
+    /**
+     * Invalidate OPcache entries for all PHP files in a directory.
+     */
+    protected function opcacheInvalidateDirectory(string $directory): void
+    {
+        if (!is_dir($directory)) {
+            return;
+        }
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($directory, \RecursiveDirectoryIterator::SKIP_DOTS)
+        );
+        foreach ($iterator as $file) {
+            if (in_array($file->getExtension(), ['php', 'phtml'], true)) {
+                opcache_invalidate($file->getPathname(), true);
+            }
+        }
     }
 
     /**

@@ -201,7 +201,9 @@ trait TraitModule
 
         // To clear cache after upgrade avoids some mysterious issues, in
         // particular when a doctrine entity is modified.
-        $this->getManageModuleAndResources()->clearCaches();
+        // But invalidate only current module files instead of resetting entire
+        // opcache to avoid jit segfaults on multiple upgrades with apache.
+        $this->getManageModuleAndResources()->clearCaches($this->modulePath());
     }
 
     public function getManageModuleAndResources(): \Common\ManageModuleAndResources
