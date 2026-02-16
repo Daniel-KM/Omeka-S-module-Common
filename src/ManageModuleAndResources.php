@@ -1108,7 +1108,7 @@ class ManageModuleAndResources
     }
 
     /**
-     * Clear php caches.
+     * Clear php and doctrine caches.
      *
      * This method may be used when updating the schema of an entity, in which
      * case the cache may need to be refreshed.
@@ -1119,19 +1119,36 @@ class ManageModuleAndResources
      *
      * @see https://github.com/php/php-src/issues/20818
      * @see https://github.com/php/php-src/issues/13508
-     *
-     * TODO Clear doctrine caches. See https://github.com/doctrine/orm/issues/11133
      */
     public function clearCaches(?string $modulePath = null): void
     {
+        // Invalidate OPcache: targeted per-module or full reset as fallback.
         if ($modulePath && function_exists('opcache_invalidate')) {
             $this->opcacheInvalidateDirectory($modulePath);
         } elseif (function_exists('opcache_reset')) {
             opcache_reset();
         }
+
+        // Clear Doctrine metadata cache to fix issue with entity schema change.
+        try {
+            /** @var \Doctrine\ORM\EntityManager $entityManager */
+            $entityManager = $this->services->get('Omeka\EntityManager');
+            $cache = $entityManager->getConfiguration()->getMetadataCache();
+            if ($cache) {
+                if (method_exists($cache, 'clear')) {
+                    $cache->clear();
+                } elseif (method_exists($cache, 'deleteAll')) {
+                    $cache->deleteAll();
+                }
+            }
+        } catch (\Exception $e) {
+            // Ignore.
+        }
+
         if (function_exists('apcu_clear_cache')) {
             apcu_clear_cache();
         }
+
         @clearstatcache(true);
     }
 
