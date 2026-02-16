@@ -6,12 +6,33 @@ var CommonDialog = (function() {
 
     /**
      * Helper to normalize options object from string or object input.
+     *
+     * Priority: explicit options > trigger data attributes > defaults.
      */
-    var normalizeOptions = function(options, defaults) {
+    var normalizeOptions = function(options, defaults, triggerDefaults) {
         if (typeof options !== 'object') {
             options = typeof options === 'string' ? { message: options } : {};
         }
-        return Object.assign({}, defaults, options);
+        return Object.assign({}, defaults, triggerDefaults || {}, options);
+    };
+
+    /**
+     * Helper to read dialog options from a trigger element's data attributes.
+     *
+     * Reads data-dialog-heading, data-dialog-message, data-dialog-text-ok,
+     * data-dialog-text-cancel, data-dialog-nl2br from the element.
+     */
+    var readTriggerOptions = function(trigger) {
+        if (!trigger) return {};
+        var el = trigger.jquery ? trigger[0] : (trigger instanceof Element ? trigger : null);
+        if (!el || !el.dataset) return {};
+        var opts = {};
+        if (el.dataset.dialogHeading) opts.heading = el.dataset.dialogHeading;
+        if (el.dataset.dialogMessage) opts.message = el.dataset.dialogMessage;
+        if (el.dataset.dialogTextOk) opts.textOk = el.dataset.dialogTextOk;
+        if (el.dataset.dialogTextCancel) opts.textCancel = el.dataset.dialogTextCancel;
+        if (el.dataset.dialogNl2br !== undefined) opts.nl2br = isTruthy(el.dataset.dialogNl2br);
+        return opts;
     };
 
     /**
@@ -106,13 +127,15 @@ var CommonDialog = (function() {
      * Trigger o:dialog-opened.
      */
     self.dialogAlert = function(options = {}) {
+        if (typeof options === 'string') options = { message: options };
+        var triggerOpts = readTriggerOptions(options.trigger);
         options = normalizeOptions(options, {
             message: '',
             nl2br: false,
             textOk: Omeka.jsTranslate('OK'),
             textCancel: null,
             input: false,
-        });
+        }, triggerOpts);
         return self.dialogGeneric(options);
     };
 
@@ -123,13 +146,15 @@ var CommonDialog = (function() {
      * Trigger o:dialog-opened.
      */
     self.dialogConfirm = function(options = {}) {
+        if (typeof options === 'string') options = { message: options };
+        var triggerOpts = readTriggerOptions(options.trigger);
         options = normalizeOptions(options, {
             message: '',
             nl2br: false,
             textOk: Omeka.jsTranslate('OK'),
             textCancel: Omeka.jsTranslate('Cancel'),
             input: false,
-        });
+        }, triggerOpts);
         return self.dialogGeneric(options);
     };
 
@@ -140,6 +165,8 @@ var CommonDialog = (function() {
      * Trigger o:dialog-opened.
      */
     self.dialogPrompt = function(options = {}) {
+        if (typeof options === 'string') options = { message: options };
+        var triggerOpts = readTriggerOptions(options.trigger);
         options = normalizeOptions(options, {
             message: '',
             nl2br: false,
@@ -147,7 +174,7 @@ var CommonDialog = (function() {
             textCancel: Omeka.jsTranslate('Cancel'),
             textarea: false,
             defaultValue: '',
-        });
+        }, triggerOpts);
         options.input = !options.textarea;
         return self.dialogGeneric(options);
     };
@@ -166,6 +193,10 @@ var CommonDialog = (function() {
      * - defaultValue (string) Default value of the input field.
      * - textOk (string) Text for the ok button.
      * - textCancel (string) If null, the cancel button is not displayed.
+     * - trigger (Element) Element that triggered the dialog. Its data
+     *   attributes are used as fallbacks for options not explicitly set:
+     *   data-dialog-heading, data-dialog-message, data-dialog-text-ok,
+     *   data-dialog-text-cancel, data-dialog-nl2br.
      *
      * Trigger o:dialog-opened.
      */
@@ -403,7 +434,10 @@ var CommonDialog = (function() {
             }
             const msg = self.jSendMessage(data);
             if (msg) {
-                self.dialogAlert(msg);
+                self.dialogAlert({
+                    message: msg,
+                    trigger: context?.target,
+                });
             }
             document.dispatchEvent(new CustomEvent('o:jsend-success', { detail: { data, context } }));
         }
@@ -418,7 +452,11 @@ var CommonDialog = (function() {
     self.jSendFail = function (error, context) {
         error = error.responseJSON || error;
         const msg = self.jSendMessage(error) || Omeka.jsTranslate('An error occurred.');
-        self.dialogAlert({ message: msg, nl2br: true });
+        self.dialogAlert({
+            message: msg,
+            nl2br: true,
+            trigger: context?.target,
+        });
         document.dispatchEvent(new CustomEvent('o:jsend-fail', { detail: { error, context } }));
     };
 
