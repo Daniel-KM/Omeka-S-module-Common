@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://gitlab.com/Sempia/composer-plugin-common-symlink.git",
-                "reference": "5797d3dbe5c11fa238f37b20e28aa82c6089d513"
+                "reference": "95bb4c24ac23bd4a424a8d62285b948dff0c7e86"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://gitlab.com/api/v4/projects/Sempia%2Fcomposer-plugin-common-symlink/repository/archive.zip?sha=5797d3dbe5c11fa238f37b20e28aa82c6089d513",
-                "reference": "5797d3dbe5c11fa238f37b20e28aa82c6089d513",
+                "url": "https://gitlab.com/api/v4/projects/Sempia%2Fcomposer-plugin-common-symlink/repository/archive.zip?sha=95bb4c24ac23bd4a424a8d62285b948dff0c7e86",
+                "reference": "95bb4c24ac23bd4a424a8d62285b948dff0c7e86",
                 "shasum": ""
             },
             "require": {

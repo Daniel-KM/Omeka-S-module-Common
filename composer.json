@@ -23,6 +23,10 @@
     "_require (not set until Omeka S merges PR #2412)": {
         "omeka/omeka-s": "^4.0"
     },
+    "require": {
+        "sempia/common-symlink": "^1.0",
+        "sempia/external-assets": "^1.0"
+    },
     "autoload": {
         "psr-4": {
             "Common\\": "src/"
@@ -32,10 +36,6 @@
         "psr-4": {
             "CommonTest\\": "tests/CommonTest/"
         }
-    },
-    "require": {
-        "sempia/common-symlink": "^1.0",
-        "sempia/external-assets": "^1.0"
     },
     "config": {
         "platform": {
