@@ -150,6 +150,11 @@ abstract class AbstractHttpControllerTestCase extends LaminasAbstractHttpControl
         if (self::$adminUser) {
             // Set identity directly in storage (bypasses adapter).
             $auth->getStorage()->write(self::$adminUser);
+            // Set UserSettings target id (normally done during bootstrap by
+            // MvcListeners::bootstrapLocale, but bootstrap runs before the
+            // identity is set in tests).
+            $services->get('Omeka\Settings\User')
+                ->setTargetId(self::$adminUser->getId());
         }
     }
 
