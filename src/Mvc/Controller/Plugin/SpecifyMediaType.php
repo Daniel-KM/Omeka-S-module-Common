@@ -16,6 +16,8 @@ use XMLReader;
  *
  * @see \Omeka\File\TempFile
  *
+ * Copy or old adaptations:
+ *
  * @see \Common\Mvc\Controller\Plugin\SpecifyMediaType
  * @see \EasyAdmin\Mvc\Controller\Plugin\SpecifyMediaType
  * @see \IiifSearch\Mvc\Controller\Plugin\SpecifyMediaType
@@ -85,6 +87,9 @@ class SpecifyMediaType extends AbstractPlugin
         }
         if ($mediaType === 'application/json') {
             $mediaType = $this->getMediaTypeJson() ?: $mediaType;
+        }
+        if ($mediaType === 'text/html') {
+            $mediaType = $this->getMediaTypeHtml() ?: $mediaType;
         }
         return $mediaType;
     }
@@ -256,6 +261,37 @@ class SpecifyMediaType extends AbstractPlugin
         // JSON-LD (W3C): "@context" at top level.
         if (array_key_exists('@context', $json)) {
             return 'application/ld+json';
+        }
+
+        return null;
+    }
+
+    /**
+     * Detect hOCR among html files.
+     *
+     * hOCR is an html-based format for ocr output (tesseract, etc.) with
+     * extension ".hocr.html". Since finfo returns "text/html", check file
+     * extension or content for hOCR markers.
+     */
+    protected function getMediaTypeHtml(): ?string
+    {
+        // Quick check: compound extension ".hocr.html" or ".hocr".
+        $filepath = $this->filepath;
+        if (substr($filepath, -10) === '.hocr.html'
+            || substr($filepath, -5) === '.hocr'
+        ) {
+            return 'text/vnd.hocr+html';
+        }
+
+        // Content check: look for hOCR class markers in first 4 KB.
+        $handle = @fopen($filepath, 'rb');
+        if (!$handle) {
+            return null;
+        }
+        $head = fread($handle, 4096);
+        fclose($handle);
+        if ($head && strpos($head, 'ocr_page') !== false) {
+            return 'text/vnd.hocr+html';
         }
 
         return null;
