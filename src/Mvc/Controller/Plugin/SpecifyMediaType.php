@@ -517,7 +517,7 @@ REGEX;
         $dom->strictErrorChecking = false;
         $dom->validateOnParse = false;
         $dom->recover = true;
-        $dom->loadXML($xmlContent);
+        $dom->loadXML($xmlContent, LIBXML_NONET);
         libxml_clear_errors();
         libxml_use_internal_errors(false);
         return $dom;
