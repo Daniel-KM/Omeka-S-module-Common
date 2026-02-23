@@ -10,9 +10,7 @@ use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 use XMLReader;
 
 /**
- * Get a more precise media type for files, mainly xml and json ones.
- *
- * @todo Make more precise media type for text/plain.
+ * Get a more precise media type for files: xml, json, zip and binary ones.
  *
  * @see \Omeka\File\TempFile
  *
@@ -28,6 +26,7 @@ use XMLReader;
  * @see \ExtractText /data/media-types/media-type-identifiers
  * @see \IiifSearch /data/media-types/media-type-identifiers
  * @see \IiifServer\Iiif\TraitIiifType
+ * @see \ModelViewer /data/media-types/media-type-identifiers
  * @see \XmlViewer /data/media-types/media-type-identifiers
  */
 class SpecifyMediaType extends AbstractPlugin
@@ -90,6 +89,12 @@ class SpecifyMediaType extends AbstractPlugin
         }
         if ($mediaType === 'text/html') {
             $mediaType = $this->getMediaTypeHtml() ?: $mediaType;
+        }
+        if ($mediaType === 'application/octet-stream') {
+            $mediaType = $this->getMediaTypeOctetStream() ?: $mediaType;
+        }
+        if ($mediaType === 'text/plain') {
+            $mediaType = $this->getMediaTypeText() ?: $mediaType;
         }
         return $mediaType;
     }
@@ -202,15 +207,43 @@ class SpecifyMediaType extends AbstractPlugin
      *
      * In many cases, the media type is saved in a uncompressed file "mimetype"
      * at the beginning of the zip file. If present, get it.
+     *
+     * Also detects USDZ archives (first entry is a .usdc or .usda).
+     * @link https://openusd.org/release/spec_usdz.html
      */
     protected function getMediaTypeZip(): ?string
     {
-        $handle = fopen($this->filepath, 'rb');
+        $handle = @fopen($this->filepath, 'rb');
+        if (!$handle) {
+            return null;
+        }
         $contents = fread($handle, 256);
         fclose($handle);
-        return substr($contents, 30, 8) === 'mimetype'
-            ? substr($contents, 38, strpos($contents, 'PK', 38) - 38)
-            : null;
+
+        if (strlen($contents) < 32) {
+            return null;
+        }
+
+        // Many formats (EPUB, ODF…) store the type in an uncompressed
+        // "mimetype" file as first entry.
+        if (substr($contents, 30, 8) === 'mimetype') {
+            $end = strpos($contents, 'PK', 38);
+            if ($end !== false) {
+                return substr($contents, 38, $end - 38);
+            }
+        }
+
+        // USDZ: uncompressed ZIP whose first entry is a .usdc/.usda.
+        $nameLen = unpack('v', substr($contents, 26, 2))[1] ?? 0;
+        if ($nameLen > 0 && $nameLen < 200) {
+            $firstName = substr($contents, 30, $nameLen);
+            $ext = strtolower(pathinfo($firstName, PATHINFO_EXTENSION));
+            if ($ext === 'usdc' || $ext === 'usda') {
+                return 'model/vnd.usdz+zip';
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -292,6 +325,98 @@ class SpecifyMediaType extends AbstractPlugin
         fclose($handle);
         if ($head && strpos($head, 'ocr_page') !== false) {
             return 'text/vnd.hocr+html';
+        }
+
+        return null;
+    }
+
+    /**
+     * Detect 3D model formats among generic octet-stream files.
+     *
+     * PHP's bundled libmagic (< 5.45) does not recognize GLB and FBX.
+     *
+     * @link https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#glb-file-format-specification
+     */
+    protected function getMediaTypeOctetStream(): ?string
+    {
+        $handle = @fopen($this->filepath, 'rb');
+        if (!$handle) {
+            return null;
+        }
+        $head = fread($handle, 32);
+        fclose($handle);
+
+        if (strlen($head) < 4) {
+            return null;
+        }
+
+        // GLB (glTF Binary): 12-byte header starting with "glTF".
+        if (substr($head, 0, 4) === 'glTF') {
+            return 'model/gltf-binary';
+        }
+
+        // FBX Binary (Autodesk FilmBox): 23-byte header
+        // "Kaydara FBX Binary  \0".
+        // No IANA type; the type below is used by ModelViewer.
+        if (strlen($head) >= 21
+            && substr($head, 0, 21) === "Kaydara FBX Binary  \x00"
+        ) {
+            return 'model/vnd.filmbox';
+        }
+
+        return null;
+    }
+
+    /**
+     * Detect specialized formats among files reported as text/plain.
+     *
+     * finfo returns text/plain for several binary or structured formats whose
+     * header happens to be printable ascii.
+     *
+     * @link https://www.asprs.org/wp-content/uploads/2019/07/LAS_1_4_r15.pdf
+     * @link https://openusd.org/release/spec_usdz.html
+     */
+    protected function getMediaTypeText(): ?string
+    {
+        $handle = @fopen($this->filepath, 'rb');
+        if (!$handle) {
+            return null;
+        }
+        $head = fread($handle, 16);
+        fclose($handle);
+
+        if (strlen($head) < 4) {
+            return null;
+        }
+
+        // LAS (LIDAR point cloud): magic "LASF" at offset 0.
+        if (substr($head, 0, 4) === 'LASF') {
+            return 'application/vnd.las';
+        }
+
+        // USDC (USD Crate binary): magic "PXR-USDC" at offset 0.
+        // No specific IANA type for USDC; model/vnd.usda covers only
+        // the ascii variant. The generic model/vnd.usd is used here.
+        if (strlen($head) >= 8
+            && substr($head, 0, 8) === 'PXR-USDC'
+        ) {
+            return 'model/vnd.usd';
+        }
+
+        // USDA (USD ascii): magic "#usda " at offset 0.
+        if (strlen($head) >= 6
+            && substr($head, 0, 6) === '#usda '
+        ) {
+            return 'model/vnd.usda';
+        }
+
+        // PLY (Stanford Polygon Format): magic "ply\n" or "ply\r\n".
+        // No IANA-registered type; application/x-ply is commonly used
+        // by tools such as MeshLab.
+        if (substr($head, 0, 4) === "ply\n"
+            || substr($head, 0, 5) === "ply\r\n"
+        ) {
+            return 'application/x-ply';
         }
 
         return null;
