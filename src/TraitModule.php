@@ -1232,7 +1232,7 @@ trait TraitModule
         if (!$result) {
             $this->getServiceLocator()->get('Omeka\Logger')->err(
                 'The directory "{path}" is not writeable: {error}.', // @translate
-                ['path' => $dirPath, 'error' => error_get_last()['message']]
+                ['path' => $dirPath, 'error' => error_get_last()['message'] ?? 'unknown error']
             );
             return null;
         }
