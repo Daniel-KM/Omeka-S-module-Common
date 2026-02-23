@@ -12,7 +12,7 @@ use XMLReader;
 /**
  * Get a more precise media type for files, mainly xml and json ones.
  *
- * @todo Make more precise media type for text/plain and application/json.
+ * @todo Make more precise media type for text/plain.
  *
  * @see \Omeka\File\TempFile
  *
@@ -82,6 +82,9 @@ class SpecifyMediaType extends AbstractPlugin
         }
         if ($mediaType === 'application/zip') {
             $mediaType = $this->getMediaTypeZip() ?: $mediaType;
+        }
+        if ($mediaType === 'application/json') {
+            $mediaType = $this->getMediaTypeJson() ?: $mediaType;
         }
         return $mediaType;
     }
@@ -203,6 +206,59 @@ class SpecifyMediaType extends AbstractPlugin
         return substr($contents, 30, 8) === 'mimetype'
             ? substr($contents, 38, strpos($contents, 'PK', 38) - 38)
             : null;
+    }
+
+    /**
+     * Extract a more precise json media type when possible.
+     *
+     * Detects glTF, GeoJSON and JSON-LD among generic json
+     * files. Only files up to 5 MB are decoded to avoid memory
+     * issues with very large datasets (e.g. GeoJSON).
+     *
+     * @link https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html
+     * @link https://datatracker.ietf.org/doc/html/rfc7946
+     * @link https://www.w3.org/TR/json-ld11/
+     */
+    protected function getMediaTypeJson(): ?string
+    {
+        if (@filesize($this->filepath) > 5242880) {
+            return null;
+        }
+
+        $content = @file_get_contents($this->filepath);
+        if (!$content) {
+            return null;
+        }
+
+        $json = @json_decode($content, true);
+        if (!is_array($json)) {
+            return null;
+        }
+
+        // glTF 2.0: required top-level "asset" with "version".
+        if (isset($json['asset']['version'])) {
+            return 'model/gltf+json';
+        }
+
+        // GeoJSON (RFC 7946): "type" is one of 9 values.
+        if (isset($json['type'])
+            && in_array($json['type'], [
+                'FeatureCollection', 'Feature',
+                'Point', 'MultiPoint',
+                'LineString', 'MultiLineString',
+                'Polygon', 'MultiPolygon',
+                'GeometryCollection',
+            ])
+        ) {
+            return 'application/geo+json';
+        }
+
+        // JSON-LD (W3C): "@context" at top level.
+        if (array_key_exists('@context', $json)) {
+            return 'application/ld+json';
+        }
+
+        return null;
     }
 
     /**
