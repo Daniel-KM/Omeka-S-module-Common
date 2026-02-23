@@ -14,6 +14,7 @@
     </coverage>
     <testsuites>
         <testsuite name="Common Unit Tests">
+            <directory>./CommonTest/Mvc</directory>
             <directory>./CommonTest/Stdlib</directory>
             <directory>./CommonTest/View</directory>
             <directory>./CommonTest/Validator</directory>
