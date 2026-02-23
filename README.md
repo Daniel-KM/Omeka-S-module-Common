@@ -138,7 +138,7 @@ The module includes a comprehensive test suite with unit and functional tests.
 Run them from the root of Omeka:
 
 ```sh
-vendor/bin/phpunit -c modules/Common/tests/phpunit.xml --testdox
+vendor/bin/phpunit -c modules/Common/phpunit.xml --testdox
 ```
 
 
