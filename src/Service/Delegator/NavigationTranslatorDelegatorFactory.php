@@ -2,7 +2,7 @@
 
 namespace Common\Service\Delegator;
 
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\DelegatorFactoryInterface;
 use Omeka\Site\Navigation\Translator;
 
@@ -32,7 +32,7 @@ class NavigationTranslatorDelegatorFactory implements DelegatorFactoryInterface
             protected $innerTranslator;
 
             /**
-             * @var \Interop\Container\ContainerInterface
+             * @var \Psr\Container\ContainerInterface
              */
             protected $container;
 

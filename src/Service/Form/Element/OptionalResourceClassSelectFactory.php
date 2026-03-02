@@ -3,7 +3,7 @@
 namespace Common\Service\Form\Element;
 
 use Common\Form\Element\OptionalResourceClassSelect;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class OptionalResourceClassSelectFactory implements FactoryInterface

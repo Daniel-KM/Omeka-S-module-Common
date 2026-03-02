@@ -3,7 +3,7 @@
 namespace Common\Service\ControllerPlugin;
 
 use Common\Mvc\Controller\Plugin\PrepareMessage;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class PrepareMessageFactory implements FactoryInterface

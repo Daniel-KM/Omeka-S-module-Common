@@ -3,7 +3,7 @@
 namespace Common\Service\ControllerPlugin;
 
 use Common\Mvc\Controller\Plugin\SpecifyMediaType;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class SpecifyMediaTypeFactory implements FactoryInterface

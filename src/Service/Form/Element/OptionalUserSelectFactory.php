@@ -3,7 +3,7 @@
 namespace Common\Service\Form\Element;
 
 use Common\Form\Element\OptionalUserSelect;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class OptionalUserSelectFactory implements FactoryInterface

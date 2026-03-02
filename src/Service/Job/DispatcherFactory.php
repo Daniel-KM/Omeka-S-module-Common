@@ -3,7 +3,7 @@
 namespace Common\Service\Job;
 
 use Common\Job\Dispatcher;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class DispatcherFactory implements FactoryInterface

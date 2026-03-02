@@ -3,7 +3,7 @@
 namespace Common\Service\Delegator;
 
 use Common\I18n\Translator;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\DelegatorFactoryInterface;
 
 /**

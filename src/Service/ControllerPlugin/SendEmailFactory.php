@@ -3,7 +3,7 @@
 namespace Common\Service\ControllerPlugin;
 
 use Common\Mvc\Controller\Plugin\SendEmail;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class SendEmailFactory implements FactoryInterface
