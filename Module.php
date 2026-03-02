@@ -141,43 +141,56 @@ class Module extends AbstractModule
         }
 
         // Add indices to speed up omeka.
+        // - simple: ['table' => 'column'];
+        // - composite: ['table' => ['idx_name' => 'sql']].
 
-        $tableColumns = [
+        $tableIndexes = [
             ['fulltext_search' => 'is_public'],
             ['media' => 'ingester'],
             ['media' => 'renderer'],
             ['media' => 'media_type'],
             ['media' => 'extension'],
             ['resource' => 'resource_type'],
+            ['resource' => ['idx_type_created' => '`resource_type`, `created`']],
+            ['resource' => ['idx_type_modified' => '`resource_type`, `modified`']],
             ['value' => 'type'],
             ['value' => 'lang'],
+            ['value' => ['idx_property_value' => '`property_id`, `value`(190)']],
             // Keep session last, because it may fail on a big database.
             ['session' => 'modified'],
         ];
 
         // Do not create index if it exists, whatever the name is.
         $newIndices = [];
-        foreach ($tableColumns as $key => $tableColumn) {
-            $table = key($tableColumn);
-            $column = reset($tableColumn);
+        foreach ($tableIndexes as $key => $tableIndex) {
+            $table = key($tableIndex);
+            $columns = reset($tableIndex);
+            if (is_array($columns)) {
+                $indexName = key($columns);
+                $checkSql = "SHOW INDEX FROM `$table` WHERE `Key_name` = '$indexName'";
+            } else {
+                $indexName = $columns;
+                $checkSql = "SHOW INDEX FROM `$table` WHERE `Column_name` = '$columns'";
+            }
             try {
-                $stmt = $connection->executeQuery("SHOW INDEX FROM `$table` WHERE `column_name` = '$column';");
-                $result = $stmt->fetchOne();
+                $result = $connection
+                    ->executeQuery($checkSql)->fetchOne();
                 if ($result) {
-                    unset($tableColumns[$key]);
+                    unset($tableIndexes[$key]);
                 } else {
-                    $newIndices[] = "$table/$column";
+                    $newIndices[] = "$table/$indexName";
                 }
             } catch (\Exception $e) {
-                // Table does not exist yet (e.g., during test bootstrap).
-                unset($tableColumns[$key]);
+                // Table does not exist yet.
+                unset($tableIndexes[$key]);
             }
         }
 
         if ($newIndices) {
             // Dispatch background job to add indexes.
             // The class is not available during upgrade or install.
-            require_once __DIR__ . '/src/Job/AddDatabaseIndexes.php';
+            require_once __DIR__
+                . '/src/Job/AddDatabaseIndexes.php';
             $dispatcher = $services->get('Omeka\Job\Dispatcher');
             $dispatcher->dispatch(\Common\Job\AddDatabaseIndexes::class);
             $message = new \Common\Stdlib\PsrMessage(

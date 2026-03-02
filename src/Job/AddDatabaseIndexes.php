@@ -18,74 +18,105 @@ class AddDatabaseIndexes extends AbstractJob
         $referenceIdProcessor->setReferenceId('common/add-database-indexes/job_' . $this->job->getId());
         $logger->addProcessor($referenceIdProcessor);
 
-        $tableColumns = [
+        // Simple: ['table' => 'column'].
+        // Composite: ['table' => ['idx_name' => 'sql']].
+        $tableIndexes = [
             ['fulltext_search' => 'is_public'],
             ['media' => 'ingester'],
             ['media' => 'renderer'],
             ['media' => 'media_type'],
             ['media' => 'extension'],
             ['resource' => 'resource_type'],
+            ['resource' => ['idx_type_created' => '`resource_type`, `created`']],
+            ['resource' => ['idx_type_modified' => '`resource_type`, `modified`']],
             ['value' => 'type'],
             ['value' => 'lang'],
+            ['value' => ['idx_property_value' => '`property_id`, `value`(190)']],
             // Keep session last, because it may fail on a big database.
             ['session' => 'modified'],
         ];
 
         // Do not create index if it exists, whatever the name is.
         $newIndices = [];
-        foreach ($tableColumns as $key => $tableColumn) {
-            $table = key($tableColumn);
-            $column = reset($tableColumn);
-            $stmt = $connection->executeQuery(
-                "SHOW INDEX FROM `$table` WHERE `column_name` = '$column';"
-            );
-            $result = $stmt->fetchOne();
-            if ($result) {
-                unset($tableColumns[$key]);
+        foreach ($tableIndexes as $key => $tableIndex) {
+            $table = key($tableIndex);
+            $columns = reset($tableIndex);
+            if (is_array($columns)) {
+                $indexName = key($columns);
+                $checkSql = "SHOW INDEX FROM `$table` WHERE `Key_name` = '$indexName'";
             } else {
-                $newIndices[] = "$table/$column";
+                $indexName = $columns;
+                $checkSql = "SHOW INDEX FROM `$table` WHERE `Column_name` = '$columns'";
+            }
+            $result = $connection
+                ->executeQuery($checkSql)->fetchOne();
+            if ($result) {
+                unset($tableIndexes[$key]);
+            } else {
+                $newIndices[] = "$table/$indexName";
             }
         }
 
         if (!$newIndices) {
-            $logger->info('All database indexes already exist.'); // @translate
+            $logger->info(
+                'All database indexes already exist.' // @translate
+            );
             return;
         }
 
         $logger->info(
             'Adding {count} database indexes: {list}', // @translate
-            ['count' => count($newIndices), 'list' => implode(', ', $newIndices)]
+            [
+                'count' => count($newIndices),
+                'list' => implode(', ', $newIndices),
+            ]
         );
 
         $added = [];
-        foreach ($tableColumns as $tableColumn) {
-            $table = key($tableColumn);
-            $column = reset($tableColumn);
+        foreach ($tableIndexes as $tableIndex) {
+            $table = key($tableIndex);
+            $columns = reset($tableIndex);
+            if (is_array($columns)) {
+                $indexName = key($columns);
+                $columnsSql = reset($columns);
+            } else {
+                $indexName = $columns;
+                $columnsSql = "`$columns`";
+            }
             try {
                 $logger->info(
-                    'Adding index on table `{table}` for column `{column}`.', // @translate
-                    ['table' => $table, 'column' => $column]
+                    'Adding index `{index}` on table `{table}`.', // @translate
+                    ['index' => $indexName, 'table' => $table]
                 );
                 $connection->executeStatement(
-                    "ALTER TABLE `$table` ADD INDEX `$column` (`$column`);"
+                    "ALTER TABLE `$table`"
+                    . " ADD INDEX `$indexName`"
+                    . " ($columnsSql)"
                 );
-                $added[] = "$table/$column";
+                $added[] = "$table/$indexName";
                 $logger->info(
-                    'Successfully added index on table `{table}` for column `{column}`.', // @translate
-                    ['table' => $table, 'column' => $column]
+                    'Successfully added index `{index}` on table `{table}`.', // @translate
+                    ['index' => $indexName, 'table' => $table]
                 );
             } catch (\Exception $e) {
                 $logger->err(
-                    'Unable to add index on table `{table}` for column `{column}`: {msg}', // @translate
-                    ['table' => $table, 'column' => $column, 'msg' => $e->getMessage()]
+                    'Unable to add index `{index}` on table `{table}`: {msg}', // @translate
+                    [
+                        'index' => $indexName,
+                        'table' => $table,
+                        'msg' => $e->getMessage(),
+                    ]
                 );
             }
         }
 
         if ($added) {
             $logger->info(
-                'Successfully added {count} database indexes: {list}', // @translate,
-                ['count' => count($added), 'list' => implode(', ', $added)]
+                'Successfully added {count} database indexes: {list}', // @translate
+                [
+                    'count' => count($added),
+                    'list' => implode(', ', $added),
+                ]
             );
         }
     }
