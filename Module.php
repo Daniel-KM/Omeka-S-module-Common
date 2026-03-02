@@ -187,12 +187,55 @@ class Module extends AbstractModule
         }
 
         if ($newIndices) {
-            // Dispatch background job to add indexes.
-            // The class is not available during upgrade or install.
-            require_once __DIR__
-                . '/src/Job/AddDatabaseIndexes.php';
+            // Dispatch background job to add indexes (session and value tables
+            // can be very large). Temporarily mark the module as active so the
+            // background PHP-CLI process can bootstrap it.
+            require_once __DIR__ . '/src/Job/AddDatabaseIndexes.php';
+
+            $moduleId = 'Common';
+            $moduleRow = $connection->executeQuery(
+                'SELECT `is_active`, `version` FROM `module` WHERE `id` = ?',
+                [$moduleId]
+            )->fetchAssociative();
+            $wasActive = (bool) ($moduleRow['is_active'] ?? false);
+
+            // Read the new version from module.ini.
+            $ini = parse_ini_file(__DIR__ . '/config/module.ini');
+            $newVersion = $ini['version']
+                ?? $moduleRow['version'];
+            $connection->executeStatement(
+                'UPDATE `module` SET `version` = ?, `is_active` = 1 WHERE `id` = ?',
+                [$newVersion, $moduleId]
+            );
+
             $dispatcher = $services->get('Omeka\Job\Dispatcher');
-            $job = $dispatcher->dispatch(\Common\Job\AddDatabaseIndexes::class);
+            $job = $dispatcher->dispatch(
+                \Common\Job\AddDatabaseIndexes::class
+            );
+
+            // Wait for the background process to read the module state.
+            sleep(5);
+
+            $status = $connection->executeQuery(
+                'SELECT `status` FROM `job` WHERE `id` = ?',
+                [$job->getId()]
+            )->fetchOne();
+            if ($status === \Omeka\Entity\Job::STATUS_STARTING) {
+                $messenger->addWarning(new \Common\Stdlib\PsrMessage(
+                    'The job #{job_id} is still starting. It may need to be relaunched manually.', // @translate
+                    ['job_id' => $job->getId()]
+                ));
+            }
+
+            // Restore is_active if the module was inactive. The version is
+            // not restored: the Module Manager overwrites it after upgrade.
+            if (!$wasActive) {
+                $connection->executeStatement(
+                    'UPDATE `module`  SET `is_active` = 0 WHERE `id` = ?',
+                    [$moduleId]
+                );
+            }
+
             $urlHelper = $services->get('ViewHelperManager')->get('url');
             $message = new \Common\Stdlib\PsrMessage(
                 'Adding database indexes in background (job {link_job}#{job_id}{link_end}, {link_log}logs{link_end}).', // @translate
@@ -201,7 +244,7 @@ class Module extends AbstractModule
                     'job_id' => $job->getId(),
                     'link_end' => '</a>',
                     'link_log' => class_exists('Log\Module', false)
-                        ? sprintf('<a href="%1$s">', $urlHelper('admin/default', ['controller' => 'log'], ['query' => ['job_id' => $job->getId()]]))
+                        ? sprintf('<a href="%1$s">', $urlHelper('admin/default', ['controller' => 'log', ], ['query' => ['job_id' => $job->getId()]]))
                         : sprintf('<a href="%1$s" target="_blank">', $urlHelper('admin/id', ['controller' => 'job', 'action' => 'log', 'id' => $job->getId()])),
                 ]
             );
