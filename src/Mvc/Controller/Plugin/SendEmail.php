@@ -143,10 +143,10 @@ class SendEmail extends AbstractPlugin
             static::$spamKeywords = include dirname(__DIR__, 4) . '/data/mailer/spam_keywords.php';
         }
         $spamKeywords = static::$spamKeywords;
-        $bodyLower = mb_strtolower($body);
         foreach ($spamKeywords as $spamKeyword) {
-            // str_contains() is not always utf-8 safe with ascii keywords.
-            if (mb_substr_count($bodyLower, $spamKeyword)) {
+            // Use word boundaries to avoid false positives on substrings, for
+            // example "cialis" in "specialiste").
+            if (preg_match('/\b' . preg_quote($spamKeyword, '/') . '\b/ui', $body)) {
                 $this->logger->warn(
                     'Email not sent: this is a spam with "{keyword}" (To: {to}; From: {from}): {body}', // @translate
                     ['keyword' => $spamKeyword, 'to' => json_encode($to, 320), 'from' => json_encode($from, 320), 'body' => $body]
