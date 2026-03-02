@@ -2,6 +2,7 @@
 
 namespace Common\Form\Element;
 
+use Common\Stdlib\EasyMeta;
 use Laminas\Form\Element\Select;
 use Omeka\DataType\Manager as DataTypeManager;
 
@@ -20,6 +21,11 @@ class DataTypeSelect extends Select
      * @var DataTypeManager
      */
     protected $dataTypeManager;
+
+    /**
+     * @var EasyMeta
+     */
+    protected $easyMeta;
 
     /**
      * @var array
@@ -43,9 +49,15 @@ class DataTypeSelect extends Select
         }
 
         /** @see \Omeka\View\Helper\DataType::getSelect() */
+        $dataTypes = $this->dataDataTypes;
+        if ($this->getOption('used') && $this->easyMeta) {
+            $usedNames = $this->easyMeta->dataTypeNamesUsed();
+            $dataTypes = array_intersect_key($dataTypes, $usedNames);
+        }
+
         $options = [];
         $optgroupOptions = [];
-        foreach ($this->dataDataTypes as $dataTypeName => $dataDataType) {
+        foreach ($dataTypes as $dataTypeName => $dataDataType) {
             if ($dataDataType['opt_group_label']) {
                 // Hash the optgroup key to avoid collisions when merging with
                 // data types without an optgroup.
@@ -88,6 +100,12 @@ class DataTypeSelect extends Select
     {
         $this->dataTypeManager = $dataTypeManager;
         $this->prepareDataDataTypes();
+        return $this;
+    }
+
+    public function setEasyMeta(EasyMeta $easyMeta): self
+    {
+        $this->easyMeta = $easyMeta;
         return $this;
     }
 

@@ -32,6 +32,9 @@ class DataType extends \Omeka\View\Helper\DataType
     public function getSelect($name, $value = null, $attributes = [], $options = [])
     {
         $element = $this->formElementManager->get(\Common\Form\Element\DataTypeSelect::class);
+        if (!empty($options['used'])) {
+            $element->setOption('used', true);
+        }
         $element
             ->setName($name)
             ->setEmptyOption('Default')
