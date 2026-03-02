@@ -339,7 +339,7 @@ trait TraitModule
 
     protected function modulePath(): string
     {
-        return OMEKA_PATH . '/modules/' . static::NAMESPACE;
+        return dirname((new \ReflectionClass(static::class))->getFileName());
     }
 
     protected function preInstall(): void
