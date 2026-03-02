@@ -82,7 +82,8 @@ class ManageModuleAndResources
      */
     public function checkAllResources(string $module): bool
     {
-        $filepathData = OMEKA_PATH . '/modules/' . $module . '/data/';
+        $modulePath = $this->resolveModulePath($module);
+        $filepathData = ($modulePath ?? OMEKA_PATH . '/modules/' . $module) . '/data/';
 
         // Vocabularies.
         foreach ($this->listFilesInDir($filepathData . 'vocabularies', ['json']) as $filepath) {
@@ -136,7 +137,8 @@ class ManageModuleAndResources
      */
     public function createAllResources(string $module): self
     {
-        $filepathData = OMEKA_PATH . '/modules/' . $module . '/data/';
+        $modulePath = $this->resolveModulePath($module);
+        $filepathData = ($modulePath ?? OMEKA_PATH . '/modules/' . $module) . '/data/';
 
         // Vocabularies.
         foreach ($this->listFilesInDir($filepathData . 'vocabularies', ['json']) as $filepath) {
@@ -955,12 +957,16 @@ class ManageModuleAndResources
 
         // Check if this is already the full path.
         $modulesPath = OMEKA_PATH . '/modules/';
-        if (strncmp($fileOrUrl, $modulesPath, strlen($modulesPath)) === 0) {
+        $composerModulesPath = OMEKA_PATH . '/composer-addons/modules/';
+        if (strncmp($fileOrUrl, $modulesPath, strlen($modulesPath)) === 0
+            || strncmp($fileOrUrl, $composerModulesPath, strlen($composerModulesPath)) === 0
+        ) {
             $filepath = $fileOrUrl;
         } elseif (!$module) {
             return null;
         } else {
-            $filepath = $modulesPath . $module . '/data/' . ($dataDirectory ? $dataDirectory . '/' : '') . $fileOrUrl;
+            $modulePath = $this->resolveModulePath($module);
+            $filepath = ($modulePath ?? $modulesPath . $module) . '/data/' . ($dataDirectory ? $dataDirectory . '/' : '') . $fileOrUrl;
         }
 
         return $this->isFileReadable($filepath) ? $filepath : null;
@@ -1188,5 +1194,25 @@ class ManageModuleAndResources
         } catch (\Exception $e) {
             return null;
         }
+    }
+
+    /**
+     * Resolve the real filesystem path of a module directory.
+     *
+     * Work for modules in modules/ and composer-addons/modules/.
+     * Use ModuleManager to find actual Module.php path, then derive directory.
+     */
+    public function resolveModulePath(string $module): ?string
+    {
+        /** @var \Omeka\Module\Manager $moduleManager */
+        $moduleManager = $this->services->get('Omeka\ModuleManager');
+        $moduleObject = $moduleManager->getModule($module);
+        if (!$moduleObject) {
+            return null;
+        }
+        $moduleFilePath = $moduleObject->getModuleFilePath();
+        return $moduleFilePath
+            ? dirname($moduleFilePath)
+            : null;
     }
 }
