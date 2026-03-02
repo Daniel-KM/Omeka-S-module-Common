@@ -192,10 +192,20 @@ class Module extends AbstractModule
             require_once __DIR__
                 . '/src/Job/AddDatabaseIndexes.php';
             $dispatcher = $services->get('Omeka\Job\Dispatcher');
-            $dispatcher->dispatch(\Common\Job\AddDatabaseIndexes::class);
+            $job = $dispatcher->dispatch(\Common\Job\AddDatabaseIndexes::class);
+            $urlHelper = $services->get('ViewHelperManager')->get('url');
             $message = new \Common\Stdlib\PsrMessage(
-                'A background job has been started to add database indexes.' // @translate
+                'Adding database indexes in background (job {link_job}#{job_id}{link_end}, {link_log}logs{link_end}).', // @translate
+                [
+                    'link_job' => sprintf('<a href="%s">', htmlspecialchars($urlHelper('admin/id', ['controller' => 'job', 'id' => $job->getId()]))),
+                    'job_id' => $job->getId(),
+                    'link_end' => '</a>',
+                    'link_log' => class_exists('Log\Module', false)
+                        ? sprintf('<a href="%1$s">', $urlHelper('admin/default', ['controller' => 'log'], ['query' => ['job_id' => $job->getId()]]))
+                        : sprintf('<a href="%1$s" target="_blank">', $urlHelper('admin/id', ['controller' => 'job', 'action' => 'log', 'id' => $job->getId()])),
+                ]
             );
+            $message->setEscapeHtml(false);
             $messenger->addSuccess($message);
         }
     }
