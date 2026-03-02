@@ -14,6 +14,10 @@ return [
             // Allow to add the PSR-3 formatter to default logger.
             'Omeka\Logger' => Service\LoggerFactory::class,
         ],
+        'aliases' => [
+            // @deprecated Use "Common\EasyMeta". Will be removed in a future version.
+            'EasyMeta' => 'Common\EasyMeta',
+        ],
         'delegators' => [
             'Laminas\I18n\Translator\TranslatorInterface' => [
                 __NAMESPACE__ => Service\Delegator\TranslatorDelegatorFactory::class,
