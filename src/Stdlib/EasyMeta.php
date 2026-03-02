@@ -1578,7 +1578,6 @@ class EasyMeta
             )
             ->from('`property`', 'property')
             ->innerJoin('property', 'vocabulary', 'vocabulary', '`property`.`vocabulary_id` = `vocabulary`.`id`')
-            ->groupBy('`property`.`id`')
             ->orderBy('`vocabulary`.`id`', 'asc')
             ->addOrderBy('`property`.`id`', 'asc')
         ;
@@ -1596,6 +1595,7 @@ class EasyMeta
     {
         // Most of the time, we don't need used properties and all properties at
         // the same time, so fetching them is done separately of initProperties().
+        // Use EXISTS instead of INNER JOIN to short-circuit on first match.
         $qb = $this->connection->createQueryBuilder();
         $qb
             ->select(
@@ -1604,8 +1604,7 @@ class EasyMeta
             )
             ->from('`property`', 'property')
             ->innerJoin('property', 'vocabulary', 'vocabulary', '`property`.`vocabulary_id` = `vocabulary`.`id`')
-            ->innerJoin('property', 'value', 'value', '`property`.`id` = `value`.`property_id`')
-            ->groupBy('`property`.`id`')
+            ->andWhere('EXISTS (SELECT 1 FROM `value` WHERE `value`.`property_id` = `property`.`id`)')
             ->orderBy('`vocabulary`.`id`', 'asc')
             ->addOrderBy('`property`.`id`', 'asc')
         ;
@@ -1626,7 +1625,6 @@ class EasyMeta
             )
             ->from('`resource_class`', 'resource_class')
             ->innerJoin('resource_class', 'vocabulary', 'vocabulary', '`resource_class`.`vocabulary_id` = `vocabulary`.`id`')
-            ->groupBy('`resource_class`.`id`')
             ->orderBy('`vocabulary`.`id`', 'asc')
             ->addOrderBy('`resource_class`.`id`', 'asc')
         ;
@@ -1643,6 +1641,7 @@ class EasyMeta
     {
         // Most of the time, we don't need used classes and all classes at the
         // same time, so fetching them is done separately of initResourceClasses().
+        // Use EXISTS instead of INNER JOIN to short-circuit on first match.
         $qb = $this->connection->createQueryBuilder();
         $qb
             ->select(
@@ -1651,8 +1650,7 @@ class EasyMeta
             )
             ->from('`resource_class`', 'resource_class')
             ->innerJoin('resource_class', 'vocabulary', 'vocabulary', '`resource_class`.`vocabulary_id` = `vocabulary`.`id`')
-            ->innerJoin('resource_class', 'resource', 'resource', '`resource_class`.`id` = `resource`.`resource_class_id`')
-            ->groupBy('`resource_class`.`id`')
+            ->andWhere('EXISTS (SELECT 1 FROM `resource` WHERE `resource`.`resource_class_id` = `resource_class`.`id`)')
             ->orderBy('`vocabulary`.`id`', 'asc')
             ->addOrderBy('`resource_class`.`id`', 'asc')
         ;
@@ -1671,7 +1669,6 @@ class EasyMeta
                 '`resource_template`.`id` AS id'
             )
             ->from('resource_template', 'resource_template')
-            ->groupBy('`resource_template`.`id`')
             ->orderBy('`resource_template`.`label`', 'asc')
         ;
         $result = $this->connection->executeQuery($qb)->fetchAllKeyValue();
@@ -1684,6 +1681,7 @@ class EasyMeta
 
     protected function initResourceTemplatesUsed(): void
     {
+        // Use EXISTS instead of INNER JOIN to short-circuit on first match.
         $qb = $this->connection->createQueryBuilder();
         $qb
             ->select(
@@ -1691,8 +1689,7 @@ class EasyMeta
                 '`resource_template`.`id` AS id'
             )
             ->from('resource_template', 'resource_template')
-            ->innerJoin('resource_template', 'resource', 'resource', '`resource_template`.`id` = `resource`.`resource_template_id`')
-            ->groupBy('`resource_template`.`id`')
+            ->andWhere('EXISTS (SELECT 1 FROM `resource` WHERE `resource`.`resource_template_id` = `resource_template`.`id`)')
             ->orderBy('`resource_template`.`label`', 'asc')
         ;
         $result = $this->connection->executeQuery($qb)->fetchAllKeyValue();
@@ -1727,7 +1724,6 @@ class EasyMeta
                 '`vocabulary`.`id` AS id'
             )
             ->from('`vocabulary`', 'vocabulary')
-            ->groupBy('`vocabulary`.`id`')
             ->orderBy('`vocabulary`.`id`', 'asc')
         ;
         $result = $this->connection->executeQuery($qb)->fetchAllAssociative();
