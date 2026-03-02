@@ -14,6 +14,9 @@ class AddDatabaseIndexes extends AbstractJob
         $services = $this->getServiceLocator();
         $connection = $services->get('Omeka\Connection');
         $logger = $services->get('Omeka\Logger');
+        $referenceIdProcessor = new \Laminas\Log\Processor\ReferenceId();
+        $referenceIdProcessor->setReferenceId('common/add-database-indexes/job_' . $this->job->getId());
+        $logger->addProcessor($referenceIdProcessor);
 
         $tableColumns = [
             ['fulltext_search' => 'is_public'],
