@@ -202,8 +202,18 @@ class Module extends AbstractModule
 
     protected function checkGeneric(): void
     {
-        $paths = glob(OMEKA_PATH . '/modules/*/src/Generic/AbstractModule.php');
-        if (count($paths)) {
+        $moduleDirs = [
+            OMEKA_PATH . '/modules',
+            OMEKA_PATH . '/composer-addons/modules',
+        ];
+        $hasGenericUsage = false;
+        foreach ($moduleDirs as $dir) {
+            if (is_dir($dir) && glob($dir . '/*/src/Generic/AbstractModule.php')) {
+                $hasGenericUsage = true;
+                break;
+            }
+        }
+        if ($hasGenericUsage) {
             return;
         }
 
@@ -211,7 +221,9 @@ class Module extends AbstractModule
         $connection = $services->get('Omeka\Connection');
         $connection->executeStatement('DELETE FROM `module` WHERE `id` = "Generic";');
 
-        if (!file_exists(OMEKA_PATH . '/modules/Generic/AbstractModule.php')) {
+        if (!file_exists(OMEKA_PATH . '/modules/Generic/AbstractModule.php')
+            && !file_exists(OMEKA_PATH . '/composer-addons/modules/Generic/AbstractModule.php')
+        ) {
             return;
         }
 
