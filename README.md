@@ -15,6 +15,7 @@ copy-paste common code between modules.
 
   - AssetUrl for internal assets
   - DefaultSite
+  - DeferredJobDispatch, to run multiple individual jobs in bulk
   - EasyMeta to get ids, terms and labels from properties, classes, templates,
     vocabularies; to get main data types too (literal, resource or uri); to get
     resource api names from any names used in Omeka and modules.
@@ -39,6 +40,7 @@ copy-paste common code between modules.
   - Data Type Select
   - Group Textarea
   - Ini Textarea
+  - Note
   - Media Ingester Select
   - Media Renderer Select
   - Media Type Select
@@ -86,13 +88,30 @@ copy-paste common code between modules.
   refined to make features working. For example `text/xml` is not precise enough
   for the module IiifServer to manage xml ocr alto files, that should be
   identified with the right media type `application/alto+xml`. The same issue
-  occurs with xml mets, tei, json-ld, etc.
+  occurs with xml mets, tei, json-ld, etc. Main formats for 3d files are managed.
 
 - Internal assets
 
   By default, only external assets can be overridden in themes. This option in
   the config file allows to by-pass core assets. This is useful mainly for js in
   admin interface.
+
+- Data base index
+
+  To improve performance of common queries, some indices are added in database:
+
+  - fulltext_search: is_public
+  - media: ingester
+  - media: renderer
+  - media: media_type
+  - media: extension
+  - resource: resource_type
+  - resource: idx_type_created (resource_type, created)
+  - resource: idx_type_modified (resource_type, modified)
+  - value: type
+  - value: lang
+  - value: idx_property_value (property_id, value (190))
+  - session: modified
 
 
 Installation
@@ -168,6 +187,33 @@ Use helper assetUrl().
 Use helper defaultSite(). As argument, you may set id, slug, id_slug or slug_id.
 The default is to return the representation.
 
+#### Deferred Job Dispatch
+
+Some modules run a job each time an item or a media is saved, in particular in
+batch processes, and it implies multiple parallel jobs that are not consistent
+or that overloads server. Furthermore, flushing entity inside an api event may
+trigger a global flush that conflicts with pending entities in the doctrine
+UnitOfWork.
+
+To avoid this issue, use the service `Common\DeferredJobDispatch` in order to
+send all resource ids to the job as a single request and dispatch them once at
+shutdown. So the service can be used in a module event listener like that:
+
+```php
+$deferred = $services->get('Common\DeferredJobDispatch');
+$deferred->defer(
+    \MyModule\Job\MyJob::class,
+    'job_key',
+    ['item_ids' => $itemId]
+);
+```
+
+At shutdown, one job per unique job key is dispatched, with all accumulated
+params merged via the optional callback set as fourth argument.
+
+Real life implementation can be seen in modules [Bulk Import], [Derivative Media],
+[Easy Admin], [Iiif Server], or [Image Server].
+
 #### EasyMeta
 
 This service can be used as helper or plugin. It allows to get ids, terms and
@@ -224,6 +270,12 @@ sub-messages can be managed.
 #### MatchedRouteName
 
 Allow to get the matched route name directly.
+
+#### Note
+
+`Note` is a form element to display explication inside forms. It is a simplified
+version of feature from Zend 1 that was not ported to Zend 3/Laminas. It was
+implemented in some modules.
 
 #### SendEmail
 
@@ -659,6 +711,11 @@ Copyright
 [Easy Admin]: https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin
 [Selection]: https://gitlab.com/Daniel-KM/Omeka-S-module-Selection
 [Two Factor Authentication]: https://gitlab.com/Daniel-KM/Omeka-S-module-TwoFactAuth
+[Bulk Import]: https://gitlab.com/Daniel-KM/Omeka-S-module-BulkImport
+[Derivative Media]: https://gitlab.com/Daniel-KM/Omeka-S-module-DerivativeMedia
+[Easy Admin]: https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin
+[Iiif Server]: https://gitlab.com/Daniel-KM/Omeka-S-module-IiifServer
+[Image Server]: https://gitlab.com/Daniel-KM/Omeka-S-module-ImageServer
 [jQuery-Autocomplete]: https://github.com/devbridge/jQuery-Autocomplete
 [module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-Common/-/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
