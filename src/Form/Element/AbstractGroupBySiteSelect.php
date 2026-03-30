@@ -62,7 +62,9 @@ abstract class AbstractGroupBySiteSelect extends Select
      * - query;
      * - site_group;
      * - exclude_current_site;
-     * - disable_group_by_site.
+     * - disable_group_by_site;
+     * - site_label: "title" (default), "slug", or "title_slug";
+     * - page_label: "title" (default), "slug", or "title_slug".
      *
      * {@inheritDoc}
      * @see \Laminas\Form\Element\Select::getValueOptions()
@@ -92,6 +94,9 @@ abstract class AbstractGroupBySiteSelect extends Select
             unset($siteGroup[$currentSiteSlug]);
         }
 
+        $siteLabelMode = $this->getOption('site_label') ?: 'title';
+        $pageLabelMode = $this->getOption('page_label') ?: 'title';
+
         $disableGroupBySite = (bool) $this->getOption('disable_group_by_site');
         if ($disableGroupBySite) {
             // Group alphabetically by resource label without grouping by site.
@@ -104,7 +109,8 @@ abstract class AbstractGroupBySiteSelect extends Select
                 } elseif ($excludeCurrentSite && $siteSlug === $currentSiteSlug) {
                     continue;
                 }
-                $resources[$this->getValueLabel($resource)][] = $resource->id();
+                $label = $this->formatPageLabel($resource, $pageLabelMode);
+                $resources[$label][] = $resource->id();
             }
 
             ksort($resources);
@@ -128,7 +134,9 @@ abstract class AbstractGroupBySiteSelect extends Select
                 }
                 $resourceSites[$siteSlug]['site'] = $site;
                 $resourceSites[$siteSlug]['resources'][] = $resource;
-                $resourceSiteTitles[$siteSlug] = $site ? $site->title() : null;
+                $resourceSiteTitles[$siteSlug] = $site
+                    ? $this->formatSiteLabel($site, $siteLabelMode)
+                    : null;
             }
             natcasesort($resourceSiteTitles);
             $resourceSites = array_replace($resourceSiteTitles, $resourceSites);
@@ -137,14 +145,14 @@ abstract class AbstractGroupBySiteSelect extends Select
             foreach ($resourceSites as $resourceSite) {
                 $options = [];
                 foreach ($resourceSite['resources'] as $resource) {
-                    $options[$resource->id()] = $this->getValueLabel($resource);
+                    $options[$resource->id()] = $this->formatPageLabel($resource, $pageLabelMode);
                 }
                 if (!$options) {
                     continue;
                 }
                 $site = $resourceSite['site'];
                 if ($site instanceof SiteRepresentation) {
-                    $label = $site->isPublic() ? $site->title() : ($site->title() . ' *');
+                    $label = $this->formatSiteLabel($site, $siteLabelMode);
                 }
                 // Is it really possible? Not important anyway.
                 else {
@@ -155,6 +163,33 @@ abstract class AbstractGroupBySiteSelect extends Select
         }
 
         return $this->prependValuesOptions($valueOptions);
+    }
+
+    protected function formatSiteLabel(SiteRepresentation $site, string $mode): string
+    {
+        $title = $site->isPublic()
+            ? $site->title()
+            : ($site->title() . ' *');
+        switch ($mode) {
+            case 'slug':
+                return $site->slug();
+            case 'title_slug':
+                return $title . ' (' . $site->slug() . ')';
+            default:
+                return $title;
+        }
+    }
+
+    protected function formatPageLabel(SitePageRepresentation $resource, string $mode): string
+    {
+        switch ($mode) {
+            case 'slug':
+                return $resource->slug();
+            case 'title_slug':
+                return $this->getValueLabel($resource) . ' (' . $resource->slug() . ')';
+            default:
+                return $this->getValueLabel($resource);
+        }
     }
 
     /**
