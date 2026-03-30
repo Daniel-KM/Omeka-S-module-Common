@@ -1139,7 +1139,12 @@ class ManageModuleAndResources
         try {
             /** @var \Doctrine\ORM\EntityManager $entityManager */
             $entityManager = $this->services->get('Omeka\EntityManager');
-            $cache = $entityManager->getConfiguration()->getMetadataCache();
+            $config = $entityManager->getConfiguration();
+            // ORM 2.14+/3.x uses getMetadataCache() (PSR-6). ORM 2.7–2.13 uses
+            // getMetadataCacheImpl() (Doctrine Cache).
+            $cache = method_exists($config, 'getMetadataCache')
+                ? $config->getMetadataCache()
+                : $config->getMetadataCacheImpl();
             if ($cache) {
                 if (method_exists($cache, 'clear')) {
                     $cache->clear();

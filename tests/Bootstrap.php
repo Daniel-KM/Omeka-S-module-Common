@@ -212,7 +212,7 @@ class Bootstrap
     {
         foreach ($modules as $moduleName) {
             // Check if module is optional (prefixed with "?").
-            $isOptional = str_starts_with($moduleName, '?');
+            $isOptional = substr($moduleName, 0, 1) === '?';
             if ($isOptional) {
                 $moduleName = substr($moduleName, 1);
             }

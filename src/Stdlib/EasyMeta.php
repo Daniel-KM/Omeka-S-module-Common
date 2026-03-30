@@ -1743,4 +1743,5 @@ class EasyMeta
             + array_column($result, 'uri', 'uri')
             + array_column($result, 'uri', 'id');
     }
+
 }

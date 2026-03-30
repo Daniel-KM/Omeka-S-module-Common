@@ -2,6 +2,18 @@
 
 namespace Common;
 
+// Polyfill Omeka\Stdlib\PsrMessage for Omeka S < 4.2 so that Common\Stdlib\PsrMessage
+// can extend it and session objects serialized as PsrMessage can be
+// deserialized on any version.
+if (!class_exists('Omeka\Stdlib\PsrMessage', false)
+    && !class_exists('Omeka\Stdlib\PsrMessage')
+) {
+    require_once __DIR__ . '/data/compat/MessageInterface.php';
+    require_once __DIR__ . '/data/compat/PsrInterpolateInterface.php';
+    require_once __DIR__ . '/data/compat/PsrInterpolateTrait.php';
+    require_once __DIR__ . '/data/compat/PsrMessage.php';
+}
+
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Omeka\Module\AbstractModule;
 
