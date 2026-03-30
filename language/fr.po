@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-09 00:00+0000\n"
-"PO-Revision-Date: 2026-02-09 00:00+0000\n"
+"POT-Creation-Date: 2026-03-30 00:00+0000\n"
+"PO-Revision-Date: 2026-03-30 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -38,7 +38,7 @@ msgstr "Non trouvé."
 msgid "default"
 msgstr "défaut"
 
-#: Module.php:70
+#: Module.php:83
 msgid ""
 "The php extension \"intl\" is not available. It is recommended to install it "
 "to manage diacritics and non-latin characters and to translate dates, "
@@ -48,17 +48,26 @@ msgstr ""
 "gérer les caractères diacritiques et non-latin et pour traduire les dates, "
 "les nombres et plus."
 
-#: Module.php:183
-msgid "A background job has been started to add database indexes."
+#: Module.php:237
+msgid ""
+"The job #{job_id} is still starting. It may need to be relaunched manually."
 msgstr ""
-"Une tâche en arrière plan a été lancée pour ajouter des index à la base de "
-"données."
+"La tâche #{job_id} est encore en démarrage. Il peut être nécessaire de la "
+"relancer manuellement."
 
-#: Module.php:205
+#: Module.php:253
+msgid ""
+"Adding database indexes in background (job {link_job}#{job_id}{link_end}, "
+"{link_log}logs{link_end})."
+msgstr ""
+"Ajout des index dans la base de données en arrière-plan (tâche {link_job}"
+"#{job_id}{link_end}, {link_log}journaux{link_end})."
+
+#: Module.php:296
 msgid "The module Generic is no longer needed and can be removed."
 msgstr "Le module Generic n’est plus nécessaire et peut être supprimé."
 
-#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:150
+#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:163
 msgid ""
 "Xml parsing error level {level}, code {code}, for file \"{file}\" (media "
 "#{media_id}), line {line}, column {column}: {message}"
@@ -67,7 +76,7 @@ msgstr ""
 "fichier « {file} » (média #{media_id}), ligne {line}, colonne {column}: "
 "{message}"
 
-#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:172
+#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:185
 msgid ""
 "The file \"{file}\" (media #{media_id}) is not parsable by xml reader "
 "neither dom."
@@ -75,7 +84,7 @@ msgstr ""
 "Le fichier « {file} » (média #{media_id}) n’est pas analysable par le "
 "lecteur xml ni par le lecteur dom."
 
-#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:289
+#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:506
 msgid ""
 "Warning: some files contain invalid unicode characters and cannot be "
 "processed directly."
@@ -157,30 +166,28 @@ msgstr "Choisir un type de média…"
 msgid "A message to translate should be stringable."
 msgstr "Un message à traduire doit être convertible en chaîne."
 
-#: src/Job/AddDatabaseIndexes.php:48
+#: src/Job/AddDatabaseIndexes.php:62
 msgid "All database indexes already exist."
 msgstr "Tous les index de la base de données existent déjà."
 
-#: src/Job/AddDatabaseIndexes.php:53
+#: src/Job/AddDatabaseIndexes.php:68
 msgid "Adding {count} database indexes: {list}"
 msgstr "Ajout de {count} index dans la base de données : {list}"
 
-#: src/Job/AddDatabaseIndexes.php:63
-msgid "Adding index on table `{table}` for column `{column}`."
-msgstr "Ajout d’un index sur la table `{table}` pour la colonne `{column}`."
+#: src/Job/AddDatabaseIndexes.php:88
+msgid "Adding index `{index}` on table `{table}`."
+msgstr "Ajout d’un index `{index}` sur la table `{table}`."
 
-#: src/Job/AddDatabaseIndexes.php:71
-msgid "Successfully added index on table `{table}` for column `{column}`."
+#: src/Job/AddDatabaseIndexes.php:98
+msgid "Successfully added index `{index}` on table `{table}`."
+msgstr "Index `{index}` ajouté avec succès dans la table `{table}`."
+
+#: src/Job/AddDatabaseIndexes.php:103
+msgid "Unable to add index `{index}` on table `{table}`: {msg}"
 msgstr ""
-"Index ajouté avec succès dans la table `{table}` pour la colonne `{column}`."
+"Impossible d’ajouter un index `{index}` dans la table `{table}` : {msg}"
 
-#: src/Job/AddDatabaseIndexes.php:76
-msgid "Unable to add index on table `{table}` for column `{column}`: {msg}"
-msgstr ""
-"Impossible d’ajouter un index dans la table « {table} » pour la colonne "
-"`{column}` : {msg}"
-
-#: src/Job/AddDatabaseIndexes.php:84
+#: src/Job/AddDatabaseIndexes.php:115
 msgid "Successfully added {count} database indexes: {list}"
 msgstr "{count} index ajoutés avec succès : {list}"
 
@@ -226,7 +233,7 @@ msgstr "Le chemin n’est pas lisible"
 msgid "The path is not inside the restricted path"
 msgstr "Le chemin n’est pas à l’intérieur du chemin prévu"
 
-#: src/Form/Element/AbstractGroupBySiteSelect.php:151
+#: src/Form/Element/AbstractGroupBySiteSelect.php:159
 msgid "[No site]"
 msgstr "[Aucun site]"
 
@@ -298,7 +305,7 @@ msgstr ""
 "Erreur lors de la validation de « {filename} ». Il est impossible "
 "d’enregistrer les fichiers avec l’extension « {extension} »."
 
-#: src/ManageModuleAndResources.php:93
+#: src/ManageModuleAndResources.php:94
 msgid ""
 "An error occured when loading vocabulary \"{vocabulary}\": file has no json "
 "content."
@@ -306,7 +313,7 @@ msgstr ""
 "Une erreur est survenue en chargeant le vocabulaire « {vocabulary} » : le "
 "fichier n’a pas de contenu json."
 
-#: src/ManageModuleAndResources.php:100
+#: src/ManageModuleAndResources.php:101
 msgid ""
 "An error occured when adding the prefix \"{prefix}\": another vocabulary "
 "exists. Resolve the conflict before installing this module."
@@ -314,7 +321,7 @@ msgstr ""
 "Une erreur est survenue en ajoutant le préfixe « {prefix} » : un autre "
 "vocabulaire existe. Merci de résoudre le conflit avant d’installer ce module."
 
-#: src/ManageModuleAndResources.php:112
+#: src/ManageModuleAndResources.php:113
 msgid ""
 "A custom vocab exists for \"{name}\". Remove it or rename it before "
 "installing this module."
@@ -322,7 +329,7 @@ msgstr ""
 "Un vocabulaire personnalisé existe pour « {name} » : renommez-le ou "
 "supprimez-le avant d’installer ce module."
 
-#: src/ManageModuleAndResources.php:123
+#: src/ManageModuleAndResources.php:124
 msgid ""
 "A resource template exists for {template}. Rename it or remove it before "
 "installing this module."
@@ -330,11 +337,11 @@ msgstr ""
 "Un modèle de ressource nommé « {template} » existe : renommez ou supprimez-"
 "le avant d’installer ce module."
 
-#: src/ManageModuleAndResources.php:330
+#: src/ManageModuleAndResources.php:332
 msgid "The vocabulary \"{vocabulary}\" was already installed and was kept."
 msgstr "Le vocabulaire « {vocabulary} » a déjà été installé et a été conservé."
 
-#: src/ManageModuleAndResources.php:340
+#: src/ManageModuleAndResources.php:342
 msgid ""
 "An error occured when adding the prefix \"{prefix}\": another vocabulary "
 "exists with the same prefix. Resolve the conflict before installing this "
@@ -344,7 +351,7 @@ msgstr ""
 "vocabulaire existe avec le même préfixe. Merci de résoudre le conflit avant "
 "d’installer ce module."
 
-#: src/ManageModuleAndResources.php:352
+#: src/ManageModuleAndResources.php:354
 msgid ""
 "An error occured when adding the prefix \"{prefix}\" and the associated "
 "properties: {message}"
@@ -352,7 +359,7 @@ msgstr ""
 "Une erreur est survenue en ajoutant le préfixe « {prefix} » et les "
 "propriétés associées : {message}"
 
-#: src/ManageModuleAndResources.php:431 src/ManageModuleAndResources.php:440
+#: src/ManageModuleAndResources.php:433 src/ManageModuleAndResources.php:442
 msgid ""
 "An error occured when updating vocabulary \"{prefix}\" and the associated "
 "properties: {message}"
@@ -360,7 +367,7 @@ msgstr ""
 "Une erreur est survenue lors de la mise à jour du vocabulaire « {prefix} » "
 "et les propriétés associées : {message}"
 
-#: src/ManageModuleAndResources.php:535
+#: src/ManageModuleAndResources.php:537
 msgid ""
 "The following \"{name}\" of the vocabulary \"{label}\" were replaced: "
 "{members}"
@@ -368,7 +375,7 @@ msgstr ""
 "Les « {name} » suivants du vocabulaire « {label} » ont été remplacés : "
 "{members}"
 
-#: src/ManageModuleAndResources.php:545
+#: src/ManageModuleAndResources.php:547
 msgid ""
 "Resources, values and templates were updated, but you may check settings "
 "where the old ones were used."
@@ -376,7 +383,7 @@ msgstr ""
 "Les ressources, valeurs et modèles ont été mis à jour, mais vous pouvez "
 "vérifier les paramètres où les anciennes valeurs étaient utilisées."
 
-#: src/ManageModuleAndResources.php:572
+#: src/ManageModuleAndResources.php:574
 msgid ""
 "The resource template named \"{template}\" is already available and is "
 "skipped."
@@ -384,41 +391,41 @@ msgstr ""
 "Le modèle de ressource nommé « {template} » est déjà disponible et a été "
 "conservé."
 
-#: src/ManageModuleAndResources.php:770
+#: src/ManageModuleAndResources.php:772
 msgid "The custom vocab named \"{custom_vocab}\" is not available."
 msgstr ""
 "Le vocabulaire personnalisé nommé « {custom_vocab} » n’est pas disponible."
 
-#: src/ManageModuleAndResources.php:979
+#: src/ManageModuleAndResources.php:1025
 msgid "No file or url set for the vocabulary."
 msgstr "Pas de fichier ou d’url pour le vocabulaire."
 
-#: src/ManageModuleAndResources.php:988
+#: src/ManageModuleAndResources.php:1034
 msgid "The file \"{file}\" cannot be read. Check the url."
 msgstr "Le fichier « {file} » ne peut pas être lu. Merci de vérifier l’url."
 
-#: src/ManageModuleAndResources.php:999
+#: src/ManageModuleAndResources.php:1045
 msgid "The file \"{file}\" cannot be read. Check the file."
 msgstr ""
 "Le fichier « {file} » ne peut pas être lu. Merci de vérifier le fichier."
 
-#: src/ManageModuleAndResources.php:1020
+#: src/ManageModuleAndResources.php:1066
 msgid "A vocabulary must have a namespace uri and a prefix."
 msgstr "Un vocabulaire doit avoir une uri pour l’espace de nom et un préfixe."
 
-#: src/TraitModule.php:141 src/TraitModule.php:1091
+#: src/TraitModule.php:142 src/TraitModule.php:1094
 msgid "This module requires the module \"{module}\"."
 msgstr "Ce module requiert le module « {module} »."
 
-#: src/TraitModule.php:146
+#: src/TraitModule.php:147
 msgid "This module requires modules \"{modules}\"."
 msgstr "Ce module requiert les modules « {modules} »."
 
-#: src/TraitModule.php:155
+#: src/TraitModule.php:156
 msgid "This module has resources that cannot be installed."
 msgstr "Ce module a des ressources qui ne peuvent pas être installées."
 
-#: src/TraitModule.php:163
+#: src/TraitModule.php:164
 msgid ""
 "This module cannot install its tables, because they exist already. Try to "
 "remove them first."
@@ -426,18 +433,18 @@ msgstr ""
 "Ce module ne peut pas installer ses tables car elles existent déjà. Essayez "
 "de les supprimer manuellement."
 
-#: src/TraitModule.php:493
+#: src/TraitModule.php:496
 msgid "The module removed tables \"{tables}\" from a previous broken install."
 msgstr ""
 "Le module a supprimé les tables \"{tables}\" depuis une installation échouée."
 
-#: src/TraitModule.php:1086
+#: src/TraitModule.php:1089
 msgid ""
 "This module requires the module \"{module}\", version {version} or above."
 msgstr ""
 "Ce module requiert le module « {module} », version {version} ou supérieure."
 
-#: src/TraitModule.php:1198
+#: src/TraitModule.php:1201
 msgid ""
 "The module \"{module}\" was automatically deactivated because the "
 "dependencies are unavailable."
@@ -445,11 +452,11 @@ msgstr ""
 "Le module « {module} » a été automatiquement désactivé car ses dépendances "
 "ne sont plus disponibles."
 
-#: src/TraitModule.php:1220
+#: src/TraitModule.php:1223
 msgid "The directory \"{path}\" is not writeable."
 msgstr "Le dossier « {path} » n’est pas inscriptible."
 
-#: src/TraitModule.php:1231
+#: src/TraitModule.php:1234
 msgid "The directory \"{path}\" is not writeable: {error}."
 msgstr "Le dossier « {path} » n’est pas inscriptible : {error}"
 
@@ -517,13 +524,22 @@ msgstr "vocabulaires"
 msgid "sites"
 msgstr "sites"
 
-#: config/module.config.php:138
+#: config/module.config.php:152
 msgid "An error occurred."
 msgstr "Une erreur est survenue."
 
-#: config/module.config.php:141
+#: config/module.config.php:156
+msgid "Information"
+msgstr "Information"
+
+#: config/module.config.php:158
 msgid "OK"
 msgstr "OK"
+
+#~ msgid "A background job has been started to add database indexes."
+#~ msgstr ""
+#~ "Une tâche en arrière plan a été lancée pour ajouter des index à la base "
+#~ "de données."
 
 #~ msgid "Some indexes will be added to tables to improve performance: {list}."
 #~ msgstr ""

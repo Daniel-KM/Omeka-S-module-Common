@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-09 00:00+0000\n"
+"POT-Creation-Date: 2026-03-30 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -38,34 +38,41 @@ msgstr ""
 msgid "default"
 msgstr ""
 
-#: Module.php:70
+#: Module.php:83
 msgid ""
 "The php extension \"intl\" is not available. It is recommended to install it "
 "to manage diacritics and non-latin characters and to translate dates, "
 "numbers and more."
 msgstr ""
 
-#: Module.php:183
-msgid "A background job has been started to add database indexes."
+#: Module.php:237
+msgid ""
+"The job #{job_id} is still starting. It may need to be relaunched manually."
 msgstr ""
 
-#: Module.php:205
+#: Module.php:253
+msgid ""
+"Adding database indexes in background (job {link_job}#{job_id}{link_end}, "
+"{link_log}logs{link_end})."
+msgstr ""
+
+#: Module.php:296
 msgid "The module Generic is no longer needed and can be removed."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:150
+#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:163
 msgid ""
 "Xml parsing error level {level}, code {code}, for file \"{file}\" (media "
 "#{media_id}), line {line}, column {column}: {message}"
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:172
+#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:185
 msgid ""
 "The file \"{file}\" (media #{media_id}) is not parsable by xml reader "
 "neither dom."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:289
+#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:506
 msgid ""
 "Warning: some files contain invalid unicode characters and cannot be "
 "processed directly."
@@ -134,27 +141,27 @@ msgstr ""
 msgid "A message to translate should be stringable."
 msgstr ""
 
-#: src/Job/AddDatabaseIndexes.php:48
+#: src/Job/AddDatabaseIndexes.php:62
 msgid "All database indexes already exist."
 msgstr ""
 
-#: src/Job/AddDatabaseIndexes.php:53
+#: src/Job/AddDatabaseIndexes.php:68
 msgid "Adding {count} database indexes: {list}"
 msgstr ""
 
-#: src/Job/AddDatabaseIndexes.php:63
-msgid "Adding index on table `{table}` for column `{column}`."
+#: src/Job/AddDatabaseIndexes.php:88
+msgid "Adding index `{index}` on table `{table}`."
 msgstr ""
 
-#: src/Job/AddDatabaseIndexes.php:71
-msgid "Successfully added index on table `{table}` for column `{column}`."
+#: src/Job/AddDatabaseIndexes.php:98
+msgid "Successfully added index `{index}` on table `{table}`."
 msgstr ""
 
-#: src/Job/AddDatabaseIndexes.php:76
-msgid "Unable to add index on table `{table}` for column `{column}`: {msg}"
+#: src/Job/AddDatabaseIndexes.php:103
+msgid "Unable to add index `{index}` on table `{table}`: {msg}"
 msgstr ""
 
-#: src/Job/AddDatabaseIndexes.php:84
+#: src/Job/AddDatabaseIndexes.php:115
 msgid "Successfully added {count} database indexes: {list}"
 msgstr ""
 
@@ -198,7 +205,7 @@ msgstr ""
 msgid "The path is not inside the restricted path"
 msgstr ""
 
-#: src/Form/Element/AbstractGroupBySiteSelect.php:151
+#: src/Form/Element/AbstractGroupBySiteSelect.php:159
 msgid "[No site]"
 msgstr ""
 
@@ -266,129 +273,129 @@ msgid ""
 "extension \"{extension}\"."
 msgstr ""
 
-#: src/ManageModuleAndResources.php:93
+#: src/ManageModuleAndResources.php:94
 msgid ""
 "An error occured when loading vocabulary \"{vocabulary}\": file has no json "
 "content."
 msgstr ""
 
-#: src/ManageModuleAndResources.php:100
+#: src/ManageModuleAndResources.php:101
 msgid ""
 "An error occured when adding the prefix \"{prefix}\": another vocabulary "
 "exists. Resolve the conflict before installing this module."
 msgstr ""
 
-#: src/ManageModuleAndResources.php:112
+#: src/ManageModuleAndResources.php:113
 msgid ""
 "A custom vocab exists for \"{name}\". Remove it or rename it before "
 "installing this module."
 msgstr ""
 
-#: src/ManageModuleAndResources.php:123
+#: src/ManageModuleAndResources.php:124
 msgid ""
 "A resource template exists for {template}. Rename it or remove it before "
 "installing this module."
 msgstr ""
 
-#: src/ManageModuleAndResources.php:330
+#: src/ManageModuleAndResources.php:332
 msgid "The vocabulary \"{vocabulary}\" was already installed and was kept."
 msgstr ""
 
-#: src/ManageModuleAndResources.php:340
+#: src/ManageModuleAndResources.php:342
 msgid ""
 "An error occured when adding the prefix \"{prefix}\": another vocabulary "
 "exists with the same prefix. Resolve the conflict before installing this "
 "module."
 msgstr ""
 
-#: src/ManageModuleAndResources.php:352
+#: src/ManageModuleAndResources.php:354
 msgid ""
 "An error occured when adding the prefix \"{prefix}\" and the associated "
 "properties: {message}"
 msgstr ""
 
-#: src/ManageModuleAndResources.php:431 src/ManageModuleAndResources.php:440
+#: src/ManageModuleAndResources.php:433 src/ManageModuleAndResources.php:442
 msgid ""
 "An error occured when updating vocabulary \"{prefix}\" and the associated "
 "properties: {message}"
 msgstr ""
 
-#: src/ManageModuleAndResources.php:535
+#: src/ManageModuleAndResources.php:537
 msgid ""
 "The following \"{name}\" of the vocabulary \"{label}\" were replaced: "
 "{members}"
 msgstr ""
 
-#: src/ManageModuleAndResources.php:545
+#: src/ManageModuleAndResources.php:547
 msgid ""
 "Resources, values and templates were updated, but you may check settings "
 "where the old ones were used."
 msgstr ""
 
-#: src/ManageModuleAndResources.php:572
+#: src/ManageModuleAndResources.php:574
 msgid ""
 "The resource template named \"{template}\" is already available and is "
 "skipped."
 msgstr ""
 
-#: src/ManageModuleAndResources.php:770
+#: src/ManageModuleAndResources.php:772
 msgid "The custom vocab named \"{custom_vocab}\" is not available."
 msgstr ""
 
-#: src/ManageModuleAndResources.php:979
+#: src/ManageModuleAndResources.php:1025
 msgid "No file or url set for the vocabulary."
 msgstr ""
 
-#: src/ManageModuleAndResources.php:988
+#: src/ManageModuleAndResources.php:1034
 msgid "The file \"{file}\" cannot be read. Check the url."
 msgstr ""
 
-#: src/ManageModuleAndResources.php:999
+#: src/ManageModuleAndResources.php:1045
 msgid "The file \"{file}\" cannot be read. Check the file."
 msgstr ""
 
-#: src/ManageModuleAndResources.php:1020
+#: src/ManageModuleAndResources.php:1066
 msgid "A vocabulary must have a namespace uri and a prefix."
 msgstr ""
 
-#: src/TraitModule.php:141 src/TraitModule.php:1091
+#: src/TraitModule.php:142 src/TraitModule.php:1094
 msgid "This module requires the module \"{module}\"."
 msgstr ""
 
-#: src/TraitModule.php:146
+#: src/TraitModule.php:147
 msgid "This module requires modules \"{modules}\"."
 msgstr ""
 
-#: src/TraitModule.php:155
+#: src/TraitModule.php:156
 msgid "This module has resources that cannot be installed."
 msgstr ""
 
-#: src/TraitModule.php:163
+#: src/TraitModule.php:164
 msgid ""
 "This module cannot install its tables, because they exist already. Try to "
 "remove them first."
 msgstr ""
 
-#: src/TraitModule.php:493
+#: src/TraitModule.php:496
 msgid "The module removed tables \"{tables}\" from a previous broken install."
 msgstr ""
 
-#: src/TraitModule.php:1086
+#: src/TraitModule.php:1089
 msgid ""
 "This module requires the module \"{module}\", version {version} or above."
 msgstr ""
 
-#: src/TraitModule.php:1198
+#: src/TraitModule.php:1201
 msgid ""
 "The module \"{module}\" was automatically deactivated because the "
 "dependencies are unavailable."
 msgstr ""
 
-#: src/TraitModule.php:1220
+#: src/TraitModule.php:1223
 msgid "The directory \"{path}\" is not writeable."
 msgstr ""
 
-#: src/TraitModule.php:1231
+#: src/TraitModule.php:1234
 msgid "The directory \"{path}\" is not writeable: {error}."
 msgstr ""
 
@@ -456,10 +463,14 @@ msgstr ""
 msgid "sites"
 msgstr ""
 
-#: config/module.config.php:138
+#: config/module.config.php:152
 msgid "An error occurred."
 msgstr ""
 
-#: config/module.config.php:141
+#: config/module.config.php:156
+msgid "Information"
+msgstr ""
+
+#: config/module.config.php:158
 msgid "OK"
 msgstr ""
