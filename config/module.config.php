@@ -52,6 +52,7 @@ return [
             'easyMeta' => Service\ViewHelper\EasyMetaFactory::class,
             'matchedRouteName' => Service\ViewHelper\MatchedRouteNameFactory::class,
             'mediaTypeSelect' => Service\ViewHelper\MediaTypeSelectFactory::class,
+            'moduleConfigNav' => Service\View\Helper\ModuleConfigNavFactory::class,
             'translator' => Service\ViewHelper\TranslatorFactory::class,
         ],
     ],
