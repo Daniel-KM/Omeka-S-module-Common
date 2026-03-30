@@ -7,4 +7,5 @@ use Laminas\Form\Element\MultiCheckbox;
 class OptionalMultiCheckbox extends MultiCheckbox
 {
     use TraitOptionalElement;
+    use TraitGroupedMultiOptions;
 }

@@ -7,4 +7,5 @@ use Laminas\Form\Element\Radio;
 class OptionalRadio extends Radio
 {
     use TraitOptionalElement;
+    use TraitGroupedMultiOptions;
 }
