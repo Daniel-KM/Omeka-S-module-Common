@@ -98,7 +98,7 @@ class AddDatabaseIndexes extends AbstractJob
                     'Successfully added index `{index}` on table `{table}`.', // @translate
                     ['index' => $indexName, 'table' => $table]
                 );
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 $logger->err(
                     'Unable to add index `{index}` on table `{table}`: {msg}', // @translate
                     [

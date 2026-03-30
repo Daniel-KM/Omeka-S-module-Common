@@ -618,7 +618,7 @@ class ManageModuleAndResources
         $data['o:terms'] = implode(PHP_EOL, $data['o:terms'] ?? []);
         try {
             return $this->api->create('custom_vocabs', $data)->getContent();
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return null;
         }
     }
@@ -958,7 +958,7 @@ class ManageModuleAndResources
         if ($resource) {
             try {
                 $this->api->delete($resourceName, $resource->id());
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
             }
         }
         return $this;
@@ -1192,7 +1192,7 @@ class ManageModuleAndResources
                     $cache->deleteAll();
                 }
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Ignore.
         }
 
@@ -1236,7 +1236,7 @@ class ManageModuleAndResources
     {
         try {
             return $this->api->read($resourceName, $criteria, [], $options)->getContent();
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return null;
         }
     }

@@ -71,7 +71,7 @@ class Ini extends AbstractValidator
             $this->messageTemplates[self::INI_EXCEPTION] = $e->getMessage();
             $this->error(self::INI_EXCEPTION);
             return false;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->error(self::INCORRECT);
             return false;
         }
@@ -100,7 +100,7 @@ class Ini extends AbstractValidator
         } catch (ConfigException\RuntimeException $e) {
             $this->error($this->allowDoubleQuotes ? self::INCORRECT_VALUES_DOUBLE_QUOTES : self::INCORRECT_VALUES);
             return false;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->error(self::INCORRECT);
             return false;
         }

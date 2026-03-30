@@ -27,7 +27,7 @@ class DefaultSiteFactory implements FactoryInterface
             if ($defaultSiteId) {
                 try {
                     $site = $api->read('sites', ['id' => $defaultSiteId])->getContent();
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     // Nothing.
                     // The site may be private to the user.
                 }
@@ -51,7 +51,7 @@ class DefaultSiteFactory implements FactoryInterface
                 if ($site) {
                     try {
                         $site = $api->read('sites', ['id' => $site->getId()])->getContent();
-                    } catch (\Exception $e) {
+                    } catch (\Throwable $e) {
                         // Reset site, because it is probably private to the user.
                         $site = null;
                     }

@@ -50,7 +50,7 @@ trait PsrInterpolateTrait
                 } else {
                     $replacements['{' . $key . '}'] = '[' . gettype($val) . ']';
                 }
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 // Skip.
             }
         }

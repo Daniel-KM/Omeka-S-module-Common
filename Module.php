@@ -135,7 +135,7 @@ class Module extends AbstractModule
         foreach (explode(";\n", $sqls) as $sql) {
             try {
                 $connection->executeStatement($sql);
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 // Already done.
             }
         }
@@ -147,7 +147,7 @@ class Module extends AbstractModule
                 SQL;
             try {
                 $connection->executeStatement($sql);
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 // Already done.
             }
         }
@@ -192,7 +192,7 @@ class Module extends AbstractModule
                 } else {
                     $newIndices[] = "$table/$indexName";
                 }
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 // Table does not exist yet.
                 unset($tableIndexes[$key]);
             }
