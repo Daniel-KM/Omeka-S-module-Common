@@ -908,6 +908,46 @@ class ManageModuleAndResources
     }
 
     /**
+     * Add terms to an existing custom vocab without duplicates.
+     *
+     * Useful when a module depends on another and needs to
+     * extend its custom vocabs with additional terms.
+     *
+     * @return bool True if terms were added, false if not.
+     */
+    public function enrichCustomVocab(
+        string $label,
+        array $newTerms
+    ): bool {
+        $customVocab = $this->apiRead(
+            'custom_vocabs',
+            ['label' => $label]
+        );
+        if (!$customVocab) {
+            return false;
+        }
+        $terms = $customVocab->terms();
+        $terms = is_array($terms)
+            ? $terms
+            : array_map('trim', explode(PHP_EOL, $terms));
+        $merged = array_unique(array_merge($terms, $newTerms));
+        if (count($merged) === count($terms)) {
+            return false;
+        }
+        $this->api->update(
+            'custom_vocabs',
+            $customVocab->id(),
+            [
+                'o:label' => $label,
+                'o:terms' => implode(PHP_EOL, $merged),
+            ],
+            [],
+            ['isPartial' => true]
+        );
+        return true;
+    }
+
+    /**
      * Remove a resource by a criteria.
      *
      * The resource may have been renamed or removed manually before.
