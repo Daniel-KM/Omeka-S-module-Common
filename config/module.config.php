@@ -40,11 +40,17 @@ return [
     ],
     'view_helpers' => [
         'invokables' => [
+            'formNote' => Form\View\Helper\FormNote::class,
             'isHomePage' => View\Helper\IsHomePage::class,
             'isHtml' => View\Helper\IsHtml::class,
             'isXml' => View\Helper\IsXml::class,
             // Required to manage PsrMessage.
             'messages' => View\Helper\Messages::class,
+        ],
+        'delegators' => [
+            'Laminas\Form\View\Helper\FormElement' => [
+                Service\Delegator\FormElementDelegatorFactory::class,
+            ],
         ],
         'factories' => [
             'assetUrl' => Service\ViewHelper\AssetUrlFactory::class,
@@ -66,6 +72,7 @@ return [
             Form\Element\DataTextarea::class => Form\Element\DataTextarea::class,
             Form\Element\GroupTextarea::class => Form\Element\GroupTextarea::class,
             Form\Element\IniTextarea::class => Form\Element\IniTextarea::class,
+            Form\Element\Note::class => Form\Element\Note::class,
             Form\Element\OptionalCheckbox::class => Form\Element\OptionalCheckbox::class,
             Form\Element\OptionalDate::class => Form\Element\OptionalDate::class,
             Form\Element\OptionalDateTime::class => Form\Element\OptionalDateTime::class,
