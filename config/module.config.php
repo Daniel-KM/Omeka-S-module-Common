@@ -40,6 +40,7 @@ return [
     ],
     'view_helpers' => [
         'invokables' => [
+            'formCollection' => Form\View\Helper\FormCollection::class,
             'formNote' => Form\View\Helper\FormNote::class,
             'isHomePage' => View\Helper\IsHomePage::class,
             'isHtml' => View\Helper\IsHtml::class,
