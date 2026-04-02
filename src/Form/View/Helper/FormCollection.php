@@ -17,7 +17,7 @@ class FormCollection extends LaminasFormCollection
         // Inject info text after <legend> if present.
         $info = $element->getOption('info');
         if ($info && $this->shouldWrap()) {
-            $info = $this->translateLabel($info);
+            $info = $this->getTranslator()->translate($info);
             $escape = $this->getView()->plugin('escapeHtml');
             $infoHtml = '<p class="field-comment">'
                 . $escape($info) . '</p>';
