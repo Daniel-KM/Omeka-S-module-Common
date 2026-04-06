@@ -140,21 +140,14 @@ class SendEmail extends AbstractPlugin
             }
         }
 
-        if (static::$spamKeywords === null) {
-            static::$spamKeywords = include dirname(__DIR__, 4) . '/data/mailer/spam_keywords.php';
-        }
-        $spamKeywords = static::$spamKeywords;
-        foreach ($spamKeywords as $spamKeyword) {
-            // Use word boundaries to avoid false positives on substrings, for
-            // example "cialis" in "specialiste").
-            if (preg_match('/\b' . preg_quote($spamKeyword, '/') . '\b/ui', $body)) {
-                $this->logger->warn(
-                    'Email not sent: this is a spam with "{keyword}" (To: {to}; From: {from}): {body}', // @translate
-                    ['keyword' => $spamKeyword, 'to' => json_encode($to, 320), 'from' => json_encode($from, 320), 'body' => $body]
-                );
-                // Return true to inform the spammer about a valid message sent.
-                return true;
-            }
+        $spamKeyword = $this->matchSpamKeyword($body);
+        if ($spamKeyword !== null) {
+            $this->logger->warn(
+                'Email not sent: this is a spam with "{keyword}" (To: {to}; From: {from}): {body}', // @translate
+                ['keyword' => $spamKeyword, 'to' => json_encode($to, 320), 'from' => json_encode($from, 320), 'body' => $body]
+            );
+            // Return true to inform the spammer about a valid message sent.
+            return true;
         }
 
         $adminEmail = $this->settings->get('administrator_email');
@@ -245,5 +238,26 @@ class SendEmail extends AbstractPlugin
         );
 
         return true;
+    }
+
+    /**
+     * Return the first spam keyword matched in the body, or null.
+     *
+     * Public so callers can detect spam early, for example to flag a message as
+     * spam early, without going through __invoke().
+     */
+    public function matchSpamKeyword(string $body): ?string
+    {
+        if (static::$spamKeywords === null) {
+            static::$spamKeywords = include dirname(__DIR__, 4) . '/data/mailer/spam_keywords.php';
+        }
+        foreach (static::$spamKeywords as $spamKeyword) {
+            // Word boundaries avoid false positives on substrings, for example
+            // "cialis" in "specialiste".
+            if (preg_match('/\b' . preg_quote($spamKeyword, '/') . '\b/ui', $body)) {
+                return $spamKeyword;
+            }
+        }
+        return null;
     }
 }
