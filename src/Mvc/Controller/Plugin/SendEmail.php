@@ -5,6 +5,7 @@ namespace Common\Mvc\Controller\Plugin;
 use Laminas\Log\Logger;
 use Laminas\Mail\Address\AddressInterface;
 use Laminas\Mime\Message as MimeMessage;
+use Laminas\Mime\Mime;
 use Laminas\Mime\Part as MimePart;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 use Omeka\Settings\Settings;
@@ -177,11 +178,15 @@ class SendEmail extends AbstractPlugin
         // Manage more options.
         $subject = trim((string) $subject) ?: $this->mailer->getInstallationTitle();
 
-        // Manage html message if any.
+        // Wrap the body in a MimePart to force charset UTF-8 and encoding
+        // quoted-printable, so mail clients decode accented characters.
         // Many html body are not ending with a ">", so check only initial "<".
-        if (mb_substr($body, 0, 1) === '<') {
-            $body = (new MimeMessage())->addPart((new MimePart($body))->setCharset('UTF-8')->setType('text/html'));
-        }
+        $isHtml = mb_substr($body, 0, 1) === '<';
+        $part = (new MimePart($body))
+            ->setType($isHtml ? Mime::TYPE_HTML : Mime::TYPE_TEXT)
+            ->setCharset('UTF-8')
+            ->setEncoding(Mime::ENCODING_QUOTEDPRINTABLE);
+        $body = (new MimeMessage())->addPart($part);
 
         $message = $this->mailer->createMessage();
         $message
