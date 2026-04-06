@@ -74,7 +74,7 @@ class JSend extends AbstractPlugin
             case self::FAIL:
                 if (!$data) {
                     $message = $message
-                        ?: $controller->viewHelpers()->get('messages')->getTranslatedMessages('error')
+                        ?: $this->flattenMessages($controller->viewHelpers()->get('messages')->getTranslatedMessages('error'))
                         ?: $controller->translate('Check your input for invalid data.'); // @translate
                     $data = ['message' => $message];
                 }
@@ -93,7 +93,7 @@ class JSend extends AbstractPlugin
 
             case self::ERROR:
                 $message = $message
-                    ?: $controller->viewHelpers()->get('messages')->getTranslatedMessages('error')
+                    ?: $this->flattenMessages($controller->viewHelpers()->get('messages')->getTranslatedMessages('error'))
                     ?: $controller->translate('An internal error has occurred.'); // @translate
                 $json = [
                     'status' => self::ERROR,
@@ -149,6 +149,32 @@ class JSend extends AbstractPlugin
         ?int $code = null
     ) {
         return $this->__invoke(self::ERROR, $data, $message, $httpStatusCode, $code);
+    }
+
+    /**
+     * Flatten nested array of messages returned as string.
+     *
+     * This method avoids issues when multiple errors are stored in messenger,
+     * but the output needs only a string.
+     */
+    public function flattenMessages($messages): string
+    {
+        if (!$messages) {
+            return '';
+        }
+        if (is_string($messages)) {
+            return $messages;
+        }
+        if (!is_array($messages)) {
+            return (string) $messages;
+        }
+        $flat = [];
+        array_walk_recursive($messages, function ($v) use (&$flat) {
+            if ($v !== null && $v !== '') {
+                $flat[] = (string) $v;
+            }
+        });
+        return implode("\n", $flat);
     }
 
     public function jsonErrorNotFound(?array $data = null)
