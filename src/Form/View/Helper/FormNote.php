@@ -16,9 +16,11 @@ class FormNote extends AbstractHelper
         if ($text === '') {
             return '';
         }
+        $view = $this->getView();
+        $text = $view->translate($text);
         $escape = $element->getOption('disable_html_escape') !== true;
         if ($escape) {
-            $text = $this->getView()->escapeHtml($text);
+            $text = $view->escapeHtml($text);
         }
         return '<p class="note">' . $text . '</p>';
     }
