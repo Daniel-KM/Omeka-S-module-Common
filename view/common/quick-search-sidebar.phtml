@@ -1,0 +1,42 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Laminas\Form\Form $formSearch Form with a "submit" Button element.
+ * @var string $title Already translated panel title.
+ * @var string|null $top Optional HTML inserted between the title and the form.
+ */
+
+$plugins = $this->getHelperPluginManager();
+$escape = $plugins->get('escapeHtml');
+$translate = $plugins->get('translate');
+$escapeAttr = $plugins->get('escapeHtmlAttr');
+
+$top = $top ?? null;
+
+$formSearch->prepare();
+$submit = $formSearch->get('submit');
+$formSearch->remove('submit');
+
+?>
+<div id="sidebar-search" class="sidebar search">
+    <a href="#"
+        class="sidebar-close o-icon-close"
+        aria-label="<?= $escapeAttr($translate('Close')) ?>"
+        title="<?= $escapeAttr($translate('Close')) ?>"></a>
+    <div class="sidebar-content">
+        <h3><?= $escape($title) ?></h3>
+        <?php if ($top !== null): ?>
+        <?= $top ?>
+        <?php endif; ?>
+        <?= $this->form()->openTag($formSearch) ?>
+        <div class="sidebar-search-fields disable-unsaved-warning">
+            <?php foreach ($formSearch as $elt): ?>
+            <?= $this->formRow($elt) ?>
+            <?php endforeach; ?>
+        </div>
+        <div class="confirm-panel">
+            <?= $this->formButton($submit) ?>
+        </div>
+        <?= $this->form()->closeTag() ?>
+    </div>
+</div>
