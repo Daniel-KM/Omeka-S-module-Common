@@ -1,0 +1,110 @@
+#page-actions .page-action-menu {
+    display: inline-block;
+    position: relative;
+}
+
+#page-actions .page-action-menu .with-sub-menu {
+    display: inline-block;
+    position: relative;
+}
+
+#page-actions .page-action-menu ul {
+    display: none;
+    list-style: none;
+    border: 1px solid #dfdfdf;
+    background-color: #fff;
+    border-radius: 3px;
+    text-align: left;
+    padding: 0;
+    position: absolute;
+    box-shadow: 0 0 5px #dfdfdf;
+    width: auto;
+    white-space: nowrap;
+    margin: 12px 0;
+    z-index: 5;
+}
+
+#page-actions .page-action-menu ul::before {
+    content: "";
+    position: absolute;
+    bottom: calc(100% - 1px);
+    right: 12px;
+    width: 0;
+    height: 0;
+    border-bottom: 12px solid #fff;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+}
+
+#page-actions .page-action-menu ul::after {
+    content: "";
+    position: absolute;
+    bottom: calc(100% - 1px);
+    right: 11px;
+    width: 0;
+    height: 0;
+    border-bottom: 14px solid #dfdfdf;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    z-index: -1;
+}
+
+#page-actions .page-action-menu ul a,
+#page-actions .page-action-menu ul span,
+#page-actions .page-action-menu ul button {
+    padding: 6px 12px 5px;
+    display: block;
+    position: relative;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: 0;
+    box-shadow: none;
+    margin: 0;
+    color: inherit;
+    cursor: pointer;
+    font: inherit;
+}
+
+#page-actions .page-action-menu ul li {
+    position: relative;
+}
+
+#page-actions .page-action-menu ul li.separator span {
+    font-style: italic;
+}
+
+#page-actions .page-action-menu ul li:hover::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background-color: #dfdfdf;
+}
+
+#page-actions .page-action-menu ul li:not(:last-child) a,
+#page-actions .page-action-menu ul li:not(:last-child) span,
+#page-actions .page-action-menu ul li:not(:last-child) button {
+    border-bottom: 1px solid #dfdfdf;
+}
+
+#page-actions .page-action-menu .expand::after {
+    content: "\f0d7";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    margin-left: 6px;
+}
+
+#page-actions .page-action-menu .collapse::after {
+    content: "\f0d8";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    margin-left: 6px;
+}
+
+#page-actions .page-action-menu .collapse + .collapsible {
+    overflow: visible;
+    display: block;
+}
