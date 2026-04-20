@@ -283,9 +283,8 @@ Allow to send an email. All arguments are optional, except the body. The sender
 is the no-reply email of the module [Easy Admin] by default, else the
 adminstrator email defined in main setting.
 
-A quick antispam is included via the keywords set in the file /data/mailer/spam_keywords.php.
-This file can be completed if needed. This feature will be improved or moved in
-a future version.
+A minimal antispam check is applied via keywords listed in `/data/mailer/spam_keywords.php`.
+For improved checks, install module [Bot Guard].
 
 #### SendFile
 
@@ -706,6 +705,7 @@ Copyright
 [PR #2412]: https://github.com/omeka/omeka-s/pull/2412
 [Common.zip]: https://github.com/Daniel-KM/Omeka-S-module-Common/releases
 [jSend]: https://github.com/omniti-labs/jsend
+[Bot Guard]: https://gitlab.com/Daniel-KM/Omeka-S-module-BotGuard
 [Contact Us]: https://gitlab.com/Daniel-KM/Omeka-S-module-ContactUs
 [Contribute]: https://gitlab.com/Daniel-KM/Omeka-S-module-Contribute
 [Easy Admin]: https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin
