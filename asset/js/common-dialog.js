@@ -462,25 +462,43 @@ var CommonDialog = (function() {
     };
 
     /**
+     * Flatten any nested messages structure into a single newline-joined
+     * string.
+     *
+     * Handles strings, arrays and plain objects recursively (typical shape from
+     * `$form->getMessages()`: `{field: {validatorKey: message}}` or
+     * `{field: [msg1, msg2]}`).
+     */
+    self.flattenJSendMessages = function (value) {
+        if (value === null || value === undefined) return '';
+        if (typeof value === 'string') return value;
+        if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+        if (Array.isArray(value)) {
+            return value.map(self.flattenJSendMessages).filter(s => s.length).join("\n");
+        }
+        if (typeof value === 'object') {
+            return Object.values(value).map(self.flattenJSendMessages).filter(s => s.length).join("\n");
+        }
+        return '';
+    };
+
+    /**
      * Get the main message of jSend output, in particular for status fail.
      *
-     * For fail, when there is no message, return the first string value of data,
-     * that should contain an error message.
-     * @todo Return keys with all messages for fail? Adapt for a form?
+     * Supports both shapes:
+     * - `fail` with structured `data` keyed by field (JSend-conformant, e.g.
+     *   `data: {form: {title: ['required']}}`), flattened recursively.
+     * - `fail` with fallback wrapper `data: {message: "…"}` produced by the
+     *   PHP plugin when no structured data is available.
      */
     self.jSendMessage = function (data) {
-        if (typeof data !== 'object') return null;
+        if (typeof data !== 'object' || data === null) return null;
         if (data.message) return data.message.length ? data.message : null;
         if (!data.data) return null;
         if (data.data.message) return data.data.message.length ? data.data.message : null;
         if (!data.status) return null;
         if (data.status === 'fail') {
-            let result = '';
-            for (let value of Object.values(data.data)) {
-                if (typeof value === 'string' && value.length) {
-                    result += "\n" + value;
-                }
-            }
+            const result = self.flattenJSendMessages(data.data);
             return result.length ? result : null;
         }
         return null;

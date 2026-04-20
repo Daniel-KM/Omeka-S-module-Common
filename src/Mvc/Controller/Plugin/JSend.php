@@ -177,6 +177,71 @@ class JSend extends AbstractPlugin
         return implode("\n", $flat);
     }
 
+    /**
+     * Flatten Laminas form messages to a JSend-conformant flat array.
+     *
+     * The JSend spec recommends `data` to be keyed by POST field name, with a
+     * value that is a string (or array of strings) describing the error. The
+     * nested structure returned by `$form->getMessages()` is flattened here to
+     * match html `name` attributes of elements (bracket notation of fieldsets).
+     *
+     * @param array|\Laminas\Form\FormInterface $messages Either a form instance
+     *   or the raw output of `$form->getMessages()`.
+     * @param bool $keepMultiple When true, keys with more than one error keep
+     *   an array value; otherwise only the first message is kept per key.
+     * @return array Flat array keyed by field name, for example
+     *   `['title' => 'Value is required', 'fieldset[email]' => '...']`.
+     */
+    public function flattenFormMessages($messages, bool $keepMultiple = false): array
+    {
+        if ($messages instanceof \Laminas\Form\FormInterface) {
+            $messages = $messages->getMessages();
+        }
+        if (!is_array($messages)) {
+            return [];
+        }
+        $flat = [];
+        $this->flattenFormMessagesWalk($messages, '', $flat, $keepMultiple);
+        return $flat;
+    }
+
+    protected function flattenFormMessagesWalk(array $messages, string $prefix, array &$flat, bool $keepMultiple): void
+    {
+        $leafMessages = [];
+        foreach ($messages as $key => $value) {
+            if (is_array($value)) {
+                if ($this->isLeafValidatorArray($value)) {
+                    // key is the field name, value is [validatorKey => msg].
+                    foreach ($value as $msg) {
+                        if ($msg !== null && $msg !== '') {
+                            $leafMessages[$key][] = (string) $msg;
+                        }
+                    }
+                } else {
+                    // Fieldset: recurse with bracket notation.
+                    $subPrefix = $prefix === '' ? (string) $key : $prefix . '[' . $key . ']';
+                    $this->flattenFormMessagesWalk($value, $subPrefix, $flat, $keepMultiple);
+                }
+            } elseif ($value !== null && $value !== '') {
+                $leafMessages[$key][] = (string) $value;
+            }
+        }
+        foreach ($leafMessages as $key => $msgs) {
+            $name = $prefix === '' ? (string) $key : $prefix . '[' . $key . ']';
+            $flat[$name] = $keepMultiple && count($msgs) > 1 ? $msgs : reset($msgs);
+        }
+    }
+
+    protected function isLeafValidatorArray(array $value): bool
+    {
+        foreach ($value as $v) {
+            if (is_array($v)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public function jsonErrorNotFound(?array $data = null)
     {
         return $this->__invoke(self::FAIL, $data, $this->translate('Not found.'), HttpResponse::STATUS_CODE_404);
