@@ -336,7 +336,7 @@ class DataTextarea extends ArrayTextarea
                         $data[$arrayKey] = implode($separator, $list);
                     }
                 }
-                $string .= implode($kvSeparator, array_map('strval', $data)) . "\n";
+                $string .= implode($kvSeparator, array_map([$this, 'valueToFlatString'], $data)) . "\n";
             }
         }
         // Simple list.
@@ -346,7 +346,7 @@ class DataTextarea extends ArrayTextarea
                     $values = (array) $values;
                 }
                 $data = array_values($values);
-                $string .= implode($kvSeparator, array_map('strval', $data)) . "\n";
+                $string .= implode($kvSeparator, array_map([$this, 'valueToFlatString'], $data)) . "\n";
             }
         }
         $string = rtrim($string, "\n");
@@ -396,7 +396,7 @@ class DataTextarea extends ArrayTextarea
                 }
                 // Don't add the key value separator for the last field, and
                 // append a line break to add an empty line.
-                $string .= implode($kvSeparator, array_map('strval', array_slice($data, 0, -1))) . "\n"
+                $string .= implode($kvSeparator, array_map([$this, 'valueToFlatString'], array_slice($data, 0, -1))) . "\n"
                     . $data[$lastKey] . "\n\n";
             }
         }
@@ -407,7 +407,7 @@ class DataTextarea extends ArrayTextarea
                     $values = (array) $values;
                 }
                 $data = array_values($values);
-                $string .= implode("\n", array_map('strval', $data)) . "\n\n";
+                $string .= implode("\n", array_map([$this, 'valueToFlatString'], $data)) . "\n\n";
             }
         }
         $string = rtrim($string, "\n");
@@ -536,6 +536,22 @@ class DataTextarea extends ArrayTextarea
         }
         return $array === []
             || array_keys($array) === range(0, count($array) - 1);
+    }
+
+    /**
+     * Stringify a row value, flattening any unconfigured nested array.
+     *
+     * Settings can be persisted with values that do not match the declared
+     * dataKeys/dataArrayKeys shape (form bug, manual SQL, legacy format). In
+     * that case sub-arrays must be coerced to a string without triggering a
+     * PHP "Array to string conversion" warning when the textarea is rendered.
+     */
+    protected function valueToFlatString($value): string
+    {
+        if (is_array($value)) {
+            return implode(' ', array_map([$this, 'valueToFlatString'], $value));
+        }
+        return (string) $value;
     }
 
     /**
