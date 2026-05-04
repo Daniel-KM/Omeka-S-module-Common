@@ -1330,6 +1330,20 @@ class ManageModuleAndResources
                     $cache->deleteAll();
                 }
             }
+
+            // Omeka forces setAutoGenerateProxyClasses(-1): proxies are never
+            // regenerated on demand. After a module upgrade that changes an
+            // entity (renamed/added/removed property), stale proxy files on
+            // disk still reference the old shape and Doctrine fails with
+            // "Property X::$Y does not exist". Force regeneration here.
+            $metadataFactory = $entityManager->getMetadataFactory();
+            $allMetadata = $metadataFactory->getAllMetadata();
+            if ($allMetadata) {
+                $proxyDir = $config->getProxyDir();
+                if ($proxyDir && is_dir($proxyDir) && is_writable($proxyDir)) {
+                    $entityManager->getProxyFactory()->generateProxyClasses($allMetadata, $proxyDir);
+                }
+            }
         } catch (\Throwable $e) {
             // Ignore.
         }
