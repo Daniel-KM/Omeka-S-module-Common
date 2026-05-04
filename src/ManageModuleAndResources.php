@@ -87,11 +87,10 @@ class ManageModuleAndResources
 
         // Vocabularies.
         foreach ($this->listFilesInDir($filepathData . 'vocabularies', ['json']) as $filepath) {
-            $data = file_get_contents($filepath);
-            $data = json_decode($data, true);
-            if (!is_array($data)) {
+            $data = $this->getJsonArrayFromFile($filepath);
+            if (!$data) {
                 throw new ModuleCannotInstallException((string) new PsrMessage(
-                    'An error occured when loading vocabulary "{vocabulary}": file has no json content.', // @translate
+                    'An error occured when loading vocabulary file "{vocabulary}": file has no json content.', // @translate
                     ['vocabulary' => pathinfo($filepath, PATHINFO_FILENAME)]
                 ));
             }
@@ -107,6 +106,13 @@ class ManageModuleAndResources
         // Custom vocabs.
         // The presence of the module should be already checked during install.
         foreach ($this->listFilesInDir($filepathData . 'custom-vocabs') as $filepath) {
+            $data = $this->getJsonArrayFromFile($filepath);
+            if (!$data) {
+                throw new ModuleCannotInstallException((string) new PsrMessage(
+                    'An error occured when loading custom vocab file "{file}": file has no json content.', // @translate
+                    ['file' => pathinfo($filepath, PATHINFO_FILENAME)]
+                ));
+            }
             $exists = $this->checkCustomVocab($filepath);
             if ($exists === null) {
                 throw new ModuleCannotInstallException((string) new PsrMessage(
@@ -118,6 +124,13 @@ class ManageModuleAndResources
 
         // Resource templates.
         foreach ($this->listFilesInDir($filepathData . 'resource-templates') as $filepath) {
+            $data = $this->getJsonArrayFromFile($filepath);
+            if (!$data) {
+                throw new ModuleCannotInstallException((string) new PsrMessage(
+                    'An error occured when loading resource template file "{file}": file has no json content.', // @translate
+                    ['file' => pathinfo($filepath, PATHINFO_FILENAME)]
+                ));
+            }
             $exists = $this->checkResourceTemplate($filepath);
             if ($exists === null) {
                 throw new ModuleCannotInstallException((string) new PsrMessage(
@@ -142,9 +155,8 @@ class ManageModuleAndResources
 
         // Vocabularies.
         foreach ($this->listFilesInDir($filepathData . 'vocabularies', ['json']) as $filepath) {
-            $data = file_get_contents($filepath);
-            $data = json_decode($data, true);
-            if (is_array($data)) {
+            $data = $this->getJsonArrayFromFile($filepath);
+            if ($data && is_array($data)) {
                 $this->createOrUpdateVocabulary($data, $module);
             }
         }
@@ -219,11 +231,7 @@ class ManageModuleAndResources
      */
     public function checkResourceTemplate(string $filepath): bool
     {
-        if (!$this->isFileReadable($filepath)) {
-            return false;
-        }
-
-        $data = json_decode(file_get_contents($filepath), true);
+        $data = $this->getJsonArrayFromFile($filepath);
         if (!$data || empty($data['label'])) {
             return false;
         }
@@ -243,7 +251,7 @@ class ManageModuleAndResources
      */
     public function checkCustomVocab(string $filepath): ?bool
     {
-        $data = json_decode(file_get_contents($filepath), true);
+        $data = $this->getJsonArrayFromFile($filepath);
         if (!$data || empty($data['o:label'])) {
             return false;
         }
@@ -561,9 +569,12 @@ class ManageModuleAndResources
      * @throws \Omeka\Api\Exception\RuntimeException
      * @return \Omeka\Api\Representation\ResourceTemplateRepresentation
      */
-    public function createResourceTemplate(string $filepath): ResourceTemplateRepresentation
+    public function createResourceTemplate(string $filepath): ?ResourceTemplateRepresentation
     {
-        $data = json_decode(file_get_contents($filepath), true);
+        $data = $this->getJsonArrayFromFile($filepath);
+        if (!$data) {
+            return null;
+        }
 
         // Check if the resource template exists, so it is not replaced.
         $label = $data['o:label'] ?? '';
@@ -611,7 +622,7 @@ class ManageModuleAndResources
      */
     public function createCustomVocab(string $filepath): ?\CustomVocab\Api\Representation\CustomVocabRepresentation
     {
-        $data = json_decode(file_get_contents($filepath), true);
+        $data = $this->getJsonArrayFromFile($filepath);
         if (!$data) {
             return null;
         }
@@ -761,7 +772,15 @@ class ManageModuleAndResources
      */
     public function updateCustomVocab(string $filepath): \CustomVocab\Api\Representation\CustomVocabRepresentation
     {
-        $data = json_decode(file_get_contents($filepath), true);
+        $data = $this->getJsonArrayFromFile($filepath);
+        if (!$data) {
+            throw new RuntimeException(
+                (string) new PsrMessage(
+                    'An error occured when loading custom vocab file "{file}": file has no json content.', // @translate
+                    ['file' => pathinfo($filepath, PATHINFO_FILENAME)]
+                )
+            );
+        }
 
         $label = $data['o:label'];
         /** @var \CustomVocab\Api\Representation\CustomVocabRepresentation $customVocab */
@@ -978,7 +997,40 @@ class ManageModuleAndResources
      */
     protected function isFileReadable(string $filepath): bool
     {
-        return file_exists($filepath) && filesize($filepath) && is_readable($filepath);
+        return file_exists($filepath)
+            && is_file($filepath)
+            && filesize($filepath)
+            && is_readable($filepath);
+    }
+
+    /**
+     * Check if a file exists, is readable, and is not empty and get json array.
+     */
+    protected function getJsonArrayFromFile(string $filepath): ?array
+    {
+        if (!$this->isFileReadable($filepath)) {
+            $message = new PsrMessage(
+                'The file path {file} does not exist or is empty.', // @translate
+                ['file' => pathinfo($filepath, PATHINFO_FILENAME)]
+            );
+            $messenger = $this->services->get('ControllerPluginManager')->get('messenger');
+            $messenger->addError($message);
+            return null;
+        }
+
+        $content = file_get_contents($filepath);
+        $data = json_decode($content, true);
+        if (!is_array($data)) {
+            $message = new PsrMessage(
+                'The file path {file} does not contain a json array.', // @translate
+                ['file' => pathinfo($filepath, PATHINFO_FILENAME)]
+            );
+            $messenger = $this->services->get('ControllerPluginManager')->get('messenger');
+            $messenger->addError($message);
+            return null;
+        }
+
+        return $data;
     }
 
     /**
@@ -1087,7 +1139,7 @@ class ManageModuleAndResources
         }
         $list = array_filter(
             array_map(fn ($file) => $dirpath . DIRECTORY_SEPARATOR . $file, scandir($dirpath)),
-            fn ($file) => is_file($file) && is_readable($file) && filesize($file)
+            fn ($file) => $this->isFileReadable($file)
         );
         if ($extensions) {
             $list = array_filter($list, fn ($file) => in_array(pathinfo($file, PATHINFO_EXTENSION), $extensions));
@@ -1130,7 +1182,7 @@ class ManageModuleAndResources
 
         $paths = glob($globPath, GLOB_BRACE);
         foreach ($paths as $filepath) {
-            if (!is_file($filepath) || !$this->isFileReadable($filepath)) {
+            if (!$this->isFileReadable($filepath)) {
                 continue;
             }
             $phtml = file_get_contents($filepath);
