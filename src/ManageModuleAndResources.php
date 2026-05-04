@@ -144,6 +144,92 @@ class ManageModuleAndResources
     }
 
     /**
+     * Delete all resources installed by a module.
+     *
+     * Safe by default: vocabularies are NEVER deleted (their properties or
+     * resource classes may still be referenced by user-created resources).
+     * Resource templates and custom vocabs are deleted when they match the file
+     * label. Pass $deleteVocabularies = true to opt in to vocabulary deletion
+     * (caller is responsible for the data risk).
+     *
+     * @return string[] Human-readable messages for skipped or failed
+     * deletions (empty when everything went fine).
+     */
+    public function deleteAllResources(string $module, bool $deleteVocabularies = false): array
+    {
+        $modulePath = $this->resolveModulePath($module);
+        $filepathData = ($modulePath ?? OMEKA_PATH . '/modules/' . $module) . '/data/';
+
+        $messages = [];
+
+        // Resource templates first: they reference vocabs/custom vocabs.
+        foreach ($this->listFilesInDir($filepathData . 'resource-templates') as $filepath) {
+            $data = $this->getJsonArrayFromFile($filepath);
+            if (!$data || empty($data['label'])) {
+                continue;
+            }
+            $template = $this->apiRead('resource_templates', ['label' => $data['label']]);
+            if (!$template) {
+                continue;
+            }
+            try {
+                $this->api->delete('resource_templates', $template->id());
+            } catch (\Throwable $e) {
+                $messages[] = sprintf('Resource template "%s" not deleted: %s', $data['label'], $e->getMessage());
+            }
+        }
+
+        // Custom vocabs.
+        foreach ($this->listFilesInDir($filepathData . 'custom-vocabs') as $filepath) {
+            $data = $this->getJsonArrayFromFile($filepath);
+            if (!$data || empty($data['o:label'])) {
+                continue;
+            }
+            $cv = $this->apiRead('custom_vocabs', ['label' => $data['o:label']]);
+            if (!$cv) {
+                continue;
+            }
+            try {
+                $this->api->delete('custom_vocabs', $cv->id());
+            } catch (\Throwable $e) {
+                $messages[] = sprintf('Custom vocab "%s" not deleted: %s', $data['o:label'], $e->getMessage());
+            }
+        }
+
+        // Vocabularies (opt-in only).
+        if ($deleteVocabularies) {
+            foreach ($this->listFilesInDir($filepathData . 'vocabularies', ['json']) as $filepath) {
+                $data = $this->getJsonArrayFromFile($filepath);
+                if (!$data || empty($data['vocabulary']['o:namespace_uri'])) {
+                    continue;
+                }
+                $vocab = $this->apiRead('vocabularies', ['namespaceUri' => $data['vocabulary']['o:namespace_uri']]);
+                if (!$vocab) {
+                    continue;
+                }
+                try {
+                    $this->api->delete('vocabularies', $vocab->id());
+                } catch (\Throwable $e) {
+                    $messages[] = sprintf('Vocabulary "%s" not deleted: %s', $data['vocabulary']['o:prefix'] ?? '?', $e->getMessage());
+                }
+            }
+        } else {
+            foreach ($this->listFilesInDir($filepathData . 'vocabularies', ['json']) as $filepath) {
+                $data = $this->getJsonArrayFromFile($filepath);
+                if (!$data || empty($data['vocabulary']['o:namespace_uri'])) {
+                    continue;
+                }
+                $vocab = $this->apiRead('vocabularies', ['namespaceUri' => $data['vocabulary']['o:namespace_uri']]);
+                if ($vocab) {
+                    $messages[] = sprintf('Vocabulary "%s" kept (may be used by resources)', $data['vocabulary']['o:prefix'] ?? '?');
+                }
+            }
+        }
+
+        return $messages;
+    }
+
+    /**
      * Install all resources that are in the path data/ of a module.
      *
      * The data should have been checked first with checkAllResources().
