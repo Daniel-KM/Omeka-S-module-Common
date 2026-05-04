@@ -200,69 +200,129 @@ class Module extends AbstractModule
         }
 
         if ($newIndices) {
-            // Dispatch background job to add indexes (session and value tables
-            // can be very large). Temporarily mark the module as active so the
-            // background PHP-CLI process can bootstrap it.
-            require_once __DIR__ . '/src/Job/AddDatabaseIndexes.php';
+            // Strategy: classify each missing index as "small" or "large" by
+            // table size, then: - small: ALTER TABLE inline, immediate
+            // messenger feedback; - large: aggregated into ONE detached PHP CLI
+            // script call
+            //   that processes them sequentially with online DDL
+            //   (ALGORITHM=INPLACE, LOCK=NONE). The standalone script bypasses
+            //   Omeka bootstrap and module autoload (direct PDO +
+            //   database.ini), so no class-loading race whatever the module
+            //   state.
+            //
+            // Threshold avoids paying fork+bootstrap cost for trivial ALTERs
+            // while keeping the admin request responsive on multi-million-row
+            // tables (mdb: tens of M values, ~1M resources; busy sites: huge
+            // session table from crawlers).
+            $largeRowThreshold = 100000;
 
-            $moduleId = 'Common';
-            $moduleRow = $connection->executeQuery(
-                'SELECT `is_active`, `version` FROM `module` WHERE `id` = ?',
-                [$moduleId]
-            )->fetchAssociative();
-            $wasActive = (bool) ($moduleRow['is_active'] ?? false);
+            $tableNames = array_unique(array_map(fn ($t) => key($t), $tableIndexes));
+            $tableRows = [];
+            try {
+                $rs = $connection->executeQuery(
+                    'SELECT TABLE_NAME, TABLE_ROWS FROM information_schema.TABLES'
+                    . ' WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME IN (?)',
+                    [$tableNames],
+                    [\Doctrine\DBAL\Connection::PARAM_STR_ARRAY]
+                )->fetchAllAssociative();
+                foreach ($rs as $row) {
+                    $tableRows[$row['TABLE_NAME']] = (int) $row['TABLE_ROWS'];
+                }
+            } catch (\Throwable $e) {
+                // information_schema not readable: assume all small.
+            }
 
-            // Read the new version from module.ini.
-            $ini = parse_ini_file(__DIR__ . '/config/module.ini');
-            $newVersion = $ini['version']
-                ?? $moduleRow['version'];
-            $connection->executeStatement(
-                'UPDATE `module` SET `version` = ?, `is_active` = 1 WHERE `id` = ?',
-                [$newVersion, $moduleId]
-            );
+            $small = [];
+            $large = [];
+            foreach ($tableIndexes as $tableIndex) {
+                $table = key($tableIndex);
+                $columns = reset($tableIndex);
+                if (is_array($columns)) {
+                    $indexName = key($columns);
+                    $columnsSql = reset($columns);
+                } else {
+                    $indexName = $columns;
+                    $columnsSql = "`$columns`";
+                }
+                $entry = ['table' => $table, 'index' => $indexName, 'columns' => $columnsSql];
+                if (($tableRows[$table] ?? 0) >= $largeRowThreshold) {
+                    $large[] = $entry;
+                } else {
+                    $small[] = $entry;
+                }
+            }
 
-            $dispatcher = $services->get('Omeka\Job\Dispatcher');
-            $job = $dispatcher->dispatch(
-                \Common\Job\AddDatabaseIndexes::class
-            );
-
-            // Wait for the background process to read the module state.
-            sleep(5);
-
-            $status = $connection->executeQuery(
-                'SELECT `status` FROM `job` WHERE `id` = ?',
-                [$job->getId()]
-            )->fetchOne();
-            if ($status === \Omeka\Entity\Job::STATUS_STARTING) {
+            $added = [];
+            $failed = [];
+            foreach ($small as $entry) {
+                $sql = sprintf(
+                    'ALTER TABLE `%s` ADD INDEX `%s` (%s)',
+                    $entry['table'], $entry['index'], $entry['columns']
+                );
+                try {
+                    $connection->executeStatement($sql);
+                    $added[] = $entry['table'] . '/' . $entry['index'];
+                } catch (\Throwable $e) {
+                    $failed[] = $entry['table'] . '/' . $entry['index'] . ': ' . $e->getMessage();
+                }
+            }
+            if ($added) {
+                $messenger->addSuccess(new \Common\Stdlib\PsrMessage(
+                    'Added {count} database indexes: {list}.', // @translate
+                    ['count' => count($added), 'list' => implode(', ', $added)]
+                ));
+            }
+            if ($failed) {
                 $messenger->addWarning(new \Common\Stdlib\PsrMessage(
-                    'The job #{job_id} is still starting. It may need to be relaunched manually.', // @translate
-                    ['job_id' => $job->getId()]
+                    'Failed to add {count} database indexes: {list}.', // @translate
+                    ['count' => count($failed), 'list' => implode(' | ', $failed)]
                 ));
             }
 
-            // Restore is_active if the module was inactive. The version is
-            // not restored: the Module Manager overwrites it after upgrade.
-            if (!$wasActive) {
-                $connection->executeStatement(
-                    'UPDATE `module`  SET `is_active` = 0 WHERE `id` = ?',
-                    [$moduleId]
-                );
-            }
+            if ($large) {
+                /** @var \Omeka\Stdlib\Cli $cli */
+                $cli = $services->get('Omeka\Cli');
+                $phpPath = $cli->getCommandPath('php');
+                $script = __DIR__ . '/data/scripts/add-database-index.php';
+                $batchDir = OMEKA_PATH . '/logs';
+                if (!is_dir($batchDir) || !is_writable($batchDir)) {
+                    $batchDir = sys_get_temp_dir();
+                }
+                $batchFile = $batchDir . '/common-add-index-' . uniqid() . '.json';
+                @file_put_contents($batchFile, json_encode($large));
 
-            $urlHelper = $services->get('ViewHelperManager')->get('url');
-            $message = new \Common\Stdlib\PsrMessage(
-                'Adding database indexes in background (job {link_job}#{job_id}{link_end}, {link_log}logs{link_end}).', // @translate
-                [
-                    'link_job' => sprintf('<a href="%s">', htmlspecialchars($urlHelper('admin/id', ['controller' => 'job', 'id' => $job->getId()]))),
-                    'job_id' => $job->getId(),
-                    'link_end' => '</a>',
-                    'link_log' => class_exists('Log\Module', false)
-                        ? sprintf('<a href="%1$s">', $urlHelper('admin/default', ['controller' => 'log', ], ['query' => ['job_id' => $job->getId()]]))
-                        : sprintf('<a href="%1$s" target="_blank">', $urlHelper('admin/id', ['controller' => 'job', 'action' => 'log', 'id' => $job->getId()])),
-                ]
-            );
-            $message->setEscapeHtml(false);
-            $messenger->addSuccess($message);
+                $largeList = implode(', ', array_map(
+                    fn ($e) => $e['table'] . '/' . $e['index'] . ' (' . ($tableRows[$e['table']] ?? '?') . ' rows)',
+                    $large
+                ));
+
+                if (!$phpPath || !is_readable($script) || !file_exists($batchFile)) {
+                    $manualSqls = implode("\n", array_map(
+                        fn ($e) => sprintf(
+                            'ALTER TABLE `%s` ADD INDEX `%s` (%s), ALGORITHM=INPLACE, LOCK=NONE;',
+                            $e['table'], $e['index'], $e['columns']
+                        ),
+                        $large
+                    ));
+                    @unlink($batchFile);
+                    $messenger->addWarning(new \Common\Stdlib\PsrMessage(
+                        'PHP-CLI unavailable for {count} large-table indexes ({list}). Ask your DBA to run: {sql}', // @translate
+                        ['count' => count($large), 'list' => $largeList, 'sql' => $manualSqls]
+                    ));
+                } else {
+                    $command = sprintf(
+                        '%s %s --batch %s > /dev/null 2>&1 &',
+                        escapeshellcmd($phpPath),
+                        escapeshellarg($script),
+                        escapeshellarg($batchFile)
+                    );
+                    $cli->execute($command);
+                    $messenger->addSuccess(new \Common\Stdlib\PsrMessage(
+                        '{count} large-table indexes are being added in background with online DDL ({list}). Track progress in logs/common-add-index.log.', // @translate
+                        ['count' => count($large), 'list' => $largeList]
+                    ));
+                }
+            }
         }
     }
 
