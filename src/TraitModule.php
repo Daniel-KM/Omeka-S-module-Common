@@ -928,8 +928,6 @@ trait TraitModule
      * @param string $settingsType
      * @param int|null $id Site id or user id.
      * @param bool True if processed.
-     *
-     * @todo Allow to set default options for arrays (see module Reference).
      */
     protected function initDataToPopulate(SettingsInterface $settings, string $settingsType, ?int $id = null): bool
     {
@@ -961,20 +959,36 @@ trait TraitModule
         $translator = $services->get(TranslatorInterface::class);
 
         $currentSettings = $stmt->fetchAllKeyValue();
-        // Skip settings that are arrays, because the fields "multi-checkbox"
-        // and "multi-select" are removed when no value are selected, so it's
-        // not possible to determine if it's a new setting or an old empty
-        // setting currently. So fill them via upgrade in that case or fill the
-        // values.
-        // TODO Find a way to save empty multi-checkboxes and multi-selects (core fix).
-        $defaultSettings = array_filter($defaultSettings, fn ($v) => !is_array($v));
+
+        // This check fix the issues with multi-valued fields, where it was not
+        // possible if an config was set by the user or by the module.
+        // Check for first time init: when present, the module has already been
+        // initialized for this settings scope (config/site/user).
+        // Array defaults (multi-checkbox, multi-select) are then owned by the
+        // user (these fields submit no key when empty, so a missing row is
+        // intentional, not "never set").
+        // On first init, every default scalars and arrays are pushed and a
+        // "sentinel" key allows to mark this scope as initialized.
+        $sentinelKey = strtolower(static::NAMESPACE) . '_initialized_' . $settingsType;
+        $isFirstInit = !array_key_exists($sentinelKey, $currentSettings);
+
+        if (!$isFirstInit) {
+            $defaultSettings = array_filter($defaultSettings, fn ($v) => !is_array($v));
+        }
+
         $missingSettings = array_diff_key($defaultSettings, $currentSettings);
 
         foreach ($missingSettings as $name => $value) {
             $settings->set(
                 $name,
-                $this->isSettingTranslatable($settingsType, $name) ? $translator->translate($value) : $value
+                !is_array($value) && $this->isSettingTranslatable($settingsType, $name)
+                    ? $translator->translate($value)
+                    : $value
             );
+        }
+
+        if ($isFirstInit) {
+            $settings->set($sentinelKey, '1');
         }
 
         return true;
