@@ -858,12 +858,32 @@ trait TraitModule
         // In practice, there is a new option to set in each fieldset the group
         // where params are displayed.
 
-        // TODO Order element groups.
         // TODO Move main params to site settings and user settings.
 
+        // Merge module groups into form groups, then optionally reorder. A
+        // fieldset can declare an "element_groups_order" option as an ordered
+        // list of group keys (own groups and core ones); listed keys come first
+        // in that exact order, unlisted keys keep their original relative order
+        // at the end.
         $fieldsetElementGroups = $fieldset->getOption('element_groups');
         if ($fieldsetElementGroups) {
-            $form->setOption('element_groups', array_merge($form->getOption('element_groups') ?: [], $fieldsetElementGroups));
+            $merged = array_merge($form->getOption('element_groups') ?: [], $fieldsetElementGroups);
+            $order = $fieldset->getOption('element_groups_order');
+            if (is_array($order) && $order) {
+                $ordered = [];
+                foreach ($order as $key) {
+                    if (array_key_exists($key, $merged)) {
+                        $ordered[$key] = $merged[$key];
+                    }
+                }
+                foreach ($merged as $key => $label) {
+                    if (!array_key_exists($key, $ordered)) {
+                        $ordered[$key] = $label;
+                    }
+                }
+                $merged = $ordered;
+            }
+            $form->setOption('element_groups', $merged);
         }
 
         // The user view is managed differently.
