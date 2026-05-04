@@ -14,39 +14,37 @@
  *       --table value \
  *       --index type \
  *       --columns "`type`" \
- *       [--algorithm INPLACE] [--lock NONE] [--log /path/to/log]
+ *       [--algorithm INPLACE] [--lock NONE]
  *
  * Usage (batch of indexes via JSON file, one ALTER per array element):
- *   php add-database-index.php --batch /path/to/indexes.json [--log ...] JSON
- *   format: [{"table":"value","index":"type","columns":"`type`"}, ...]
+ *   php add-database-index.php --batch /path/to/indexes.json JSON format:
+ *   [{"table":"value","index":"type","columns":"`type`"}, ...]
  *
- * Exit code 0 always (background script — non-zero would not surface). Status
- * is appended to the log file.
+ * Exit code 0 always (background script — non-zero would not surface).
  */
 
-$opts = getopt('', ['table::', 'index::', 'columns::', 'algorithm::', 'lock::', 'log::', 'batch::']);
+$opts = getopt('', ['table::', 'index::', 'columns::', 'algorithm::', 'lock::', 'batch::']);
+
+openlog('omeka-common-add-index', LOG_PID | LOG_ODELAY, LOG_USER);
+
+$fail = function (string $msg): void {
+    syslog(LOG_ERR, $msg);
+    closelog();
+    exit(0);
+};
 
 $omekaPath = realpath(__DIR__ . '/../../../..');
 if (!$omekaPath) {
-    fwrite(STDERR, "Cannot resolve Omeka root from " . __DIR__ . "\n");
-    exit(0);
+    $fail('Cannot resolve Omeka root.');
 }
 $dbIni = $omekaPath . '/config/database.ini';
 if (!is_readable($dbIni)) {
-    fwrite(STDERR, "Cannot read database config: $dbIni\n");
-    exit(0);
+    $fail("Cannot read database config: $dbIni");
 }
-$logFile = $opts['log'] ?? ($omekaPath . '/logs/common-add-index.log');
-
-$logLine = function (string $msg) use ($logFile): void {
-    $line = sprintf("[%s] [pid %d] %s\n", date('Y-m-d H:i:s'), getmypid(), $msg);
-    @file_put_contents($logFile, $line, FILE_APPEND);
-};
 
 $db = parse_ini_file($dbIni);
 if (!$db) {
-    $logLine("Cannot parse $dbIni");
-    exit(0);
+    $fail("Cannot parse $dbIni");
 }
 
 if (!empty($db['unix_socket'])) {
@@ -63,26 +61,22 @@ try {
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
     ]);
 } catch (\Throwable $e) {
-    $logLine("Connection failed: " . $e->getMessage());
-    exit(0);
+    $fail('Database connection failed: ' . $e->getMessage());
 }
 
 // Build index list.
 $indexes = [];
 if (!empty($opts['batch'])) {
     if (!is_readable($opts['batch'])) {
-        $logLine("Batch file not readable: " . $opts['batch']);
-        exit(0);
+        $fail('Batch file not readable: ' . $opts['batch']);
     }
     $json = file_get_contents($opts['batch']);
     $decoded = json_decode($json, true);
     if (!is_array($decoded)) {
-        $logLine("Batch file is not valid JSON: " . $opts['batch']);
-        exit(0);
+        $fail('Batch file is not valid JSON: ' . $opts['batch']);
     }
     foreach ($decoded as $entry) {
         if (empty($entry['table']) || empty($entry['index']) || empty($entry['columns'])) {
-            $logLine("Skipping malformed batch entry: " . json_encode($entry));
             continue;
         }
         $indexes[] = $entry;
@@ -94,17 +88,21 @@ if (!empty($opts['batch'])) {
         'columns' => $opts['columns'],
     ];
 } else {
-    $logLine("Missing args: pass --batch <file> or --table --index --columns.");
-    exit(0);
+    $fail('Missing args: pass --batch <file> or --table --index --columns.');
 }
 
 $algorithm = preg_replace('/[^A-Z]/', '', strtoupper($opts['algorithm'] ?? 'INPLACE'));
 $lock = preg_replace('/[^A-Z]/', '', strtoupper($opts['lock'] ?? 'NONE'));
 
+$added = [];
+$skipped = [];
+$failed = [];
+
 foreach ($indexes as $idx) {
     $table = str_replace('`', '', (string) $idx['table']);
     $index = str_replace('`', '', (string) $idx['index']);
     $columns = (string) $idx['columns'];
+    $ref = "$table/$index";
 
     try {
         $exists = $pdo->query(sprintf(
@@ -113,11 +111,11 @@ foreach ($indexes as $idx) {
             $pdo->quote($index)
         ))->fetchColumn();
     } catch (\Throwable $e) {
-        $logLine("Pre-check failed for `$table`.`$index`: " . $e->getMessage());
+        $failed[] = $ref . ' (' . $e->getMessage() . ')';
         continue;
     }
     if ($exists) {
-        $logLine("Index `$index` on `$table` already exists, skipping.");
+        $skipped[] = $ref;
         continue;
     }
 
@@ -125,18 +123,15 @@ foreach ($indexes as $idx) {
         'ALTER TABLE `%s` ADD INDEX `%s` (%s), ALGORITHM=%s, LOCK=%s',
         $table, $index, $columns, $algorithm, $lock
     );
-    $logLine("Starting: $sql");
-    $start = microtime(true);
     try {
         $pdo->exec($sql);
-        $logLine(sprintf("Done `%s`.`%s` in %.2fs.", $table, $index, microtime(true) - $start));
+        $added[] = $ref;
     } catch (\Throwable $e) {
-        $logLine("Online DDL failed for `$table`.`$index` (" . $e->getMessage() . "), retrying without ALGORITHM/LOCK.");
         try {
             $pdo->exec(sprintf('ALTER TABLE `%s` ADD INDEX `%s` (%s)', $table, $index, $columns));
-            $logLine(sprintf("Done `%s`.`%s` (no online DDL) in %.2fs.", $table, $index, microtime(true) - $start));
+            $added[] = $ref;
         } catch (\Throwable $e2) {
-            $logLine("Failed `$table`.`$index`: " . $e2->getMessage());
+            $failed[] = $ref . ' (' . $e2->getMessage() . ')';
         }
     }
 }
@@ -145,5 +140,18 @@ foreach ($indexes as $idx) {
 if (!empty($opts['batch']) && is_writable($opts['batch'])) {
     @unlink($opts['batch']);
 }
+
+$summary = sprintf(
+    'add-database-index: %d added, %d skipped, %d failed.',
+    count($added),
+    count($skipped),
+    count($failed)
+);
+if ($failed) {
+    syslog(LOG_ERR, $summary . ' Failed: ' . implode('; ', $failed));
+} else {
+    syslog(LOG_INFO, $summary . ($added ? ' Added: ' . implode(', ', $added) : ''));
+}
+closelog();
 
 exit(0);
