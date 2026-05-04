@@ -168,6 +168,7 @@ class Module extends AbstractModule
             ['value' => 'type'],
             ['value' => 'lang'],
             ['value' => ['idx_property_value' => '`property_id`, `value`(190)']],
+            ['item_site' => ['idx_site_item' => '`site_id`, `item_id`']],
             // Keep session last, because it may fail on a big database.
             ['session' => 'modified'],
         ];
