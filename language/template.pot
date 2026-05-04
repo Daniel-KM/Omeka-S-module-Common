@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-30 00:00+0000\n"
+"POT-Creation-Date: 2026-05-04 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,12 +30,21 @@ msgstr ""
 msgid "The status \"%s\" is not supported by jSend."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/JSend.php:156
+#: src/Mvc/Controller/Plugin/JSend.php:247
 msgid "Not found."
 msgstr ""
 
 #: src/Stdlib/PsrMessage.php:165
 msgid "default"
+msgstr ""
+
+#: data/scripts/upgrade.php:117
+msgid ""
+"The dialog template and related view helpers have been improved for "
+"accessibility (ARIA): proper heading level (h2), aria-labelledby/aria-"
+"describedby on the dialog, aria-label on close buttons, role/aria-live on "
+"messages. Modules and themes overriding this template or using its CSS "
+"classes should be reviewed and updated accordingly."
 msgstr ""
 
 #: Module.php:83
@@ -45,18 +54,27 @@ msgid ""
 "numbers and more."
 msgstr ""
 
-#: Module.php:237
-msgid ""
-"The job #{job_id} is still starting. It may need to be relaunched manually."
+#: Module.php:271
+msgid "Added {count} database indexes: {list}."
 msgstr ""
 
-#: Module.php:253
-msgid ""
-"Adding database indexes in background (job {link_job}#{job_id}{link_end}, "
-"{link_log}logs{link_end})."
+#: Module.php:277
+msgid "Failed to add {count} database indexes: {list}."
 msgstr ""
 
-#: Module.php:296
+#: Module.php:309
+msgid ""
+"PHP-CLI unavailable for {count} large-table indexes ({list}). Ask your DBA "
+"to run: {sql}"
+msgstr ""
+
+#: Module.php:321
+msgid ""
+"{count} large-table indexes are being added in background with online DDL "
+"({list}). Track progress in logs/common-add-index.log."
+msgstr ""
+
+#: Module.php:357
 msgid "The module Generic is no longer needed and can be removed."
 msgstr ""
 
@@ -90,45 +108,45 @@ msgstr ""
 msgid "Too long subject."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/SendEmail.php:87
+#: src/Mvc/Controller/Plugin/SendEmail.php:88
 msgid "Email not sent: the content is missing (subject: {subject})."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/SendEmail.php:99
+#: src/Mvc/Controller/Plugin/SendEmail.php:100
 msgid "Email not sent: there is no recipient (subject: {subject})."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/SendEmail.php:128
+#: src/Mvc/Controller/Plugin/SendEmail.php:129
 msgid ""
 "Email not sent: the sender \"{sender}\" is not valid (subject: {subject})."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/SendEmail.php:135
+#: src/Mvc/Controller/Plugin/SendEmail.php:136
 msgid ""
 "Email not sent: the sender email \"{sender}\" is invalid (subject: "
 "{subject})."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/SendEmail.php:151
+#: src/Mvc/Controller/Plugin/SendEmail.php:146
 msgid ""
 "Email not sent: this is a spam with \"{keyword}\" (To: {to}; From: {from}): "
 "{body}"
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/SendEmail.php:198
+#: src/Mvc/Controller/Plugin/SendEmail.php:196
 msgid "Email not sent: the cc emails {list} are invalid (subject: {subject})."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/SendEmail.php:210
+#: src/Mvc/Controller/Plugin/SendEmail.php:208
 msgid "Email not sent: the bcc emails {list} are invalid (subject: {subject})."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/SendEmail.php:222
+#: src/Mvc/Controller/Plugin/SendEmail.php:220
 msgid ""
 "Email not sent: the reply-to emails {list} are invalid (subject: {subject})."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/SendEmail.php:238
+#: src/Mvc/Controller/Plugin/SendEmail.php:236
 msgid "An email was sent to {recipients} with subject: {subject}"
 msgstr ""
 
@@ -141,27 +159,27 @@ msgstr ""
 msgid "A message to translate should be stringable."
 msgstr ""
 
-#: src/Job/AddDatabaseIndexes.php:62
+#: src/Job/AddDatabaseIndexes.php:63
 msgid "All database indexes already exist."
 msgstr ""
 
-#: src/Job/AddDatabaseIndexes.php:68
+#: src/Job/AddDatabaseIndexes.php:69
 msgid "Adding {count} database indexes: {list}"
 msgstr ""
 
-#: src/Job/AddDatabaseIndexes.php:88
+#: src/Job/AddDatabaseIndexes.php:89
 msgid "Adding index `{index}` on table `{table}`."
 msgstr ""
 
-#: src/Job/AddDatabaseIndexes.php:98
+#: src/Job/AddDatabaseIndexes.php:99
 msgid "Successfully added index `{index}` on table `{table}`."
 msgstr ""
 
-#: src/Job/AddDatabaseIndexes.php:103
+#: src/Job/AddDatabaseIndexes.php:104
 msgid "Unable to add index `{index}` on table `{table}`: {msg}"
 msgstr ""
 
-#: src/Job/AddDatabaseIndexes.php:115
+#: src/Job/AddDatabaseIndexes.php:116
 msgid "Successfully added {count} database indexes: {list}"
 msgstr ""
 
@@ -273,92 +291,112 @@ msgid ""
 "extension \"{extension}\"."
 msgstr ""
 
-#: src/ManageModuleAndResources.php:94
+#: src/ManageModuleAndResources.php:93
 msgid ""
-"An error occured when loading vocabulary \"{vocabulary}\": file has no json "
-"content."
+"An error occured when loading vocabulary file \"{vocabulary}\": file has no "
+"json content."
 msgstr ""
 
-#: src/ManageModuleAndResources.php:101
+#: src/ManageModuleAndResources.php:100
 msgid ""
 "An error occured when adding the prefix \"{prefix}\": another vocabulary "
 "exists. Resolve the conflict before installing this module."
 msgstr ""
 
-#: src/ManageModuleAndResources.php:113
+#: src/ManageModuleAndResources.php:112 src/ManageModuleAndResources.php:865
+msgid ""
+"An error occured when loading custom vocab file \"{file}\": file has no json "
+"content."
+msgstr ""
+
+#: src/ManageModuleAndResources.php:119
 msgid ""
 "A custom vocab exists for \"{name}\". Remove it or rename it before "
 "installing this module."
 msgstr ""
 
-#: src/ManageModuleAndResources.php:124
+#: src/ManageModuleAndResources.php:130
+msgid ""
+"An error occured when loading resource template file \"{file}\": file has no "
+"json content."
+msgstr ""
+
+#: src/ManageModuleAndResources.php:137
 msgid ""
 "A resource template exists for {template}. Rename it or remove it before "
 "installing this module."
 msgstr ""
 
-#: src/ManageModuleAndResources.php:332
+#: src/ManageModuleAndResources.php:426
 msgid "The vocabulary \"{vocabulary}\" was already installed and was kept."
 msgstr ""
 
-#: src/ManageModuleAndResources.php:342
+#: src/ManageModuleAndResources.php:436
 msgid ""
 "An error occured when adding the prefix \"{prefix}\": another vocabulary "
 "exists with the same prefix. Resolve the conflict before installing this "
 "module."
 msgstr ""
 
-#: src/ManageModuleAndResources.php:354
+#: src/ManageModuleAndResources.php:448
 msgid ""
 "An error occured when adding the prefix \"{prefix}\" and the associated "
 "properties: {message}"
 msgstr ""
 
-#: src/ManageModuleAndResources.php:433 src/ManageModuleAndResources.php:442
+#: src/ManageModuleAndResources.php:527 src/ManageModuleAndResources.php:536
 msgid ""
 "An error occured when updating vocabulary \"{prefix}\" and the associated "
 "properties: {message}"
 msgstr ""
 
-#: src/ManageModuleAndResources.php:537
+#: src/ManageModuleAndResources.php:631
 msgid ""
 "The following \"{name}\" of the vocabulary \"{label}\" were replaced: "
 "{members}"
 msgstr ""
 
-#: src/ManageModuleAndResources.php:547
+#: src/ManageModuleAndResources.php:641
 msgid ""
 "Resources, values and templates were updated, but you may check settings "
 "where the old ones were used."
 msgstr ""
 
-#: src/ManageModuleAndResources.php:574
+#: src/ManageModuleAndResources.php:671
 msgid ""
 "The resource template named \"{template}\" is already available and is "
 "skipped."
 msgstr ""
 
-#: src/ManageModuleAndResources.php:772
+#: src/ManageModuleAndResources.php:877
 msgid "The custom vocab named \"{custom_vocab}\" is not available."
 msgstr ""
 
-#: src/ManageModuleAndResources.php:1025
+#: src/ManageModuleAndResources.php:1099
+msgid "The file path {file} does not exist or is empty."
+msgstr ""
+
+#: src/ManageModuleAndResources.php:1111
+msgid "The file path {file} does not contain a json array."
+msgstr ""
+
+#: src/ManageModuleAndResources.php:1163
 msgid "No file or url set for the vocabulary."
 msgstr ""
 
-#: src/ManageModuleAndResources.php:1034
+#: src/ManageModuleAndResources.php:1172
 msgid "The file \"{file}\" cannot be read. Check the url."
 msgstr ""
 
-#: src/ManageModuleAndResources.php:1045
+#: src/ManageModuleAndResources.php:1183
 msgid "The file \"{file}\" cannot be read. Check the file."
 msgstr ""
 
-#: src/ManageModuleAndResources.php:1066
+#: src/ManageModuleAndResources.php:1204
 msgid "A vocabulary must have a namespace uri and a prefix."
 msgstr ""
 
-#: src/TraitModule.php:142 src/TraitModule.php:1094
+#: src/TraitModule.php:142 src/TraitModule.php:1128
 msgid "This module requires the module \"{module}\"."
 msgstr ""
 
@@ -380,22 +418,22 @@ msgstr ""
 msgid "The module removed tables \"{tables}\" from a previous broken install."
 msgstr ""
 
-#: src/TraitModule.php:1089
+#: src/TraitModule.php:1123
 msgid ""
 "This module requires the module \"{module}\", version {version} or above."
 msgstr ""
 
-#: src/TraitModule.php:1201
+#: src/TraitModule.php:1235
 msgid ""
 "The module \"{module}\" was automatically deactivated because the "
 "dependencies are unavailable."
 msgstr ""
 
-#: src/TraitModule.php:1223
+#: src/TraitModule.php:1257
 msgid "The directory \"{path}\" is not writeable."
 msgstr ""
 
-#: src/TraitModule.php:1234
+#: src/TraitModule.php:1268
 msgid "The directory \"{path}\" is not writeable: {error}."
 msgstr ""
 
@@ -463,14 +501,14 @@ msgstr ""
 msgid "sites"
 msgstr ""
 
-#: config/module.config.php:152
+#: config/module.config.php:153
 msgid "An error occurred."
 msgstr ""
 
-#: config/module.config.php:156
+#: config/module.config.php:157
 msgid "Information"
 msgstr ""
 
-#: config/module.config.php:158
+#: config/module.config.php:159
 msgid "OK"
 msgstr ""
