@@ -234,18 +234,21 @@ var CommonDialog = (function() {
                 body = `<textarea class="dialog-textarea" autofocus="autofocus">${escapeHtml(options.defaultValue)}</textarea>`;
             }
 
+            const dialogUid = 'dialog-' + Math.random().toString(36).slice(2, 10);
+            const headingId = dialogUid + '-heading';
+            const messageId = dialogUid + '-message';
             dialog.innerHTML = `
                 <form method="dialog" class="dialog-background">
                     <div class="dialog-panel">
                         <div class="dialog-header">
-                            <button type="button" class="dialog-header-close-button" title="${Omeka.jsTranslate('Close')}">
-                                <span class="dialog-close">🗙</span>
+                            <button type="button" class="dialog-header-close-button">
+                                <span class="dialog-close" aria-hidden="true">🗙</span>
                                 <span class="dialog-close-label">${Omeka.jsTranslate('Close')}</span>
                             </button>
                         </div>
                         <div class="dialog-contents">
-                            <div class="dialog-heading"></div>
-                            <div class="dialog-message"></div>
+                            <div class="dialog-heading"><h2 id="${headingId}"></h2></div>
+                            <div class="dialog-message" id="${messageId}" role="status" aria-live="polite"></div>
                             <div class="dialog-body">${body}</div>
                         </div>
                         <div class="dialog-footer">
@@ -258,7 +261,12 @@ var CommonDialog = (function() {
 
             // Set heading.
             const heading = options.heading || '';
-            dialog.querySelector('.dialog-heading').textContent = heading;
+            const headingEl = dialog.querySelector('.dialog-heading h2');
+            headingEl.textContent = heading;
+            if (heading) {
+                dialog.setAttribute('aria-labelledby', headingId);
+            }
+            dialog.setAttribute('aria-describedby', messageId);
 
             // Set message: escape HTML first, then optionally convert newlines.
             if (options.nl2br) {

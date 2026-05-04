@@ -76,7 +76,10 @@
     #content dialog {
         margin: auto;
     }
-    .dialog-header,
+    .dialog-header {
+        position: relative;
+        min-height: 2em;
+    }
     .dialog-contents,
     .dialog-heading,
     .dialog-message,
@@ -85,10 +88,18 @@
         margin-top: 1em;
     }
     dialog .dialog-header-close-button {
-       float: right;
+        position: absolute;
+        top: 0.5em;
+        right: 0.5em;
+        background: inherit;
     }
     .dialog-close-label {
-        display: none;
+        font-size: 0.85em;
+    }
+    .dialog-heading {
+        font-size: 1.25em;
+        font-weight: bold;
+        text-align: center;
     }
     dialog form input,
     dialog form select,

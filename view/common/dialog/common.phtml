@@ -22,6 +22,16 @@ $htmlAttributes = fn ($key, $value) => is_bool($value) ? ($value ? sprintf('%s="
 
 $attributes ??= [];
 $attributes['class'] = trim('dialog-common ' . ($attributes['class'] ?? ''));
+$dialogId = $attributes['id'] ?? ('dialog-' . substr(md5(uniqid('', true)), 0, 8));
+$headingId = $dialogId . '-heading';
+$messageId = $dialogId . '-message';
+if (!empty($heading)) {
+    $attributes['aria-labelledby'] = $headingId;
+}
+if (!empty($message)) {
+    $attributes['aria-describedby'] = $messageId;
+}
+$messageRole = ($status ?? null) === 'error' ? 'alert' : 'status';
 
 // Prepare hierarchical names when plugin form() is not used (not here).
 if (isset($form)) $form->prepare();
@@ -32,8 +42,8 @@ $hideForm = !isset($form) || ($status ?? null) === 'success';
     <div class="dialog-background">
         <div class="dialog-panel">
             <div class="dialog-header">
-                <button type="button" class="dialog-header-close-button" title="<?= $escapeAttr($translate('Close')) ?>" autofocus="autofocus">
-                    <span class="dialog-close">🗙</span>
+                <button type="button" class="dialog-header-close-button">
+                    <span class="dialog-close" aria-hidden="true">🗙</span>
                     <span class="dialog-close-label"><?= $escape($translate('Close')) ?></span>
                 </button>
             </div>
@@ -42,13 +52,13 @@ $hideForm = !isset($form) || ($status ?? null) === 'success';
                 <div class="dialog-heading"></div>
                 <?php else: ?>
                 <div class="dialog-heading">
-                    <h4><?= $escape($heading) ?></h4>
+                    <h2 id="<?= $escapeAttr($headingId) ?>"><?= $escape($heading) ?></h2>
                 </div>
                 <?php endif; ?>
                 <?php if (empty($message)): ?>
                 <div class="dialog-message"></div>
                 <?php else: ?>
-                <div class="dialog-message<?= $status ? ' ' . $escapeAttr($status) : '' ?>">
+                <div class="dialog-message<?= $status ? ' ' . $escapeAttr($status) : '' ?>" id="<?= $escapeAttr($messageId) ?>" role="<?= $messageRole ?>" aria-live="polite">
                     <?= is_object($message) && !$message->getEscapeHtml() ? $message : $escape($message) ?>
                 </div>
                 <?php endif; ?>
