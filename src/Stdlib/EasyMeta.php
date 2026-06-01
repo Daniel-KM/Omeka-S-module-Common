@@ -1561,7 +1561,7 @@ class EasyMeta
             ->groupBy('`value`.`type`')
             ->orderBy('`value`.`type`', 'asc')
         ;
-        static::$dataTypesByNamesUsed = $this->connection->executeQuery($qb)->fetchAllKeyValue();
+        static::$dataTypesByNamesUsed = $this->connection->executeQuery($qb->getSQL())->fetchAllKeyValue();
     }
 
     protected function initDataTypesMainCustomVocabs(): void
@@ -1609,7 +1609,7 @@ class EasyMeta
             ->orderBy('`vocabulary`.`id`', 'asc')
             ->addOrderBy('`property`.`id`', 'asc')
         ;
-        $result = $this->connection->executeQuery($qb)->fetchAllAssociative();
+        $result = $this->connection->executeQuery($qb->getSQL())->fetchAllAssociative();
 
         static::$propertyIdsByTerms = array_map('intval', array_column($result, 'id', 'term'));
         static::$propertyIdsByTermsAndIds = static::$propertyIdsByTerms
@@ -1636,7 +1636,7 @@ class EasyMeta
             ->orderBy('`vocabulary`.`id`', 'asc')
             ->addOrderBy('`property`.`id`', 'asc')
         ;
-        $result = $this->connection->executeQuery($qb)->fetchAllKeyValue();
+        $result = $this->connection->executeQuery($qb->getSQL())->fetchAllKeyValue();
         $propertyIdsByTerms = array_map('intval', $result);
         $propertyIdsByIds = array_combine($propertyIdsByTerms, $propertyIdsByTerms);
         static::$propertyIdsByTermsAndIdsUsed = $propertyIdsByTerms + $propertyIdsByIds;
@@ -1656,7 +1656,7 @@ class EasyMeta
             ->orderBy('`vocabulary`.`id`', 'asc')
             ->addOrderBy('`resource_class`.`id`', 'asc')
         ;
-        $result = $this->connection->executeQuery($qb)->fetchAllAssociative();
+        $result = $this->connection->executeQuery($qb->getSQL())->fetchAllAssociative();
         static::$resourceClassIdsByTerms = array_map('intval', array_column($result, 'id', 'term'));
         static::$resourceClassIdsByTermsAndIds = static::$resourceClassIdsByTerms
             + array_column($result, 'id', 'id');
@@ -1682,7 +1682,7 @@ class EasyMeta
             ->orderBy('`vocabulary`.`id`', 'asc')
             ->addOrderBy('`resource_class`.`id`', 'asc')
         ;
-        $result = $this->connection->executeQuery($qb)->fetchAllKeyValue();
+        $result = $this->connection->executeQuery($qb->getSQL())->fetchAllKeyValue();
         $resourceClassIdsByTerms = array_map('intval', $result);
         $resourceClassIdsByIds = array_combine($resourceClassIdsByTerms, $resourceClassIdsByTerms);
         static::$resourceClassIdsByTermsAndIdsUsed = $resourceClassIdsByTerms + $resourceClassIdsByIds;
@@ -1699,7 +1699,7 @@ class EasyMeta
             ->from('resource_template', 'resource_template')
             ->orderBy('`resource_template`.`label`', 'asc')
         ;
-        $result = $this->connection->executeQuery($qb)->fetchAllKeyValue();
+        $result = $this->connection->executeQuery($qb->getSQL())->fetchAllKeyValue();
         static::$resourceTemplateIdsByLabels = array_map('intval', $result);
         static::$resourceTemplateIdsByLabelsAndIds = static::$resourceTemplateIdsByLabels
             + array_column($result, 'id', 'id');
@@ -1720,7 +1720,7 @@ class EasyMeta
             ->andWhere('EXISTS (SELECT 1 FROM `resource` WHERE `resource`.`resource_template_id` = `resource_template`.`id`)')
             ->orderBy('`resource_template`.`label`', 'asc')
         ;
-        $result = $this->connection->executeQuery($qb)->fetchAllKeyValue();
+        $result = $this->connection->executeQuery($qb->getSQL())->fetchAllKeyValue();
         $resourceTemplateIdsByLabels = array_map('intval', $result);
         $resourceTemplateIdsByIds = array_combine($resourceTemplateIdsByLabels, $resourceTemplateIdsByLabels);
         static::$resourceTemplateIdsByLabelsAndIdsUsed = $resourceTemplateIdsByLabels + $resourceTemplateIdsByIds;
@@ -1737,7 +1737,7 @@ class EasyMeta
             ->from('resource_template', 'resource_template')
             ->orderBy('resource_template.id', 'asc')
         ;
-        $result = $this->connection->executeQuery($qb)->fetchAllKeyValue();
+        $result = $this->connection->executeQuery($qb->getSQL())->fetchAllKeyValue();
         static::$resourceTemplateClassesByIds = array_map(fn ($v) => $v !== null ? (int) $v : null, $result);
     }
 
@@ -1754,7 +1754,7 @@ class EasyMeta
             ->from('`vocabulary`', 'vocabulary')
             ->orderBy('`vocabulary`.`id`', 'asc')
         ;
-        $result = $this->connection->executeQuery($qb)->fetchAllAssociative();
+        $result = $this->connection->executeQuery($qb->getSQL())->fetchAllAssociative();
 
         static::$vocabularyIdsByPrefixes = array_map('intval', array_column($result, 'id', 'prefix'));
         static::$vocabularyIdsByUris = array_map('intval', array_column($result, 'id', 'uri'));
