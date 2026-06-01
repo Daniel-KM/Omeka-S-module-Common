@@ -101,13 +101,15 @@
         font-weight: bold;
         text-align: center;
     }
-    dialog form input,
-    dialog form select,
-    dialog form textarea {
-       width: 100%;
-    }
-    dialog form textarea {
-       height: 240px;
+    dialog form {
+        & input,
+        & select,
+        & textarea {
+            width: 100%;
+        }
+        & textarea {
+            height: 240px;
+        }
     }
     .dialog-footer {
         display: flex;
@@ -119,6 +121,44 @@
         display: flex;
         justify-content: center;
         gap: 1em;
+    }
+
+    /** Form dialogs: add class "dialog-form" to any dialog wrapping a form. */
+
+    dialog.dialog-form,
+    dialog.dialog-generic:has(.dialog-textarea) {
+        width: inherit;
+        max-width: 800px;
+    }
+    dialog.dialog-form .dialog-body textarea,
+    dialog.dialog-generic:has(.dialog-textarea) .dialog-textarea {
+        width: 100%;
+        box-sizing: border-box;
+    }
+    /* Checkboxes/radios keep their natural size, not the 100% width above. */
+    dialog.dialog-form {
+        /* Inline grouped radio/checkbox options, overriding core. */
+        .inputs label,
+        & label:has(input[type=radio]),
+        & label:has(input[type=checkbox]) {
+            display: inline-block;
+            width: auto;
+            margin-right: 1em;
+        }
+        & input[type=checkbox],
+        & input[type=radio] {
+            width: auto;
+        }
+        /* Submit row aligned right, without the empty meta column. */
+        & button[name=submit],
+        & input[name=submit],
+        & .dialog-header-close-button {
+            float: right;
+        }
+        & .field:has(button[name=submit]) .field-meta,
+        & .field:has(input[name=submit]) .field-meta {
+            display: none;
+        }
     }
 
     .is-busy span.fas:not(.fa-spin):first-child {
@@ -156,12 +196,23 @@
     /** Actions */
 
     /* Fix omeka text-indent -9999px for single buttons, that are not used in omeka for now. */
-    .actions .no-action,
-    .actions .single-action {
-        text-indent: initial;
-        padding-left: 8px;
+    .actions {
+        & .no-action,
+        & .single-action {
+            text-indent: initial;
+            padding-left: 8px;
+        }
+        /* Center action-bar icons (no margin) so glyphs of different widths align
+        and spacing stays even across spans, buttons and links. */
+        & .single-action span.fas,
+        & .no-action span.fas {
+            display: block;
+            width: 100%;
+            text-align: center;
+            margin-left: 0;
+            margin-right: 0;
+        }
     }
-
 }
 
 @media screen and (max-width:640px) {

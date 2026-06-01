@@ -45,13 +45,15 @@
         font-weight: bold;
         text-align: center;
     }
-    dialog form input,
-    dialog form select,
-    dialog form textarea {
-       width: 100%;
-    }
-    dialog form textarea {
-       height: 240px;
+    dialog form {
+        & input,
+        & select,
+        & textarea {
+            width: 100%;
+        }
+        & textarea {
+            height: 240px;
+        }
     }
     .dialog-footer {
         display: flex;
@@ -98,6 +100,54 @@
     .actions .single-action {
         text-indent: initial;
         padding-left: 8px;
+    }
+    /* Center action-bar icons (no margin) so glyphs of different widths align
+       and spacing stays even across spans, buttons and links. */
+    .actions .single-action span.fas,
+    .actions .no-action span.fas {
+        display: block;
+        width: 100%;
+        text-align: center;
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    /** Form dialogs: add class "dialog-form" to any dialog wrapping a form. */
+
+    dialog.dialog-form,
+    dialog.dialog-generic:has(.dialog-textarea) {
+        width: inherit;
+        max-width: 800px;
+    }
+    dialog.dialog-form .dialog-body textarea,
+    dialog.dialog-generic:has(.dialog-textarea) .dialog-textarea {
+        width: 100%;
+        box-sizing: border-box;
+    }
+    /* Checkboxes/radios keep their natural size, not the 100% width above. */
+    dialog.dialog-form {
+        & input[type=checkbox],
+        & input[type=radio] {
+            width: auto;
+        }
+        /* Inline grouped radio/checkbox options, overriding core. */
+        & .inputs label,
+        & label:has(input[type=radio]),
+        & label:has(input[type=checkbox]) {
+            display: inline-block;
+            width: auto;
+            margin-right: 1em;
+        }
+        /* Submit row aligned right, without the empty meta column. */
+        & button[name=submit],
+        & input[name=submit],
+        & .dialog-header-close-button {
+            float: right;
+        }
+        & .field:has(button[name=submit]) .field-meta,
+        & .field:has(input[name=submit]) .field-meta {
+            display: none;
+        }
     }
 
 }
