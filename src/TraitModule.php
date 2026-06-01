@@ -239,6 +239,15 @@ trait TraitModule
         return $this;
     }
 
+    /**
+     * Failed-submit config form preserved across
+     * handleConfigForm()/getConfigForm() so per-field error messages render
+     * inline in the same request.
+     *
+     * @var \Laminas\Form\Form|null
+     */
+    protected $invalidConfigForm;
+
     public function getConfigForm(PhpRenderer $renderer)
     {
         return $this->getConfigFormAuto($renderer);
@@ -265,9 +274,15 @@ trait TraitModule
             return null;
         }
 
-        $form = $formManager->get($formClass);
-        $form->init();
-        $form->setData($data);
+        if ($this->invalidConfigForm) {
+            // Reuse the validated, failing form so per-field error messages
+            // remain attached and render inline via formCollection().
+            $form = $this->invalidConfigForm;
+        } else {
+            $form = $formManager->get($formClass);
+            $form->init();
+            $form->setData($data);
+        }
         $form->prepare();
         return $renderer->formCollection($form);
     }
@@ -297,7 +312,11 @@ trait TraitModule
         $form->init();
         $form->setData($params);
         if (!$form->isValid()) {
-            $controller->messenger()->addErrors($form->getMessages());
+            // Stash the failed form so getConfigFormAuto() can reuse it in the
+            // same request and render per-field errors inline; keep the flash
+            // messages for the page-level message strip.
+            $this->invalidConfigForm = $form;
+            $controller->messenger()->addFormErrors($form);
             return false;
         }
 
