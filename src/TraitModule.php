@@ -287,9 +287,56 @@ trait TraitModule
         return $renderer->formCollection($form);
     }
 
+    /**
+     * Load the asset adding the "Apply" button to the config form, so the
+     * settings can be saved while staying on the form. To be called from any
+     * getConfigForm() that does not rely on getConfigFormAuto().
+     */
+    protected function appendConfigApplyAsset(PhpRenderer $renderer): void
+    {
+        $renderer->headScript()
+            ->appendScript(sprintf('var CommonConfigApply = %s;', json_encode(['label' => $renderer->translate('Apply')])))
+            ->appendFile($renderer->assetUrl('js/common-config-apply.js', 'Common'));
+    }
+
     public function handleConfigForm(AbstractController $controller)
     {
-        return $this->handleConfigFormAuto($controller);
+        if (!$this->handleConfigFormAuto($controller)) {
+            return false;
+        }
+        $this->redirectToConfigFormOnApply($controller);
+        return true;
+    }
+
+    /**
+     * Stay on the config form when the user clicked "Apply" instead of
+     * "Submit". Core ModuleController always redirects to the module list on
+     * success, so a direct redirect to the configure action is sent and the
+     * core response is short-circuited. The flash messages added during the
+     * submit (notices, dispatched job links, etc.) survive the redirect and are
+     * displayed on the reloaded form. Does nothing on a standard submit.
+     */
+    protected function redirectToConfigFormOnApply(AbstractController $controller): void
+    {
+        $request = $controller->getRequest();
+        if (!$request->isPost() || !$request->getPost('apply')) {
+            return;
+        }
+
+        $controller->messenger()->addSuccess('The module was successfully configured'); // @translate
+
+        $options = ['query' => ['id' => static::NAMESPACE]];
+        $fragment = (string) $request->getPost('apply_fragment');
+        if ($fragment !== '') {
+            $options['fragment'] = $fragment;
+        }
+        $url = $controller->url()->fromRoute(null, ['action' => 'configure'], $options, true);
+
+        $response = $controller->getResponse();
+        $response->setStatusCode(302);
+        $response->getHeaders()->addHeaderLine('Location', $url);
+        $response->send();
+        exit;
     }
 
     protected function handleConfigFormAuto(AbstractController $controller): bool
