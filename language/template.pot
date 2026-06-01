@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-04 00:00+0000\n"
+"POT-Creation-Date: 2026-06-01 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -133,20 +133,20 @@ msgid ""
 "{body}"
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/SendEmail.php:196
+#: src/Mvc/Controller/Plugin/SendEmail.php:217
 msgid "Email not sent: the cc emails {list} are invalid (subject: {subject})."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/SendEmail.php:208
+#: src/Mvc/Controller/Plugin/SendEmail.php:229
 msgid "Email not sent: the bcc emails {list} are invalid (subject: {subject})."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/SendEmail.php:220
+#: src/Mvc/Controller/Plugin/SendEmail.php:241
 msgid ""
 "Email not sent: the reply-to emails {list} are invalid (subject: {subject})."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/SendEmail.php:236
+#: src/Mvc/Controller/Plugin/SendEmail.php:257
 msgid "An email was sent to {recipients} with subject: {subject}"
 msgstr ""
 
@@ -396,7 +396,7 @@ msgstr ""
 msgid "A vocabulary must have a namespace uri and a prefix."
 msgstr ""
 
-#: src/TraitModule.php:142 src/TraitModule.php:1128
+#: src/TraitModule.php:142 src/TraitModule.php:1213
 msgid "This module requires the module \"{module}\"."
 msgstr ""
 
@@ -414,26 +414,26 @@ msgid ""
 "remove them first."
 msgstr ""
 
-#: src/TraitModule.php:496
+#: src/TraitModule.php:577
 msgid "The module removed tables \"{tables}\" from a previous broken install."
 msgstr ""
 
-#: src/TraitModule.php:1123
+#: src/TraitModule.php:1208
 msgid ""
 "This module requires the module \"{module}\", version {version} or above."
 msgstr ""
 
-#: src/TraitModule.php:1235
+#: src/TraitModule.php:1320
 msgid ""
 "The module \"{module}\" was automatically deactivated because the "
 "dependencies are unavailable."
 msgstr ""
 
-#: src/TraitModule.php:1257
+#: src/TraitModule.php:1342
 msgid "The directory \"{path}\" is not writeable."
 msgstr ""
 
-#: src/TraitModule.php:1268
+#: src/TraitModule.php:1353
 msgid "The directory \"{path}\" is not writeable: {error}."
 msgstr ""
 
@@ -445,59 +445,67 @@ msgstr ""
 msgid "Select media renderers…"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:73
+#: src/Stdlib/EasyMeta.php:77
 msgid "annotation"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:78
+#: src/Stdlib/EasyMeta.php:79
+msgid "digital object"
+msgstr ""
+
+#: src/Stdlib/EasyMeta.php:83
 msgid "resource"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:79
+#: src/Stdlib/EasyMeta.php:84
 msgid "property"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:80
+#: src/Stdlib/EasyMeta.php:85
 msgid "resource class"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:88
+#: src/Stdlib/EasyMeta.php:93
 msgid "annotations"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:89
+#: src/Stdlib/EasyMeta.php:94
 msgid "assets"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:90
-msgid "items"
-msgstr ""
-
-#: src/Stdlib/EasyMeta.php:91
-msgid "item sets"
-msgstr ""
-
-#: src/Stdlib/EasyMeta.php:93
-msgid "resources"
-msgstr ""
-
-#: src/Stdlib/EasyMeta.php:94
-msgid "properties"
-msgstr ""
-
 #: src/Stdlib/EasyMeta.php:95
-msgid "resource classes"
+msgid "digital objects"
 msgstr ""
 
 #: src/Stdlib/EasyMeta.php:96
-msgid "resource templates"
+msgid "items"
 msgstr ""
 
 #: src/Stdlib/EasyMeta.php:97
+msgid "item sets"
+msgstr ""
+
+#: src/Stdlib/EasyMeta.php:99
+msgid "resources"
+msgstr ""
+
+#: src/Stdlib/EasyMeta.php:100
+msgid "properties"
+msgstr ""
+
+#: src/Stdlib/EasyMeta.php:101
+msgid "resource classes"
+msgstr ""
+
+#: src/Stdlib/EasyMeta.php:102
+msgid "resource templates"
+msgstr ""
+
+#: src/Stdlib/EasyMeta.php:103
 msgid "vocabularies"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:98
+#: src/Stdlib/EasyMeta.php:104
 msgid "sites"
 msgstr ""
 
