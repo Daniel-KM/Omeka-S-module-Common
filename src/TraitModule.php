@@ -1327,30 +1327,51 @@ trait TraitModule
     /**
      * Check or create the destination folder.
      *
+     * Guarantees that new entries can be created inside the directory, not that
+     * existing files can be overwritten: a file may belong to another user even
+     * when the directory itself is writeable.
+     *
      * @param string $dirPath Absolute path of the directory to check.
      * @return string|null The dirpath if valid, else null.
      */
     protected function checkDestinationDir(string $dirPath): ?string
     {
-        if (file_exists($dirPath)) {
-            if (!is_dir($dirPath) || !is_readable($dirPath) || !is_writeable($dirPath)) {
+        // Create the directory if needed, tolerating a concurrent creation
+        // (mkdir then fails but the directory exists). The mkdir mode is
+        // altered by the umask, so group-write is enforced afterwards for
+        // shared/multi-process setups (fails silently when not the owner).
+        if (!file_exists($dirPath)) {
+            if (!@mkdir($dirPath, 0775, true) && !is_dir($dirPath)) {
                 $this->getServiceLocator()->get('Omeka\Logger')->err(
-                    'The directory "{path}" is not writeable.', // @translate
-                    ['path' => $dirPath]
+                    'The directory "{path}" cannot be created: {error}.', // @translate
+                    ['path' => $dirPath, 'error' => error_get_last()['message'] ?? 'unknown error']
                 );
                 return null;
             }
-            return $dirPath;
+            @chmod($dirPath, 0775);
         }
 
-        $result = @mkdir($dirPath, 0775, true);
-        if (!$result) {
+        // Fast checks first: cheap rejection without touching the filesystem.
+        if (!is_dir($dirPath) || !is_readable($dirPath) || !is_writeable($dirPath)) {
+            $this->getServiceLocator()->get('Omeka\Logger')->err(
+                'The path "{path}" is not a readable and writeable directory.', // @translate
+                ['path' => $dirPath]
+            );
+            return null;
+        }
+
+        // Definitive writability test: is_writeable() does not check the
+        // execute bit nor ACLs, so actually create and remove a probe file.
+        $probe = $dirPath . '/.omeka-write-test-' . getmypid() . '-' . uniqid('', true);
+        if (@file_put_contents($probe, '') === false) {
             $this->getServiceLocator()->get('Omeka\Logger')->err(
                 'The directory "{path}" is not writeable: {error}.', // @translate
                 ['path' => $dirPath, 'error' => error_get_last()['message'] ?? 'unknown error']
             );
             return null;
         }
+        @unlink($probe);
+
         return $dirPath;
     }
 
