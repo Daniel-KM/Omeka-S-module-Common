@@ -314,7 +314,22 @@ var CommonDialog = (function() {
                 resolve(getCancelValue());
                 closeDialog();
             };
-            dialog.addEventListener('close', function() {
+            // Escape key fires the native `cancel` event then `close` on the
+            // <dialog>. Resolve the promise with the cancel value so callers
+            // awaiting it don't hang. Also handle programmatic close.
+            let settled = false;
+            const wrap = function (fn) {
+                return function (...args) {
+                    settled = true;
+                    return fn(...args);
+                };
+            };
+            if (okBtn) okBtn.onclick = wrap(okBtn.onclick);
+            if (cancelBtn) cancelBtn.onclick = wrap(cancelBtn.onclick);
+            const closeBtnEl = dialog.querySelector('.dialog-header-close-button');
+            if (closeBtnEl) closeBtnEl.onclick = wrap(closeBtnEl.onclick);
+            dialog.addEventListener('close', function () {
+                if (!settled) resolve(getCancelValue());
                 if (dialog.parentNode) dialog.remove();
             }, { once: true });
 
