@@ -20,6 +20,8 @@ class EasyMeta
         // Module Annotate (for future usage).
         'resource:annotation' => 'resource',
         'annotation' => 'resource',
+        // Module DigitalObject.
+        'resource:digitalobject' => 'resource',
         // Module DataTypeGeometry.
         'geography' => 'literal',
         'geography:coordinates' => 'literal',
@@ -50,6 +52,7 @@ class EasyMeta
     const RESOURCE_CLASSES = [
         'annotations' => \Annotate\Entity\Annotation::class,
         'assets' => \Omeka\Entity\Asset::class,
+        'digital_objects' => \DigitalObject\Entity\DigitalObject::class,
         'items' => \Omeka\Entity\Item::class,
         'item_sets' => \Omeka\Entity\ItemSet::class,
         'media' => \Omeka\Entity\Media::class,
@@ -62,6 +65,7 @@ class EasyMeta
 
     const RESOURCE_RESOURCE_CLASSES = [
         'annotations' => \Annotate\Entity\Annotation::class,
+        'digital_objects' => \DigitalObject\Entity\DigitalObject::class,
         'items' => \Omeka\Entity\Item::class,
         'item_sets' => \Omeka\Entity\ItemSet::class,
         'media' => \Omeka\Entity\Media::class,
@@ -72,6 +76,7 @@ class EasyMeta
     const RESOURCE_LABELS = [
         'annotations' => 'annotation', // @translate
         'assets' => 'asset', // @translate
+        'digital_objects' => 'digital object', // @translate
         'items' => 'item', // @translate
         'item_sets' => 'item set', // @translate
         'media' => 'media', // @translate
@@ -87,6 +92,7 @@ class EasyMeta
     const RESOURCE_LABELS_PLURAL = [
         'annotations' => 'annotations', // @translate
         'assets' => 'assets', // @translate
+        'digital_objects' => 'digital objects', // @translate
         'items' => 'items', // @translate
         'item_sets' => 'item sets', // @translate
         'media' => 'media', // @translate
@@ -269,11 +275,32 @@ class EasyMeta
         'sites' => 'sites',
         'page' => 'site_pages',
         'pages' => 'site_pages',
+        // Module DigitalObject.
+        'digital_objects' => 'digital_objects',
+        'o:DigitalObject' => 'digital_objects',
+        'o:digital_object' => 'digital_objects',
+        'o:digital_objects' => 'digital_objects',
+        'digital-object' => 'digital_objects',
+        'digital-objects' => 'digital_objects',
+        'digital_object' => 'digital_objects',
+        'digitalobject' => 'digital_objects',
+        'digitalobjects' => 'digital_objects',
+        'DigitalObject' => 'digital_objects',
+        'DigitalObjectController' => 'digital_objects',
+        'resource:digitalobject' => 'digital_objects',
+        'resource:digital_object' => 'digital_objects',
+        'resource:digital-object' => 'digital_objects',
+        \DigitalObject\Api\Representation\DigitalObjectRepresentation::class => 'digital_objects',
+        \DigitalObject\Entity\DigitalObject::class => 'digital_objects',
+        \DoctrineProxies\__CG__\DigitalObject\Entity\DigitalObject::class => 'digital_objects',
+        'DigitalObject\Controller\Admin\DigitalObject' => 'digital_objects',
+        'DigitalObject\Controller\Admin\DigitalObjectController' => 'digital_objects',
     ];
 
     const RESOURCE_TABLES = [
         'annotations' => 'annotation',
         'assets' => 'asset',
+        'digital_objects' => 'digital_object',
         'items' => 'item',
         'item_sets' => 'item_set',
         'media' => 'media',
@@ -287,6 +314,7 @@ class EasyMeta
     const RESOURCE_TYPES = [
         'annotations' => 'annotation',
         'assets' => 'asset',
+        'digital_objects' => 'digital-object',
         'items' => 'item',
         'item_sets' => 'item-set',
         'media' => 'media',
