@@ -565,9 +565,13 @@ trait TraitModule
         if (count($dropTables)) {
             // No check: if a table cannot be removed, an exception will be
             // thrown later.
+            // DBAL executeStatement() may not run multiple statements, so
+            // SET FOREIGN_KEY_CHECKS and DROP TABLE must be sent separately.
+            $connection->executeStatement('SET FOREIGN_KEY_CHECKS=0;');
             foreach ($dropTables as $table) {
-                $connection->executeStatement("SET FOREIGN_KEY_CHECKS=0; DROP TABLE `$table`;");
+                $connection->executeStatement("DROP TABLE `$table`;");
             }
+            $connection->executeStatement('SET FOREIGN_KEY_CHECKS=1;');
 
             $message = new PsrMessage(
                 'The module removed tables "{tables}" from a previous broken install.', // @translate
