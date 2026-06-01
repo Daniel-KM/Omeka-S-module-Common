@@ -181,6 +181,27 @@ class SendEmail extends AbstractPlugin
             ->setEncoding(Mime::ENCODING_QUOTEDPRINTABLE);
         $body = (new MimeMessage())->addPart($part);
 
+        // Normalize recipients to deduplicate them. Each list keeps unique
+        // emails (case-insensitive); an email is not repeated across to, cc and
+        // bcc. The reply-to drops any address that already receives the
+        // message, unless removing it would leave replies going to the no-reply
+        // sender.
+        $to = $this->addressMap($to);
+        $cc = $this->addressMap($cc);
+        $bcc = $this->addressMap($bcc);
+        $replyTo = $this->addressMap($replyTo);
+        $hasEmail = fn (array $map, string $email): bool => (bool) array_filter(
+            array_keys($map),
+            fn ($e) => strcasecmp($e, $email) === 0
+        );
+        $cc = array_filter($cc, fn ($n, $e) => !$hasEmail($to, $e), ARRAY_FILTER_USE_BOTH);
+        $bcc = array_filter($bcc, fn ($n, $e) => !$hasEmail($to, $e) && !$hasEmail($cc, $e), ARRAY_FILTER_USE_BOTH);
+        $recipients = $to + $cc + $bcc;
+        $replyToClean = array_filter($replyTo, fn ($n, $e) => !$hasEmail($recipients, $e), ARRAY_FILTER_USE_BOTH);
+        $noReplyEmail = (string) $this->settings->get('easyadmin_no_reply_email');
+        $fromIsNoReply = $noReplyEmail !== '' && strcasecmp((string) $fromEmail, $noReplyEmail) === 0;
+        $replyTo = $replyToClean ?: ($fromIsNoReply ? $replyTo : []);
+
         $message = $this->mailer->createMessage();
         $message
             ->setFrom($fromEmail, $fromName)
@@ -238,6 +259,46 @@ class SendEmail extends AbstractPlugin
         );
 
         return true;
+    }
+
+    /**
+     * Normalize an address argument to a unique [email => name] map.
+     *
+     * Accepts a string, an array ([email] or [email => name]) or an
+     * AddressInterface. Deduplicates emails case-insensitively (first wins).
+     */
+    protected function addressMap($value): array
+    {
+        if ($value === null || $value === '') {
+            return [];
+        }
+        if ($value instanceof AddressInterface || is_string($value)) {
+            $value = [$value];
+        }
+        $map = [];
+        foreach ($value as $key => $val) {
+            if ($val instanceof AddressInterface) {
+                $email = $val->getEmail();
+                $name = (string) $val->getName();
+            } elseif (is_int($key)) {
+                $email = (string) $val;
+                $name = '';
+            } else {
+                $email = (string) $key;
+                $name = (string) $val;
+            }
+            $email = trim($email);
+            if ($email === '') {
+                continue;
+            }
+            foreach (array_keys($map) as $existing) {
+                if (strcasecmp($existing, $email) === 0) {
+                    continue 2;
+                }
+            }
+            $map[$email] = $name;
+        }
+        return $map;
     }
 
     /**
