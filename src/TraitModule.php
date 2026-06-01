@@ -284,6 +284,17 @@ trait TraitModule
             $form->setData($data);
         }
         $form->prepare();
+
+        // When the form declares element groups, render them as sections via
+        // the dedicated helper, since the default formCollection() ignores the
+        // "element_groups" option. Fieldset-based (tabbed) layouts remain the
+        // responsibility of each module's own getConfigForm().
+        if ($form->getOption('element_groups')
+            && $renderer->getHelperPluginManager()->has('formCollectionElementGroups')
+        ) {
+            return $renderer->formCollectionElementGroups($form);
+        }
+
         return $renderer->formCollection($form);
     }
 
