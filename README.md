@@ -623,6 +623,22 @@ Furthermore, it is not possible to call a method of the trait that is overridden
 by the class Module. This is why there are methods suffixed with "Auto" that can
 be used in such a case.
 
+### Config form "Apply" button
+
+The trait can add an "Apply" button next to the standard "Submit" button on a
+module config form. Unlike "Submit", which saves and returns to the module list,
+"Apply" saves the settings and stays on the form (active tab included).
+
+The button is opt-in per module: call `$this->appendConfigApplyAsset($renderer)`
+in `getConfigForm()` to display it. The "stay on the form" behavior is handled by
+the trait `handleConfigForm()`; modules that override `handleConfigForm()` must
+call `$this->redirectToConfigFormOnApply($controller)` before returning, so it
+also runs after their own processing (saved settings, dispatched jobs, etc.).
+
+The button can also be enabled globally for every module config form (even
+modules that do not use the trait) with an option provided by module
+[Easy Admin].
+
 ### Installing resources
 
 To install resources, the class `ManageModuleAndResources` can be used. It is
