@@ -637,8 +637,12 @@ trait TraitModule
             foreach ($defaultSettings as $name => $value) {
                 $value = $this->isSettingTranslatable($settingsType, $name)
                     ? $translator->translate($value) : $value;
+                // INSERT IGNORE keeps the install idempotent: a previous broken
+                // install may have left some settings, and a duplicate primary
+                // key (id, target) must not abort the process nor overwrite an
+                // existing value.
                 $connection->executeStatement(
-                    "INSERT INTO `$table` (`id`, `$targetColumn`, `value`)"
+                    "INSERT IGNORE INTO `$table` (`id`, `$targetColumn`, `value`)"
                         . " SELECT ?, `id`, ? FROM $targetTable",
                     [$name, json_encode($value)]
                 );
