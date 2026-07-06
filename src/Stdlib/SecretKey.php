@@ -3,22 +3,20 @@
 namespace Common\Stdlib;
 
 /**
- * Resolve and persist the application secret key used to encrypt secrets at
- * rest (@see Cipher), keeping it out of the database and out of the merged
- * application config.
+ * Resolve and persist the application secret keys used to encrypt secrets.
  *
- * The key is resolved, in order, from:
- * 1. config/secret_key.php, a generated file returning the key (the normal
- *    case: generated on install when the config directory is writable);
- * 2. the OMEKA_SECRET_KEY environment variable (for hosts where the config
- *    directory is not writable, e.g. containers or managed hosting).
+ * The keys are kept out of the database for security and for privacy.
  *
- * The generated file is a PHP file returning a string, so it is not served as
- * readable text even if the config directory is exposed, and it never enters
- * the application config (config cache, debug dumps).
+ * The keys are resolved from:
+ * 1. config/secret_key.php, a generated file returning the keys as an array;
+ * 2. environment variable `OMEKA_SECRET_KEY`, for hosts where the config
+ *    directory is not writeable (containers or managed hosting).
  *
- * The config directory defaults to OMEKA_PATH . '/config' and can be overridden
- * (mainly for testing).
+ * Multiple keys enable rotation: the first is the current key (used to
+ * encrypt), the next ones are previous keys kept to decrypt older values.
+ *
+ * The config directory is OMEKA_PATH . '/config/' and can be overridden mainly
+ * for testing.
  */
 final class SecretKey
 {
@@ -27,26 +25,25 @@ final class SecretKey
     const ENV = 'OMEKA_SECRET_KEY';
 
     /**
-     * Resolve the secret key, or null when none is set.
+     * Resolve the secret keys (the first is current), or an empty array.
+     *
+     * @return string[]
      */
-    public static function resolve(?string $configDir = null): ?string
+    public static function resolve(?string $configDir = null): array
     {
         $file = self::filePath($configDir);
         if (is_readable($file)) {
-            $key = include $file;
-            if (is_string($key) && $key !== '') {
-                return $key;
+            $keys = self::normalize(include $file);
+            if ($keys !== []) {
+                return $keys;
             }
         }
-        $env = getenv(self::ENV);
-        if (is_string($env) && $env !== '') {
-            return $env;
-        }
-        return null;
+
+        return self::normalize(getenv(self::ENV));
     }
 
     /**
-     * Generate a new secret key (base64 of 32 random bytes).
+     * Generate a new secret key, a base64 string of 32 random bytes.
      */
     public static function generate(): string
     {
@@ -54,19 +51,38 @@ final class SecretKey
     }
 
     /**
-     * Store a generated key in the config directory.
+     * Store a key in the config directory, as an array to allow rotation.
      *
      * @return bool False when the file could not be written.
      */
     public static function store(string $base64Key, ?string $configDir = null): bool
     {
         $file = self::filePath($configDir);
-        $content = "<?php\nreturn " . var_export($base64Key, true) . ";\n";
+        $content = "<?php\n"
+            . "// Application secret keys. The first is the current key (used to\n"
+            . "// encrypt); add previous keys after it to keep decrypting old values\n"
+            . "// during rotation.\n"
+            . "return [\n    " . var_export($base64Key, true) . ",\n];\n";
         if (@file_put_contents($file, $content, LOCK_EX) === false) {
             return false;
         }
         @chmod($file, 0600);
         return true;
+    }
+
+    /**
+     * @param string[]|string|false $value
+     * @return string[]
+     */
+    private static function normalize($value): array
+    {
+        $keys = [];
+        foreach ((array) $value as $key) {
+            if (is_string($key) && $key !== '') {
+                $keys[] = $key;
+            }
+        }
+        return $keys;
     }
 
     private static function filePath(?string $configDir): string
