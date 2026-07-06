@@ -114,10 +114,13 @@ class FormTabs extends AbstractHelper
 
     /**
      * Derive the tab list from the form option "element_tabs", dispatching each
-     * element and fieldset to its own "tab" option. Independent from
-     * "element_groups" (sections).
+     * element and fieldset to its own "tab" option.
+     *
+     * Public so callers can derive the declarative tabs, then inject extra
+     * non-form content into a tab via "content_before"/"content_after" before
+     * passing the result back to __invoke(), for example a diagnostics tab.
      */
-    protected function tabsFromOption(Form $form): array
+    public function tabsFromOption(Form $form): array
     {
         $elementTabs = $form->getOption('element_tabs') ?: [];
         if (!$elementTabs) {
