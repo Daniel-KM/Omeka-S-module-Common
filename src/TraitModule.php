@@ -291,13 +291,20 @@ trait TraitModule
 
         $form->prepare();
 
+        $helpers = $renderer->getHelperPluginManager();
+
+        // A form may declare a tabbed layout via the option "element_tabs"
+        // (each element/fieldset carries a "tab" option). This is independent
+        // from "element_groups", which render as sections (possibly nested
+        // inside a tab). No custom getConfigForm() is needed.
+        if ($form->getOption('element_tabs') && $helpers->has('formTabs')) {
+            return $renderer->formTabs($form);
+        }
+
         // When the form declares element groups, render them as sections via
         // the dedicated helper, since the default formCollection() ignores the
-        // "element_groups" option. Fieldset-based (tabbed) layouts remain the
-        // responsibility of each module's own getConfigForm().
-        if ($form->getOption('element_groups')
-            && $renderer->getHelperPluginManager()->has('formCollectionElementGroups')
-        ) {
+        // "element_groups" option.
+        if ($form->getOption('element_groups') && $helpers->has('formCollectionElementGroups')) {
             return $renderer->formCollectionElementGroups($form);
         }
 

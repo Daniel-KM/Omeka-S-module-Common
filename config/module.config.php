@@ -47,7 +47,9 @@ return [
     ],
     'view_helpers' => [
         'invokables' => [
-            'configFormTabs' => View\Helper\ConfigFormTabs::class,
+            'formTabs' => View\Helper\FormTabs::class,
+            // Deprecated alias.
+            'configFormTabs' => View\Helper\FormTabs::class,
             'formCollection' => Form\View\Helper\FormCollection::class,
             'formNote' => Form\View\Helper\FormNote::class,
             'formSecret' => Form\View\Helper\FormSecret::class,
