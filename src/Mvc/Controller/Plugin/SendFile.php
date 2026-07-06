@@ -39,7 +39,7 @@ class SendFile extends AbstractPlugin
      * @return \Laminas\Http\Response|null Return null when there is no file or
      *   the file is empty and option "skip_empty_file" is set.
      */
-    public function __invoke(string $filepath, array $params): ?HttpResponse
+    public function __invoke(string $filepath, array $params = []): ?HttpResponse
     {
         // Security check: reject path traversal and null bytes.
         // Don't use realpath() to avoid issues with some server configs
@@ -82,6 +82,9 @@ class SendFile extends AbstractPlugin
             : basename($filepath);
         // Sanitize filename to prevent header injection via CRLF.
         $filename = str_replace(["\r", "\n", "\0", '"'], '', $filename);
+        // Build an ASCII fallback (e.g. "É" → "E") for legacy user agents and
+        // keep the original UTF-8 name as RFC 5987 filename* parameter.
+        $filenameAscii = $this->toAsciiFilename($filename);
 
         $dispositionMode = $params['disposition_mode'] ?? 'inline';
         if ($dispositionMode === 'query') {
@@ -106,7 +109,16 @@ class SendFile extends AbstractPlugin
         /** @var \Laminas\Http\Headers $headers */
         $headers = $response->getHeaders()
             ->addHeaderLine(sprintf('Content-Type: %s', $contentType))
-            ->addHeaderLine(sprintf('Content-Disposition: %s; filename="%s"', $dispositionMode, $filename))
+            ->addHeaderLine(
+                $filenameAscii !== $filename
+                    ? sprintf(
+                        "Content-Disposition: %s; filename=\"%s\"; filename*=UTF-8''%s",
+                        $dispositionMode,
+                        $filenameAscii,
+                        rawurlencode($filename)
+                    )
+                    : sprintf('Content-Disposition: %s; filename="%s"', $dispositionMode, $filename)
+            )
             // ->addHeaderLine('Content-Description', 'File Transfer')
             ->addHeaderLine('Content-Transfer-Encoding: binary');
 
@@ -200,5 +212,38 @@ class SendFile extends AbstractPlugin
 
         // Return response to avoid default view rendering and to manage events.
         return $response;
+    }
+
+    /**
+     * Fold a UTF-8 filename to a plain ASCII equivalent (e.g. "École.pdf" →
+     * "Ecole.pdf"). Preserves alphanumerics, dot, dash, underscore and space;
+     * unknown characters are replaced by "_" so the fallback stays a valid,
+     * non-empty filename.
+     */
+    protected function toAsciiFilename(string $filename): string
+    {
+        if ($filename === '' || preg_match('//u', $filename) === 0) {
+            return $filename;
+        }
+        $ascii = null;
+        if (class_exists(\Transliterator::class)) {
+            $tr = \Transliterator::create('Any-Latin; Latin-ASCII; [:Nonspacing Mark:] Remove; NFC');
+            if ($tr) {
+                $ascii = $tr->transliterate($filename);
+            }
+        }
+        if ($ascii === null || $ascii === false) {
+            $prev = setlocale(LC_CTYPE, '0');
+            setlocale(LC_CTYPE, 'C.UTF-8', 'en_US.UTF-8', 'C');
+            $ascii = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $filename);
+            if ($prev !== false) {
+                setlocale(LC_CTYPE, $prev);
+            }
+        }
+        if ($ascii === false || $ascii === null) {
+            $ascii = $filename;
+        }
+        $ascii = preg_replace('/[^A-Za-z0-9._\- ]/', '_', $ascii);
+        return $ascii === '' ? 'file' : $ascii;
     }
 }
