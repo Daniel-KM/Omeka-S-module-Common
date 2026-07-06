@@ -210,6 +210,20 @@ class Bootstrap
      */
     public static function installModules(array $modules, bool $verbose = true): void
     {
+        // Register the psr-4 namespaces of the modules to install: during the
+        // install, the module is not active yet, so its namespace is not
+        // registered by the Omeka module manager and the classes of the module
+        // used by its own install() are not found.
+        $loader = new \Composer\Autoload\ClassLoader();
+        foreach ($modules as $moduleName) {
+            $name = ltrim($moduleName, '?');
+            $srcPath = dirname(__DIR__, 2) . '/' . $name . '/src/';
+            if (is_dir($srcPath)) {
+                $loader->addPsr4($name . '\\', $srcPath);
+            }
+        }
+        $loader->register();
+
         foreach ($modules as $moduleName) {
             // Check if module is optional (prefixed with "?").
             $isOptional = substr($moduleName, 0, 1) === '?';
