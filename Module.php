@@ -43,6 +43,7 @@ class Module extends AbstractModule
     public function install(ServiceLocatorInterface $services): void
     {
         $this->setServiceLocator($services);
+        $this->registerModuleNamespace();
         $this->preparePsrMessage();
         $this->checkExtensionIntl();
         $this->fixIndexes();
@@ -53,8 +54,21 @@ class Module extends AbstractModule
     public function upgrade($oldVersion, $newVersion, ServiceLocatorInterface $services): void
     {
         $this->setServiceLocator($services);
+        $this->registerModuleNamespace();
         $filepath = __DIR__ . '/data/scripts/upgrade.php';
         require_once $filepath;
+    }
+
+    /**
+     * Register the module psr-4 namespace during install/upgrade: the module is
+     * not active yet, so the Omeka module manager has not registered it and the
+     * module's own classes used by install()/upgrade() would not be found.
+     */
+    protected function registerModuleNamespace(): void
+    {
+        $loader = new \Composer\Autoload\ClassLoader();
+        $loader->addPsr4(__NAMESPACE__ . '\\', __DIR__ . '/src/');
+        $loader->register();
     }
 
     /**
@@ -86,15 +100,15 @@ class Module extends AbstractModule
     protected function preparePsrMessage(): void
     {
         // Polyfill core PsrMessage classes for Omeka S < 4.2.
+        // The module psr-4 classes (Common\Stdlib\PsrMessage, etc.) are
+        // autoloaded, since the namespace is registered by registerModuleNamespace()
+        // during install.
         if (version_compare(\Omeka\Module::VERSION, '4.2', '<')) {
             require_once __DIR__ . '/data/compat/MessageInterface.php';
             require_once __DIR__ . '/data/compat/PsrInterpolateInterface.php';
             require_once __DIR__ . '/data/compat/PsrInterpolateTrait.php';
             require_once __DIR__ . '/data/compat/PsrMessage.php';
         }
-        require_once __DIR__ . '/src/Stdlib/PsrInterpolateInterface.php';
-        require_once __DIR__ . '/src/Stdlib/PsrInterpolateTrait.php';
-        require_once __DIR__ . '/src/Stdlib/PsrMessage.php';
     }
 
     protected function checkExtensionIntl(): void
