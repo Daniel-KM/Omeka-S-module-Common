@@ -24,6 +24,7 @@
         "omeka/omeka-s": "^4.0"
     },
     "require": {
+        "ext-sodium": "*",
         "sempia/common-symlink": "^1.0",
         "sempia/external-assets": "^1.1"
     },

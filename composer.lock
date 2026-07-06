@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "97fb80120d3f7938dc45ef2f9014d4ec",
+    "content-hash": "1ca1732c4c75e099d820888180aa7585",
     "packages": [
         {
             "name": "sempia/common-symlink",
@@ -125,7 +125,9 @@
     "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": {},
+    "platform": {
+        "ext-sodium": "*"
+    },
     "platform-dev": {},
     "platform-overrides": {
         "php": "7.4"

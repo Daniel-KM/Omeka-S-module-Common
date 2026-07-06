@@ -4,7 +4,8 @@ namespace Common;
 
 return [
     'service_manager' => [
-        'factories' => [
+        'factories' => array_filter([
+            'Common\Cipher' => Service\Stdlib\CipherFactory::class,
             'Common\DeferredJobDispatch' => Service\Stdlib\DeferredJobDispatchFactory::class,
             'Common\EasyMeta' => Service\Stdlib\EasyMetaFactory::class,
             // TODO Use a delegator for file, dispatcher and logger factories? A direct factory is simpler for the same result for these services.
@@ -14,7 +15,13 @@ return [
             'Omeka\Job\Dispatcher' => Service\Job\DispatcherFactory::class,
             // Allow to add the PSR-3 formatter to default logger.
             'Omeka\Logger' => Service\LoggerFactory::class,
-        ],
+            // Backfill of the core secret-key cipher: defer to the core service
+            // as soon as it provides the class, otherwise provide the backfill.
+            // During preload, the class may be available but not loaded yet.
+            'Omeka\Cipher' => class_exists(\Omeka\Stdlib\Cipher::class)
+                ? null
+                : Service\Stdlib\CipherFactory::class,
+        ]),
         'aliases' => [
             // @deprecated Use "Common\EasyMeta". Will be removed in a future version.
             'EasyMeta' => 'Common\EasyMeta',
