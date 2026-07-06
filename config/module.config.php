@@ -54,7 +54,7 @@ return [
                 Service\Delegator\FormElementDelegatorFactory::class,
             ],
         ],
-        'factories' => [
+        'factories' => array_filter([
             'assetUrl' => Service\ViewHelper\AssetUrlFactory::class,
             'dataType' => Service\ViewHelper\DataTypeFactory::class,
             'defaultSite' => Service\ViewHelper\DefaultSiteFactory::class,
@@ -63,7 +63,12 @@ return [
             'mediaTypeSelect' => Service\ViewHelper\MediaTypeSelectFactory::class,
             'moduleConfigNav' => Service\View\Helper\ModuleConfigNavFactory::class,
             'translator' => Service\ViewHelper\TranslatorFactory::class,
-        ],
+            // Override of core "trigger" view helper to also fire on error pages (no route match).
+            // Drop once the upstream fix ships in Omeka S 4.3.
+            'trigger' => version_compare(\Omeka\Module::VERSION, '4.3', '<')
+                ? Service\ViewHelper\TriggerFactory::class
+                : null,
+        ]),
     ],
     // Add some common elements and make standard elements and some omeka ones optional.
     // The elements of the module Advanced Search that add features are not included.
