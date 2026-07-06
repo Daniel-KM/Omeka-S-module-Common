@@ -119,10 +119,10 @@ Installation
 
 See general end user documentation for [installing a module].
 
-**IMPORTANT**: As long as [PR #2412] is not merged, use the Zip method or use
+**IMPORTANT**: As long as [PR #2432] is not merged, use the Zip method or use
 version 3.4.76.
 
-* With composer (recommended, requires Omeka S with [PR #2412])
+* With composer (recommended, requires Omeka S with [PR #2432])
 
 From the root of Omeka S, install the module:
 
@@ -289,7 +289,8 @@ For improved checks, install module [Bot Guard].
 #### SendFile
 
 Send a file for download, without limit of size or memory, via a stream.
-The content disposition can be set via the parameters of via the query (download=1 for attachment, else inline).
+The content disposition can be set via the parameters of via the query (download=1
+for attachment, else inline).
 
 #### PrepareMessage
 
@@ -580,7 +581,13 @@ with this class with the trait:
 namespace MyModule;
 
 if (!trait_exists(\Common\TraitModule::class, false)) {
-    require_once dirname(__DIR__) . '/Common/src/TraitModule.php';
+    if (file_exists(OMEKA_PATH . '/modules/Common/src/TraitModule.php')) {
+        require_once OMEKA_PATH . '/modules/Common/src/TraitModule.php';
+    } elseif (file_exists(OMEKA_PATH . '/composer-addons/modules/Common/src/TraitModule.php')) {
+        require_once OMEKA_PATH . '/composer-addons/modules/Common/src/TraitModule.php';
+    } elseif (file_exists(dirname(__DIR__) . '/Common/src/TraitModule.php')) {
+        require_once dirname(__DIR__) . '/Common/src/TraitModule.php';
+    }
 }
 
 use Common\TraitModule;
@@ -598,7 +605,13 @@ The class AbstractModule is still provided, but deprecated. You may extend it:
 
 ```php
 if (!class_exists(\Common\AbstractModule::class, false)) {
-    require_once dirname(__DIR__) . '/Common/src/AbstractModule.php';
+    if (file_exists(OMEKA_PATH . '/modules/Common/src/AbstractModule.php')) {
+        require_once OMEKA_PATH . '/modules/Common/src/AbstractModule.php';
+    } elseif (file_exists(OMEKA_PATH . '/composer-addons/modules/Common/src/AbstractModule.php')) {
+        require_once OMEKA_PATH . '/composer-addons/modules/Common/src/AbstractModule.php';
+    } elseif (file_exists(dirname(__DIR__) . '/Common/src/AbstractModule.php')) {
+        require_once dirname(__DIR__) . '/Common/src/AbstractModule.php';
+    }
 }
 
 use Common\AbstractModule;
@@ -608,13 +621,6 @@ class Module extends AbstractModule
     const NAMESPACE = __NAMESPACE__;
 }
 ```
-
-**Note**: When Common is installed via composer, classes and traits are
-autoloaded via PSR-4 (`Common\TraitModule`, `Common\AbstractModule`, etc.). The
-`require_once` with `class_exists()`/`trait_exists()` check ensures backward
-compatibility with manual (zip) installations in the directory modules/ and is
-needed during upgrades of module Common. This check will be useless for the next
-major upgrade of Omeka.
 
 **WARNING**: with an abstract class, `parent::method()` in the module calls the
 method of the abstract class (`Common\AbstractModule`), but with a trait,
@@ -639,6 +645,59 @@ The button can also be enabled globally for every module config form (even
 modules that do not use the trait) with an option provided by module
 [Easy Admin].
 
+### Secret settings (encrypted at rest)
+
+To store a sensitive setting (API key, password, token), use the form element
+`Common\Form\Element\Secret` instead of a text or password element:
+
+```php
+use Common\Form\Element as CommonElement;
+
+$this->add([
+    'name' => 'mymodule_api_key',
+    'type' => CommonElement\Secret::class,
+    'options' => [
+        'label' => 'API key', // @translate
+    ],
+    'attributes' => [
+        'id' => 'mymodule_api_key',
+    ],
+]);
+```
+
+The element and its view helper `formSecret` handle the **presentation** only:
+
+- the input is a plain text field by default (clearer when typing a value) and
+  excluded from autofill; set the element option `masked` to true to render a
+  password input instead;
+- a lock icon always marks the field as a secret, and turns green when a value is
+  already saved;
+- the stored value is **never echoed** back to the browser;
+- when a value is already set, a companion "remove the saved value" checkbox
+  (`{name}_remove`) and a "leave empty to keep the current value" placeholder are
+  displayed.
+
+A form element cannot handle **persistence** (encryption at rest, "keep the
+current value on empty submission", "clear on remove"), because that happens at
+save time, to which the element has no access, and because the element is blanked
+so it does not even know the current value. Where that logic lives depends on how
+the form is saved:
+
+- **Module config form**: nothing to do. The trait `handleConfigForm()` detects
+  the Secret elements, encrypts them with the service `Omeka\Cipher` on save,
+  keeps the current value on empty submission, and clears it when the companion
+  `{name}_remove` checkbox is checked. Display is handled by `blankSecretFields()`.
+- **Entity or resource form** (saved through an API adapter, not the trait): apply
+  the same three rules in the adapter `hydrate()`: encrypt the non-empty value
+  with `Omeka\Cipher`, keep the existing stored value when the submission is empty
+  (and no `{name}_remove`), and clear it when `{name}_remove` is checked. Decrypt
+  in the representation when the value is read. The trait cannot reach an entity
+  adapter, so this cannot be shared with it yet.
+
+Secrets are only encrypted when a key is configured (auto-generated in
+`config/secret_key.php` on install, or the environment variable
+`OMEKA_SECRET_KEY`); otherwise they are stored clear.
+
 ### Installing resources
 
 To install resources, the class `ManageModuleAndResources` can be used. It is
@@ -648,7 +707,13 @@ located inside `data/`, that will be automatically imported.
 
 ```php
 if (!class_exists(\Common\ManageModuleAndResources::class, false)) {
-    require_once dirname(__DIR__) . '/Common/src/ManageModuleAndResources.php';
+    if (file_exists(OMEKA_PATH . '/modules/Common/src/ManageModuleAndResources.php')) {
+        require_once OMEKA_PATH . '/modules/Common/src/ManageModuleAndResources.php';
+    } elseif (file_exists(OMEKA_PATH . '/composer-addons/modules/Common/src/ManageModuleAndResources.php')) {
+        require_once OMEKA_PATH . '/composer-addons/modules/Common/src/ManageModuleAndResources.php';
+    } elseif (file_exists(dirname(__DIR__) . '/Common/src/ManageModuleAndResources.php')) {
+        require_once dirname(__DIR__) . '/Common/src/ManageModuleAndResources.php';
+    }
 }
 ```
 
