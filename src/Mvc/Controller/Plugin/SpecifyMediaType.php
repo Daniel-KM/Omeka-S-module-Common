@@ -93,6 +93,19 @@ class SpecifyMediaType extends AbstractPlugin
         if ($mediaType === 'application/octet-stream') {
             $mediaType = $this->getMediaTypeOctetStream() ?: $mediaType;
         }
+        // finfo may misdetect a text file as a binary audio, video or image
+        // when its first bytes collide with a magic signature.
+        // For example a text starting with "V" then a multibyte char matches
+        // the MPEG-4 LOAS syncword 0x56E0, returned as audio/x-mp4a-latm.
+        // Because a binary stream cannot be valid text, reclassify text content
+        // as text/plain.
+        if ($mediaType
+            && $mediaType !== 'image/svg+xml'
+            && preg_match('~^(?:audio|video|image)/~', $mediaType)
+            && $this->looksLikeText()
+        ) {
+            $mediaType = 'text/plain';
+        }
         if ($mediaType === 'text/plain') {
             $mediaType = $this->getMediaTypeText() ?: $mediaType;
         }
@@ -420,6 +433,33 @@ class SpecifyMediaType extends AbstractPlugin
         }
 
         return null;
+    }
+
+    /**
+     * Tell whether the file content is text and not a binary stream.
+     *
+     * Used to detect when finfo misclassified a text file as a binary audio,
+     * video or image type from a magic signature collision in the first bytes.
+     */
+    protected function looksLikeText(): bool
+    {
+        $content = @file_get_contents($this->filepath, false, null, 0, 65536);
+        if ($content === false || $content === '') {
+            return false;
+        }
+        // A binary stream contains null bytes; text does not.
+        if (strpos($content, "\0") !== false) {
+            return false;
+        }
+        // Valid utf-8 or ascii is text.
+        if (mb_check_encoding($content, 'UTF-8')) {
+            return true;
+        }
+        // Legacy 8-bit text (ISO-8859-*, Windows-125x, etc.) cannot be
+        // discriminated by encoding, since every byte is a valid character.
+        // So, rely on the ratio of control bytes, rare in texts.
+        $control = preg_match_all('~[\x01-\x08\x0B\x0E-\x1F]~', $content);
+        return $control / strlen($content) < 0.01;
     }
 
     /**
