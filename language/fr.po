@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-01 00:00+0000\n"
-"PO-Revision-Date: 2026-06-01 00:00+0000\n"
+"POT-Creation-Date: 2026-07-06 00:00+0000\n"
+"PO-Revision-Date: 2026-07-06 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -16,6 +16,22 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.6\n"
+
+#: src/Form/View/Helper/FormSecret.php:45 src/TraitModule.php:444
+msgid "Leave empty to keep the current value"
+msgstr "Laisser vide pour garder la valeur actuelle"
+
+#: src/Form/View/Helper/FormSecret.php:55
+msgid "A value is already saved"
+msgstr "Une valeur est déjà enregistrée"
+
+#: src/Form/View/Helper/FormSecret.php:56
+msgid "This value is secret"
+msgstr "Cette valeur est secrète"
+
+#: src/Form/View/Helper/FormSecret.php:76
+msgid "Remove the saved value"
+msgstr "Supprimer la valeur enregistrée"
 
 #: src/Mvc/Controller/Plugin/JSend.php:78
 msgid "Check your input for invalid data."
@@ -38,7 +54,7 @@ msgstr "Non trouvé."
 msgid "default"
 msgstr "défaut"
 
-#: data/scripts/upgrade.php:117
+#: data/scripts/upgrade.php:118
 msgid ""
 "The dialog template and related view helpers have been improved for "
 "accessibility (ARIA): proper heading level (h2), aria-labelledby/aria-"
@@ -52,7 +68,24 @@ msgstr ""
 "aria-live sur les messages. Les modules et les thèmes reprenant ce gabarit "
 "ou utilisant ses classes css doivent être vérifiées."
 
-#: Module.php:83
+#: Module.php:87
+msgid "A secret key was generated in config/secret_key.php to encrypt secrets."
+msgstr ""
+"Une clé secrète a été créée dans config/secret_key.php pour chiffrer les "
+"secrets."
+
+#: Module.php:90
+msgid ""
+"The secret key could not be created: set it manually in config/"
+"secret_key.php or set the environment variable \"OMEKA_SECRET_KEY\" to "
+"encrypt secrets (module api keys, etc.)."
+msgstr ""
+"La clé secrète ne peut pas être créée. Il convient de la créer manuellement "
+"dans config/secret_key.php ou de définir la variable d’environnement "
+"\"OMEKA_SECRET_KEY\" pour chiffrer les secrets (clés d’api des modules, "
+"etc.)."
+
+#: Module.php:121
 msgid ""
 "The php extension \"intl\" is not available. It is recommended to install it "
 "to manage diacritics and non-latin characters and to translate dates, "
@@ -62,15 +95,15 @@ msgstr ""
 "gérer les caractères diacritiques et non-latin et pour traduire les dates, "
 "les nombres et plus."
 
-#: Module.php:271
+#: Module.php:309
 msgid "Added {count} database indexes: {list}."
 msgstr "{count} index ajoutés avec succès : {list}"
 
-#: Module.php:277
+#: Module.php:315
 msgid "Failed to add {count} database indexes: {list}."
 msgstr "Échec de l’ajout de {count} index dans la base de données : {list}"
 
-#: Module.php:309
+#: Module.php:347
 msgid ""
 "PHP-CLI unavailable for {count} large-table indexes ({list}). Ask your DBA "
 "to run: {sql}"
@@ -78,7 +111,7 @@ msgstr ""
 "L’accès php via cli n’est pas disponible pour {count} index avec de grandes "
 "tables ({list}). Lancer la commande suivant manuellement : {sql}"
 
-#: Module.php:321
+#: Module.php:359
 msgid ""
 "{count} large-table indexes are being added in background with online DDL "
 "({list}). Track progress in logs/common-add-index.log."
@@ -86,11 +119,11 @@ msgstr ""
 "{count} index pour des grandes tables ont été ajoutés en arrière plan "
 "({list}). Suivez la progression dans le fichier logs/common-add-index.log."
 
-#: Module.php:357
+#: Module.php:395
 msgid "The module Generic is no longer needed and can be removed."
 msgstr "Le module Generic n’est plus nécessaire et peut être supprimé."
 
-#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:163
+#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:176
 msgid ""
 "Xml parsing error level {level}, code {code}, for file \"{file}\" (media "
 "#{media_id}), line {line}, column {column}: {message}"
@@ -99,7 +132,7 @@ msgstr ""
 "fichier « {file} » (média #{media_id}), ligne {line}, colonne {column}: "
 "{message}"
 
-#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:185
+#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:198
 msgid ""
 "The file \"{file}\" (media #{media_id}) is not parsable by xml reader "
 "neither dom."
@@ -107,7 +140,7 @@ msgstr ""
 "Le fichier « {file} » (média #{media_id}) n’est pas analysable par le "
 "lecteur xml ni par le lecteur dom."
 
-#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:506
+#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:546
 msgid ""
 "Warning: some files contain invalid unicode characters and cannot be "
 "processed directly."
@@ -460,7 +493,7 @@ msgstr ""
 msgid "A vocabulary must have a namespace uri and a prefix."
 msgstr "Un vocabulaire doit avoir une uri pour l’espace de nom et un préfixe."
 
-#: src/TraitModule.php:142 src/TraitModule.php:1213
+#: src/TraitModule.php:142 src/TraitModule.php:1303
 msgid "This module requires the module \"{module}\"."
 msgstr "Ce module requiert le module « {module} »."
 
@@ -480,18 +513,18 @@ msgstr ""
 "Ce module ne peut pas installer ses tables car elles existent déjà. Essayez "
 "de les supprimer manuellement."
 
-#: src/TraitModule.php:577
+#: src/TraitModule.php:667
 msgid "The module removed tables \"{tables}\" from a previous broken install."
 msgstr ""
 "Le module a supprimé les tables \"{tables}\" depuis une installation échouée."
 
-#: src/TraitModule.php:1208
+#: src/TraitModule.php:1298
 msgid ""
 "This module requires the module \"{module}\", version {version} or above."
 msgstr ""
 "Ce module requiert le module « {module} », version {version} ou supérieure."
 
-#: src/TraitModule.php:1320
+#: src/TraitModule.php:1410
 msgid ""
 "The module \"{module}\" was automatically deactivated because the "
 "dependencies are unavailable."
@@ -499,11 +532,16 @@ msgstr ""
 "Le module « {module} » a été automatiquement désactivé car ses dépendances "
 "ne sont plus disponibles."
 
-#: src/TraitModule.php:1342
-msgid "The directory \"{path}\" is not writeable."
-msgstr "Le dossier « {path} » n’est pas inscriptible."
+#: src/TraitModule.php:1440
+msgid "The directory \"{path}\" cannot be created: {error}."
+msgstr "Le dossier « {path} » ne peut pas être créé : {error}"
 
-#: src/TraitModule.php:1353
+#: src/TraitModule.php:1451
+msgid "The path \"{path}\" is not a readable and writeable directory."
+msgstr ""
+"Le chemin « {path} » n’est pas dans un dossier lisible et inscriptible."
+
+#: src/TraitModule.php:1462
 msgid "The directory \"{path}\" is not writeable: {error}."
 msgstr "Le dossier « {path} » n’est pas inscriptible : {error}"
 
@@ -579,17 +617,20 @@ msgstr "vocabulaires"
 msgid "sites"
 msgstr "sites"
 
-#: config/module.config.php:153
+#: config/module.config.php:169
 msgid "An error occurred."
 msgstr "Une erreur est survenue."
 
-#: config/module.config.php:157
+#: config/module.config.php:173
 msgid "Information"
 msgstr "Information"
 
-#: config/module.config.php:159
+#: config/module.config.php:175
 msgid "OK"
 msgstr "OK"
+
+#~ msgid "The directory \"{path}\" is not writeable."
+#~ msgstr "Le dossier « {path} » n’est pas inscriptible."
 
 #~ msgid ""
 #~ "The job #{job_id} is still starting. It may need to be relaunched "

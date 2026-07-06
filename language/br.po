@@ -1,28 +1,35 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) 2026 THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
-#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-01 00:00+0000\n"
-"PO-Revision-Date: 2026-06-01 00:00+0000\n"
+"POT-Creation-Date: 2026-07-06 00:00+0000\n"
+"PO-Revision-Date: 2026-07-06 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: br <LL@li.org>\n"
 "Language: br\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=6; plural=(n==1 ? 0 : n%10==1 && n%100!=11 && n%100!"
-"=71 && n%100!=91 ? 1 : n%10==2 && n%100!=12 && n%100!=72 && n%100!=92 ? 2 : "
-"(n%10==3 || n%10==4 || n%10==9) && n%100!=13 && n%100!=14 && n%100!=19 && "
-"n%100!=73 && n%100!=74 && n%100!=79 && n%100!=93 && n%100!=94 && n%100!=99 ? "
-"3 : n%1000000==0 ? 4 : 5);\n"
+"Plural-Forms: nplurals=6; plural=(n==1 ? 0 : n%10==1 && n%100!=11 && n%100!=71 && n%100!=91 ? 1 : n%10==2 && n%100!=12 && n%100!=72 && n%100!=92 ? 2 : (n%10==3 || n%10==4 || n%10==9) && n%100!=13 && n%100!=14 && n%100!=19 && n%100!=73 && n%100!=74 && n%100!=79 && n%100!=93 && n%100!=94 && n%100!=99 ? 3 : n%1000000==0 ? 4 : 5);\n"
 "Generated-By: Babel 2.18.0\n"
 "X-Generator: Poedit 3.6\n"
+
+#: src/Form/View/Helper/FormSecret.php:45 src/TraitModule.php:444
+msgid "Leave empty to keep the current value"
+msgstr "Lezit goullo evit mirout an talvoud a-vremañ"
+
+#: src/Form/View/Helper/FormSecret.php:55
+msgid "A value is already saved"
+msgstr "Un talvoud zo bet enrollet dija"
+
+#: src/Form/View/Helper/FormSecret.php:56
+msgid "This value is secret"
+msgstr "Ar priz-mañ zo kuzh"
+
+#: src/Form/View/Helper/FormSecret.php:76
+msgid "Remove the saved value"
+msgstr "Lemel an talvoud enrollet"
 
 #: src/Mvc/Controller/Plugin/JSend.php:78
 msgid "Check your input for invalid data."
@@ -45,82 +52,53 @@ msgstr "N'eo ket bet kavet."
 msgid "default"
 msgstr "dre ziouer"
 
-#: data/scripts/upgrade.php:117
-msgid ""
-"The dialog template and related view helpers have been improved for "
-"accessibility (ARIA): proper heading level (h2), aria-labelledby/aria-"
-"describedby on the dialog, aria-label on close buttons, role/aria-live on "
-"messages. Modules and themes overriding this template or using its CSS "
-"classes should be reviewed and updated accordingly."
-msgstr ""
-"Gwellaet eo bet patrom an diviz hag ar skoazellerioù gwel liammet outañ evit "
-"an hegerzhded (ARIA) : live titl reizh (h2), aria-labelledby/aria-"
-"describedby war an diviz, aria-label war ar boutonnoù serriñ, role/aria-live "
-"war ar c'hemennadoù. Ar moduloù hag an temoù a dremen dreist ar patrom-mañ "
-"pe a implij e c'hlasoù CSS a rank bezañ adwelet hag hizivaet diouzh se."
+#: data/scripts/upgrade.php:118
+msgid "The dialog template and related view helpers have been improved for accessibility (ARIA): proper heading level (h2), aria-labelledby/aria-describedby on the dialog, aria-label on close buttons, role/aria-live on messages. Modules and themes overriding this template or using its CSS classes should be reviewed and updated accordingly."
+msgstr "Gwellaet eo bet patrom an diviz hag ar skoazellerioù gwel liammet outañ evit an hegerzhded (ARIA) : live titl reizh (h2), aria-labelledby/aria-describedby war an diviz, aria-label war ar boutonnoù serriñ, role/aria-live war ar c'hemennadoù. Ar moduloù hag an temoù a dremen dreist ar patrom-mañ pe a implij e c'hlasoù CSS a rank bezañ adwelet hag hizivaet diouzh se."
 
-#: Module.php:83
-msgid ""
-"The php extension \"intl\" is not available. It is recommended to install it "
-"to manage diacritics and non-latin characters and to translate dates, "
-"numbers and more."
-msgstr ""
-"An astenn php \"intl\" n'eo ket hegerz. Erbedet e vez he staliañ evit merañ "
-"an diakritikoù hag an arouezennoù nann-latin, ha da zaveziñ deiziadoù, "
-"sifroù ha traoù all."
+#: Module.php:87
+msgid "A secret key was generated in config/secret_key.php to encrypt secrets."
+msgstr "Ur c'hlevier kuzh a zo bet krouet e config/secret_key.php evit rinegañ ar sekredoù."
 
-#: Module.php:271
+#: Module.php:90
+msgid "The secret key could not be created: set it manually in config/secret_key.php or set the environment variable \"OMEKA_SECRET_KEY\" to encrypt secrets (module api keys, etc.)."
+msgstr "N'haller ket krouiñ an alc'hwez kuzh : lakait anezhañ gant an dorn e config/secret_key.php pe lakait ar gemmell endro \"OMEKA_SECRET_KEY\" evit kodañ ar sekredoù (alc'hwezioù API ar modul, hag all)."
+
+#: Module.php:121
+msgid "The php extension \"intl\" is not available. It is recommended to install it to manage diacritics and non-latin characters and to translate dates, numbers and more."
+msgstr "An astenn php \"intl\" n'eo ket hegerz. Erbedet e vez he staliañ evit merañ an diakritikoù hag an arouezennoù nann-latin, ha da zaveziñ deiziadoù, sifroù ha traoù all."
+
+#: Module.php:309
 msgid "Added {count} database indexes: {list}."
 msgstr "Ouzhpennet {count} menegerioù diaz-roadennoù : {list}."
 
-#: Module.php:277
+#: Module.php:315
 msgid "Failed to add {count} database indexes: {list}."
 msgstr "C'hwitet war ouzhpennañ menegerioù an diaz-roadennoù {count} : {list}."
 
-#: Module.php:309
-msgid ""
-"PHP-CLI unavailable for {count} large-table indexes ({list}). Ask your DBA "
-"to run: {sql}"
-msgstr ""
-"PHP-CLI n'eo ket hegerz evit {count} menegerioù taolen vras ({list}). "
-"Goulennit digant ho Meraer Bankoù-titouroù (DBA) seveniñ: {sql}"
+#: Module.php:347
+msgid "PHP-CLI unavailable for {count} large-table indexes ({list}). Ask your DBA to run: {sql}"
+msgstr "PHP-CLI n'eo ket hegerz evit {count} menegerioù taolen vras ({list}). Goulennit digant ho Meraer Bankoù-titouroù (DBA) seveniñ: {sql}"
 
-#: Module.php:321
-msgid ""
-"{count} large-table indexes are being added in background with online DDL "
-"({list}). Track progress in logs/common-add-index.log."
-msgstr ""
-"{count} Emañ menegerioù taolenn vras {list} o vezañ ouzhpennet en diadreñv "
-"gant DDL enlinenn. Heuliañ an araokadennoù e logs/common-add-index.log."
+#: Module.php:359
+msgid "{count} large-table indexes are being added in background with online DDL ({list}). Track progress in logs/common-add-index.log."
+msgstr "{count} Emañ menegerioù taolenn vras {list} o vezañ ouzhpennet en diadreñv gant DDL enlinenn. Heuliañ an araokadennoù e logs/common-add-index.log."
 
-#: Module.php:357
+#: Module.php:395
 msgid "The module Generic is no longer needed and can be removed."
-msgstr ""
-"N'eus ket ezhomm ken eus ar modul Generic ha gallout a ra bezañ lamet kuit."
+msgstr "N'eus ket ezhomm ken eus ar modul Generic ha gallout a ra bezañ lamet kuit."
 
-#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:163
-msgid ""
-"Xml parsing error level {level}, code {code}, for file \"{file}\" (media "
-"#{media_id}), line {line}, column {column}: {message}"
-msgstr ""
-"Fazi dielfennañ XML live {level}, kod {code}, evit ar restr \"{file}\" "
-"(media #{media_id}), linenn {line}, kolonenn {column}: {message}"
+#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:176
+msgid "Xml parsing error level {level}, code {code}, for file \"{file}\" (media #{media_id}), line {line}, column {column}: {message}"
+msgstr "Fazi dielfennañ XML live {level}, kod {code}, evit ar restr \"{file}\" (media #{media_id}), linenn {line}, kolonenn {column}: {message}"
 
-#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:185
-msgid ""
-"The file \"{file}\" (media #{media_id}) is not parsable by xml reader "
-"neither dom."
-msgstr ""
-"N'haller ket parsañ ar restr \"{file}\" (media #{media_id}) gant al lenner "
-"XML nag gant an DOM."
+#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:198
+msgid "The file \"{file}\" (media #{media_id}) is not parsable by xml reader neither dom."
+msgstr "N'haller ket parsañ ar restr \"{file}\" (media #{media_id}) gant al lenner XML nag gant an DOM."
 
-#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:506
-msgid ""
-"Warning: some files contain invalid unicode characters and cannot be "
-"processed directly."
-msgstr ""
-"Diwallit : en restroù zo ez eus arouezennoù unicode direizh, ha n'haller ket "
-"o tretiñ war-eeun."
+#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:546
+msgid "Warning: some files contain invalid unicode characters and cannot be processed directly."
+msgstr "Diwallit : en restroù zo ez eus arouezennoù unicode direizh, ha n'haller ket o tretiñ war-eeun."
 
 #: src/Mvc/Controller/Plugin/PrepareMessage.php:106
 msgid "Empty message."
@@ -136,54 +114,35 @@ msgstr "Danvez re hir."
 
 #: src/Mvc/Controller/Plugin/SendEmail.php:88
 msgid "Email not sent: the content is missing (subject: {subject})."
-msgstr ""
-"Postel n'eo ket bet kaset : diouer a ra an danvez (danvez : {subject})."
+msgstr "Postel n'eo ket bet kaset : diouer a ra an danvez (danvez : {subject})."
 
 #: src/Mvc/Controller/Plugin/SendEmail.php:100
 msgid "Email not sent: there is no recipient (subject: {subject})."
 msgstr "Postel n'eo ket bet kaset : n'eus ket a resever (danvez : {subject})."
 
 #: src/Mvc/Controller/Plugin/SendEmail.php:129
-msgid ""
-"Email not sent: the sender \"{sender}\" is not valid (subject: {subject})."
-msgstr ""
-"Postel n'eo ket bet kaset : n'eo ket reizh an kaser \"{sender}\" (danvez : "
-"{subject})."
+msgid "Email not sent: the sender \"{sender}\" is not valid (subject: {subject})."
+msgstr "Postel n'eo ket bet kaset : n'eo ket reizh an kaser \"{sender}\" (danvez : {subject})."
 
 #: src/Mvc/Controller/Plugin/SendEmail.php:136
-msgid ""
-"Email not sent: the sender email \"{sender}\" is invalid (subject: "
-"{subject})."
-msgstr ""
-"Postel n'eo ket bet kaset : postel an kaser \"{sender}\" n'eo ket reizh "
-"(danvez : {subject})."
+msgid "Email not sent: the sender email \"{sender}\" is invalid (subject: {subject})."
+msgstr "Postel n'eo ket bet kaset : postel an kaser \"{sender}\" n'eo ket reizh (danvez : {subject})."
 
 #: src/Mvc/Controller/Plugin/SendEmail.php:146
-msgid ""
-"Email not sent: this is a spam with \"{keyword}\" (To: {to}; From: {from}): "
-"{body}"
-msgstr ""
-"Postel n'eo ket bet kaset : ur spam eo hemañ gant \"{keyword}\" (Da : {to}; "
-"Eus : {from}): {body}"
+msgid "Email not sent: this is a spam with \"{keyword}\" (To: {to}; From: {from}): {body}"
+msgstr "Postel n'eo ket bet kaset : ur spam eo hemañ gant \"{keyword}\" (Da : {to}; Eus : {from}): {body}"
 
 #: src/Mvc/Controller/Plugin/SendEmail.php:217
 msgid "Email not sent: the cc emails {list} are invalid (subject: {subject})."
-msgstr ""
-"Postel n'eo ket bet kaset : ar posteloù cc {list} n'int ket reizh (danvez : "
-"{subject})."
+msgstr "Postel n'eo ket bet kaset : ar posteloù cc {list} n'int ket reizh (danvez : {subject})."
 
 #: src/Mvc/Controller/Plugin/SendEmail.php:229
 msgid "Email not sent: the bcc emails {list} are invalid (subject: {subject})."
-msgstr ""
-"Postel n'eo ket bet kaset : posteloù bcc {list} n'int ket reizh (danvez : "
-"{subject})."
+msgstr "Postel n'eo ket bet kaset : posteloù bcc {list} n'int ket reizh (danvez : {subject})."
 
 #: src/Mvc/Controller/Plugin/SendEmail.php:241
-msgid ""
-"Email not sent: the reply-to emails {list} are invalid (subject: {subject})."
-msgstr ""
-"Postel n'eo ket bet kaset : ar chomlec'hioù postel respont {list} n'int ket "
-"reizh (danvez : {subject})."
+msgid "Email not sent: the reply-to emails {list} are invalid (subject: {subject})."
+msgstr "Postel n'eo ket bet kaset : ar chomlec'hioù postel respont {list} n'int ket reizh (danvez : {subject})."
 
 #: src/Mvc/Controller/Plugin/SendEmail.php:257
 msgid "An email was sent to {recipients} with subject: {subject}"
@@ -212,13 +171,11 @@ msgstr "Ouzhpennañ an endeks `{index}` war an daolenn `{table}`."
 
 #: src/Job/AddDatabaseIndexes.php:99
 msgid "Successfully added index `{index}` on table `{table}`."
-msgstr ""
-"Ouzhpennet eo bet an indeks `{index}` war an daolenn `{table}` gant berzh."
+msgstr "Ouzhpennet eo bet an indeks `{index}` war an daolenn `{table}` gant berzh."
 
 #: src/Job/AddDatabaseIndexes.php:104
 msgid "Unable to add index `{index}` on table `{table}`: {msg}"
-msgstr ""
-"N'haller ket ouzhpennañ an endeks `{index}` war an daolenn `{table}`: {msg}"
+msgstr "N'haller ket ouzhpennañ an endeks `{index}` war an daolenn `{table}`: {msg}"
 
 #: src/Job/AddDatabaseIndexes.php:116
 msgid "Successfully added {count} database indexes: {list}"
@@ -321,119 +278,63 @@ msgid "Send message"
 msgstr "Kas ur gemennadenn"
 
 #: src/File/Validator.php:29
-msgid ""
-"Error validating \"{filename}\". Cannot store files with the media type "
-"\"{mediatype}\"."
-msgstr ""
-"Fazi o gwiriañ \"{filename}\". N'haller ket enrollañ restroù gant ar seurt "
-"media \"{mediatype}\"."
+msgid "Error validating \"{filename}\". Cannot store files with the media type \"{mediatype}\"."
+msgstr "Fazi o gwiriañ \"{filename}\". N'haller ket enrollañ restroù gant ar seurt media \"{mediatype}\"."
 
 #: src/File/Validator.php:42
-msgid ""
-"Error validating \"{filename}\". Cannot store files with the resolved "
-"extension \"{extension}\"."
-msgstr ""
-"Fazi o gwiriañ \"{filename}\". N'haller ket enrollañ restroù gant an astenn "
-"diskoulmet \"{extension}\"."
+msgid "Error validating \"{filename}\". Cannot store files with the resolved extension \"{extension}\"."
+msgstr "Fazi o gwiriañ \"{filename}\". N'haller ket enrollañ restroù gant an astenn diskoulmet \"{extension}\"."
 
 #: src/ManageModuleAndResources.php:93
-msgid ""
-"An error occured when loading vocabulary file \"{vocabulary}\": file has no "
-"json content."
-msgstr ""
-"Ur fazi zo c'hoarvezet pa ouezer kargañ ar restr geriaoueg \"{vocabulary}"
-"\" : n'eus danvez json ebet er restr."
+msgid "An error occured when loading vocabulary file \"{vocabulary}\": file has no json content."
+msgstr "Ur fazi zo c'hoarvezet pa ouezer kargañ ar restr geriaoueg \"{vocabulary}\" : n'eus danvez json ebet er restr."
 
 #: src/ManageModuleAndResources.php:100
-msgid ""
-"An error occured when adding the prefix \"{prefix}\": another vocabulary "
-"exists. Resolve the conflict before installing this module."
-msgstr ""
-"Ur fazi zo c'hoarvezet pa ouzhpenned ar rakger \"{prefix}\": ur geriaoueg "
-"all a zo. Diskoulmit an dizemglev a-raok staliañ ar modul-mañ."
+msgid "An error occured when adding the prefix \"{prefix}\": another vocabulary exists. Resolve the conflict before installing this module."
+msgstr "Ur fazi zo c'hoarvezet pa ouzhpenned ar rakger \"{prefix}\": ur geriaoueg all a zo. Diskoulmit an dizemglev a-raok staliañ ar modul-mañ."
 
 #: src/ManageModuleAndResources.php:112 src/ManageModuleAndResources.php:865
-msgid ""
-"An error occured when loading custom vocab file \"{file}\": file has no json "
-"content."
-msgstr ""
-"Ur fazi zo c'hoarvezet pa ouezer kargañ ar restr geriaoueg personelaet "
-"\"{file}\": n'eus danvez json ebet er restr."
+msgid "An error occured when loading custom vocab file \"{file}\": file has no json content."
+msgstr "Ur fazi zo c'hoarvezet pa ouezer kargañ ar restr geriaoueg personelaet \"{file}\": n'eus danvez json ebet er restr."
 
 #: src/ManageModuleAndResources.php:119
-msgid ""
-"A custom vocab exists for \"{name}\". Remove it or rename it before "
-"installing this module."
-msgstr ""
-"Ur geriaoueg personelaet a zo evit \"{name}\". Lamit anezhi pe adanvet "
-"anezhi a-raok staliañ ar modul-mañ."
+msgid "A custom vocab exists for \"{name}\". Remove it or rename it before installing this module."
+msgstr "Ur geriaoueg personelaet a zo evit \"{name}\". Lamit anezhi pe adanvet anezhi a-raok staliañ ar modul-mañ."
 
 #: src/ManageModuleAndResources.php:130
-msgid ""
-"An error occured when loading resource template file \"{file}\": file has no "
-"json content."
-msgstr ""
-"Ur fazi zo c'hoarvezet pa ouezer kargañ ar restr patrom danvez \"{file}\": "
-"n'eus danvez json ebet er restr."
+msgid "An error occured when loading resource template file \"{file}\": file has no json content."
+msgstr "Ur fazi zo c'hoarvezet pa ouezer kargañ ar restr patrom danvez \"{file}\": n'eus danvez json ebet er restr."
 
 #: src/ManageModuleAndResources.php:137
-msgid ""
-"A resource template exists for {template}. Rename it or remove it before "
-"installing this module."
-msgstr ""
-"Ur patrom danvez a zo evit {template}. Adanvet anezhañ pe lamet anezhañ kuit "
-"a-raok staliañ ar modul-mañ."
+msgid "A resource template exists for {template}. Rename it or remove it before installing this module."
+msgstr "Ur patrom danvez a zo evit {template}. Adanvet anezhañ pe lamet anezhañ kuit a-raok staliañ ar modul-mañ."
 
 #: src/ManageModuleAndResources.php:426
 msgid "The vocabulary \"{vocabulary}\" was already installed and was kept."
 msgstr "Ar geriaoueg \"{vocabulary}\" a oa bet staliet dija ha miret eo bet."
 
 #: src/ManageModuleAndResources.php:436
-msgid ""
-"An error occured when adding the prefix \"{prefix}\": another vocabulary "
-"exists with the same prefix. Resolve the conflict before installing this "
-"module."
-msgstr ""
-"Ur fazi zo c'hoarvezet pa ouzhpenned ar rakger \"{prefix}\": ur geriaoueg "
-"all zo gant ar memes rakger. Diskoulmit an dizemglev a-raok staliañ ar modul-"
-"mañ."
+msgid "An error occured when adding the prefix \"{prefix}\": another vocabulary exists with the same prefix. Resolve the conflict before installing this module."
+msgstr "Ur fazi zo c'hoarvezet pa ouzhpenned ar rakger \"{prefix}\": ur geriaoueg all zo gant ar memes rakger. Diskoulmit an dizemglev a-raok staliañ ar modul-mañ."
 
 #: src/ManageModuleAndResources.php:448
-msgid ""
-"An error occured when adding the prefix \"{prefix}\" and the associated "
-"properties: {message}"
-msgstr ""
-"Ur fazi zo c'hoarvezet pa ouzhpenned ar rakger \"{prefix}\" hag ar perzhioù "
-"stag outañ : {message}"
+msgid "An error occured when adding the prefix \"{prefix}\" and the associated properties: {message}"
+msgstr "Ur fazi zo c'hoarvezet pa ouzhpenned ar rakger \"{prefix}\" hag ar perzhioù stag outañ : {message}"
 
 #: src/ManageModuleAndResources.php:527 src/ManageModuleAndResources.php:536
-msgid ""
-"An error occured when updating vocabulary \"{prefix}\" and the associated "
-"properties: {message}"
-msgstr ""
-"Ur fazi zo c'hoarvezet pa oa o hizivaat ar geriaoueg \"{prefix}\" hag ar "
-"perzhioù stag outi : {message}"
+msgid "An error occured when updating vocabulary \"{prefix}\" and the associated properties: {message}"
+msgstr "Ur fazi zo c'hoarvezet pa oa o hizivaat ar geriaoueg \"{prefix}\" hag ar perzhioù stag outi : {message}"
 
 #: src/ManageModuleAndResources.php:631
-msgid ""
-"The following \"{name}\" of the vocabulary \"{label}\" were replaced: "
-"{members}"
-msgstr ""
-"An \"{name}\" da-heul eus ar geriaoueg \"{label}\" a zo bet erlec'hiet : "
-"{members}"
+msgid "The following \"{name}\" of the vocabulary \"{label}\" were replaced: {members}"
+msgstr "An \"{name}\" da-heul eus ar geriaoueg \"{label}\" a zo bet erlec'hiet : {members}"
 
 #: src/ManageModuleAndResources.php:641
-msgid ""
-"Resources, values and templates were updated, but you may check settings "
-"where the old ones were used."
-msgstr ""
-"Hizivaet eo bet ar mammennoù, an talvoudoù hag ar patromoù, met gallout a "
-"rit gwiriañ an arventennoù el lec'hioù ma oant implijet ar re gozh."
+msgid "Resources, values and templates were updated, but you may check settings where the old ones were used."
+msgstr "Hizivaet eo bet ar mammennoù, an talvoudoù hag ar patromoù, met gallout a rit gwiriañ an arventennoù el lec'hioù ma oant implijet ar re gozh."
 
 #: src/ManageModuleAndResources.php:671
-msgid ""
-"The resource template named \"{template}\" is already available and is "
-"skipped."
+msgid "The resource template named \"{template}\" is already available and is skipped."
 msgstr "Ar patrom danvez anvet \"{template}\" a zo dija hegerz ha lamet eo."
 
 #: src/ManageModuleAndResources.php:877
@@ -464,7 +365,7 @@ msgstr "N'haller ket lenn ar restr \"{file}\". Gwiriit ar restr."
 msgid "A vocabulary must have a namespace uri and a prefix."
 msgstr "Ur geriaoueg a rank kaout un URI egor-anvioù hag ur rakger."
 
-#: src/TraitModule.php:142 src/TraitModule.php:1213
+#: src/TraitModule.php:142 src/TraitModule.php:1303
 msgid "This module requires the module \"{module}\"."
 msgstr "Ezhomm en deus ar modul-mañ eus ar modul \"{module}\"."
 
@@ -477,39 +378,30 @@ msgid "This module has resources that cannot be installed."
 msgstr "Er modul-mañ ez eus danvezioù na c'hallont ket bezañ staliet."
 
 #: src/TraitModule.php:164
-msgid ""
-"This module cannot install its tables, because they exist already. Try to "
-"remove them first."
-msgstr ""
-"N'hall ket ar modul-mañ staliañ e daolennoù, rak ez eus anezho dija. Klaskit "
-"o dilemel da gentañ."
+msgid "This module cannot install its tables, because they exist already. Try to remove them first."
+msgstr "N'hall ket ar modul-mañ staliañ e daolennoù, rak ez eus anezho dija. Klaskit o dilemel da gentañ."
 
-#: src/TraitModule.php:577
+#: src/TraitModule.php:667
 msgid "The module removed tables \"{tables}\" from a previous broken install."
-msgstr ""
-"Tennet eo bet ar modul an taolennoù \"{tables}\" eus ur staliadur torret a-"
-"raok."
+msgstr "Tennet eo bet ar modul an taolennoù \"{tables}\" eus ur staliadur torret a-raok."
 
-#: src/TraitModule.php:1208
-msgid ""
-"This module requires the module \"{module}\", version {version} or above."
-msgstr ""
-"Ezhomm en deus ar modul-mañ eus ar modul \"{module}\", stumm {version} pe "
-"unan uheloc'h."
+#: src/TraitModule.php:1298
+msgid "This module requires the module \"{module}\", version {version} or above."
+msgstr "Ezhomm en deus ar modul-mañ eus ar modul \"{module}\", stumm {version} pe unan uheloc'h."
 
-#: src/TraitModule.php:1320
-msgid ""
-"The module \"{module}\" was automatically deactivated because the "
-"dependencies are unavailable."
-msgstr ""
-"Dizgweredekaet eo bet ar modul \"{module}\" ent emgefreek peogwir n'eo ket "
-"hegerz an dependansoù."
+#: src/TraitModule.php:1410
+msgid "The module \"{module}\" was automatically deactivated because the dependencies are unavailable."
+msgstr "Dizgweredekaet eo bet ar modul \"{module}\" ent emgefreek peogwir n'eo ket hegerz an dependansoù."
 
-#: src/TraitModule.php:1342
-msgid "The directory \"{path}\" is not writeable."
-msgstr "N'haller ket skrivañ er c'havlec'h \"{path}\"."
+#: src/TraitModule.php:1440
+msgid "The directory \"{path}\" cannot be created: {error}."
+msgstr "N'haller ket krouiñ ar rollad \"{path}\" : {error}."
 
-#: src/TraitModule.php:1353
+#: src/TraitModule.php:1451
+msgid "The path \"{path}\" is not a readable and writeable directory."
+msgstr "N'eo ket al lec'hienn \"{path}\" un dastumad lennus ha skrivañus."
+
+#: src/TraitModule.php:1462
 msgid "The directory \"{path}\" is not writeable: {error}."
 msgstr "N'haller ket skrivañ er c'havlec'h \"{path}\" : {error}."
 
@@ -585,14 +477,17 @@ msgstr "geriaouegoù"
 msgid "sites"
 msgstr "lec'hiennoù"
 
-#: config/module.config.php:153
+#: config/module.config.php:169
 msgid "An error occurred."
 msgstr "Ur fazi zo c'hoarvezet."
 
-#: config/module.config.php:157
+#: config/module.config.php:173
 msgid "Information"
 msgstr "Titouroù"
 
-#: config/module.config.php:159
+#: config/module.config.php:175
 msgid "OK"
 msgstr "Mat eo"
+
+#~ msgid "The directory \"{path}\" is not writeable."
+#~ msgstr "N'haller ket skrivañ er c'havlec'h \"{path}\"."

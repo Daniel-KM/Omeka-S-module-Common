@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-01 00:00+0000\n"
+"POT-Creation-Date: 2026-07-06 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,22 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: src/Form/View/Helper/FormSecret.php:45 src/TraitModule.php:444
+msgid "Leave empty to keep the current value"
+msgstr ""
+
+#: src/Form/View/Helper/FormSecret.php:55
+msgid "A value is already saved"
+msgstr ""
+
+#: src/Form/View/Helper/FormSecret.php:56
+msgid "This value is secret"
+msgstr ""
+
+#: src/Form/View/Helper/FormSecret.php:76
+msgid "Remove the saved value"
+msgstr ""
 
 #: src/Mvc/Controller/Plugin/JSend.php:78
 msgid "Check your input for invalid data."
@@ -38,7 +54,7 @@ msgstr ""
 msgid "default"
 msgstr ""
 
-#: data/scripts/upgrade.php:117
+#: data/scripts/upgrade.php:118
 msgid ""
 "The dialog template and related view helpers have been improved for "
 "accessibility (ARIA): proper heading level (h2), aria-labelledby/aria-"
@@ -47,50 +63,61 @@ msgid ""
 "classes should be reviewed and updated accordingly."
 msgstr ""
 
-#: Module.php:83
+#: Module.php:87
+msgid "A secret key was generated in config/secret_key.php to encrypt secrets."
+msgstr ""
+
+#: Module.php:90
+msgid ""
+"The secret key could not be created: set it manually in config/"
+"secret_key.php or set the environment variable \"OMEKA_SECRET_KEY\" to "
+"encrypt secrets (module api keys, etc.)."
+msgstr ""
+
+#: Module.php:121
 msgid ""
 "The php extension \"intl\" is not available. It is recommended to install it "
 "to manage diacritics and non-latin characters and to translate dates, "
 "numbers and more."
 msgstr ""
 
-#: Module.php:271
+#: Module.php:309
 msgid "Added {count} database indexes: {list}."
 msgstr ""
 
-#: Module.php:277
+#: Module.php:315
 msgid "Failed to add {count} database indexes: {list}."
 msgstr ""
 
-#: Module.php:309
+#: Module.php:347
 msgid ""
 "PHP-CLI unavailable for {count} large-table indexes ({list}). Ask your DBA "
 "to run: {sql}"
 msgstr ""
 
-#: Module.php:321
+#: Module.php:359
 msgid ""
 "{count} large-table indexes are being added in background with online DDL "
 "({list}). Track progress in logs/common-add-index.log."
 msgstr ""
 
-#: Module.php:357
+#: Module.php:395
 msgid "The module Generic is no longer needed and can be removed."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:163
+#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:176
 msgid ""
 "Xml parsing error level {level}, code {code}, for file \"{file}\" (media "
 "#{media_id}), line {line}, column {column}: {message}"
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:185
+#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:198
 msgid ""
 "The file \"{file}\" (media #{media_id}) is not parsable by xml reader "
 "neither dom."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:506
+#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:546
 msgid ""
 "Warning: some files contain invalid unicode characters and cannot be "
 "processed directly."
@@ -396,7 +423,7 @@ msgstr ""
 msgid "A vocabulary must have a namespace uri and a prefix."
 msgstr ""
 
-#: src/TraitModule.php:142 src/TraitModule.php:1213
+#: src/TraitModule.php:142 src/TraitModule.php:1303
 msgid "This module requires the module \"{module}\"."
 msgstr ""
 
@@ -414,26 +441,30 @@ msgid ""
 "remove them first."
 msgstr ""
 
-#: src/TraitModule.php:577
+#: src/TraitModule.php:667
 msgid "The module removed tables \"{tables}\" from a previous broken install."
 msgstr ""
 
-#: src/TraitModule.php:1208
+#: src/TraitModule.php:1298
 msgid ""
 "This module requires the module \"{module}\", version {version} or above."
 msgstr ""
 
-#: src/TraitModule.php:1320
+#: src/TraitModule.php:1410
 msgid ""
 "The module \"{module}\" was automatically deactivated because the "
 "dependencies are unavailable."
 msgstr ""
 
-#: src/TraitModule.php:1342
-msgid "The directory \"{path}\" is not writeable."
+#: src/TraitModule.php:1440
+msgid "The directory \"{path}\" cannot be created: {error}."
 msgstr ""
 
-#: src/TraitModule.php:1353
+#: src/TraitModule.php:1451
+msgid "The path \"{path}\" is not a readable and writeable directory."
+msgstr ""
+
+#: src/TraitModule.php:1462
 msgid "The directory \"{path}\" is not writeable: {error}."
 msgstr ""
 
@@ -509,14 +540,14 @@ msgstr ""
 msgid "sites"
 msgstr ""
 
-#: config/module.config.php:153
+#: config/module.config.php:169
 msgid "An error occurred."
 msgstr ""
 
-#: config/module.config.php:157
+#: config/module.config.php:173
 msgid "Information"
 msgstr ""
 
-#: config/module.config.php:159
+#: config/module.config.php:175
 msgid "OK"
 msgstr ""
