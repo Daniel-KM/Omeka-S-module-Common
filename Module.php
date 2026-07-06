@@ -47,6 +47,7 @@ class Module extends AbstractModule
         $this->checkExtensionIntl();
         $this->fixIndexes();
         $this->checkGeneric();
+        $this->ensureSecretKey();
     }
 
     public function upgrade($oldVersion, $newVersion, ServiceLocatorInterface $services): void
@@ -54,6 +55,29 @@ class Module extends AbstractModule
         $this->setServiceLocator($services);
         $filepath = __DIR__ . '/data/scripts/upgrade.php';
         require_once $filepath;
+    }
+
+    /**
+     * Generate the application secret key when none is configured and the
+     * config directory is writable, so secrets are encrypted at rest out of the
+     * box. Backfill of the core feature; a no-op once a key is set.
+     */
+    protected function ensureSecretKey(): void
+    {
+        $services = $this->getServiceLocator();
+        if (\Common\Stdlib\SecretKey::resolve()) {
+            return;
+        }
+        $logger = $services->get('Omeka\Logger');
+        if (\Common\Stdlib\SecretKey::store(\Common\Stdlib\SecretKey::generate())) {
+            $logger->info('A secret key was generated in config/secret_key.php to encrypt secrets.'); // @translate
+        } else {
+            $message = new \Common\Stdlib\PsrMessage(
+                'The secret key could not be created: set it manually in config/secret_key.php or set the environment variable "OMEKA_SECRET_KEY" to encrypt secrets (module api keys, etc.).' // @translate
+            );
+            $logger->warn($message->getMessage());
+            $services->get('ControllerPluginManager')->get('messenger')->addWarning($message);
+        }
     }
 
     /**

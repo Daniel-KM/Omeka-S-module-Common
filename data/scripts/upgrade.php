@@ -29,6 +29,7 @@ $this->preparePsrMessage();
 $this->checkExtensionIntl();
 $this->fixIndexes();
 $this->checkGeneric();
+$this->ensureSecretKey();
 
 if (version_compare($oldVersion, '3.4.85', '<')) {
     // initDataToPopulate() now seeds array defaults (multi-checkbox,
