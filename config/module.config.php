@@ -8,6 +8,7 @@ return [
             'Common\Cipher' => Service\Stdlib\CipherFactory::class,
             'Common\DeferredJobDispatch' => Service\Stdlib\DeferredJobDispatchFactory::class,
             'Common\EasyMeta' => Service\Stdlib\EasyMetaFactory::class,
+            'Common\UpgradeJobDispatch' => Service\Stdlib\UpgradeJobDispatchFactory::class,
             // TODO Use a delegator for file, dispatcher and logger factories? A direct factory is simpler for the same result for these services.
             'Omeka\File\TempFileFactory' => Service\File\TempFileFactoryFactory::class,
             'Omeka\File\Validator' => Service\File\ValidatorFactory::class,
