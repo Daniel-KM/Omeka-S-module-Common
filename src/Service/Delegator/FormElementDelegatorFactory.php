@@ -6,7 +6,11 @@ use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\DelegatorFactoryInterface;
 
 /**
- * Map custom element types to the view helpers that render them.
+ * Map the elements provided by Common to their view helpers.
+ *
+ * Only Common's own elements are registered here; the other custom types
+ * (recaptcha, ckeditor, color_picker, Asset, Query…) are already mapped by the
+ * core delegator.
  */
 class FormElementDelegatorFactory implements DelegatorFactoryInterface
 {
@@ -14,16 +18,7 @@ class FormElementDelegatorFactory implements DelegatorFactoryInterface
         callable $callback, ?array $options = null
     ) {
         $formElement = $callback();
-        $formElement->addType('recaptcha', 'formRecaptcha');
-        $formElement->addType('ckeditor', 'formCkeditor');
-        $formElement->addType('ckeditor_inline', 'formCkeditorInline');
-        $formElement->addType('restore_textarea', 'formRestoreTextarea');
-        $formElement->addType('color_picker', 'formColorPicker');
-        $formElement->addClass('Omeka\Form\Element\Asset', 'formAsset');
-        $formElement->addClass('Omeka\Form\Element\Query', 'formQuery');
-        $formElement->addClass('Omeka\Form\Element\Columns', 'formColumns');
-        $formElement->addClass('Omeka\Form\Element\BrowseDefaults', 'formBrowseDefaults');
-        $formElement->addClass('Omeka\Form\Element\SelectSortInterface', 'formSelectSort');
+        $formElement->addType('note', 'formNote');
         $formElement->addClass('Omeka\Form\Element\Secret', 'formSecret');
         $formElement->addClass('Common\Form\Element\Secret', 'formSecret');
         return $formElement;
