@@ -78,4 +78,31 @@ trait TraitGroupedMultiOptions
 
         return parent::setValueOptions($flat);
     }
+
+    /**
+     * Display the options in a column (one per line) instead of a row.
+     *
+     * Enable with the element option "value_column" => true.
+     */
+    public function getValueOptions(): array
+    {
+        $options = parent::getValueOptions();
+        if (!$this->getOption('value_column')) {
+            return $options;
+        }
+        $result = [];
+        foreach ($options as $key => $spec) {
+            if (is_scalar($spec)) {
+                $spec = ['value' => (string) $key, 'label' => $spec];
+            }
+            $labelAttributes = $spec['label_attributes'] ?? [];
+            $style = trim((string) ($labelAttributes['style'] ?? ''));
+            if (strpos($style, 'display') === false) {
+                $labelAttributes['style'] = ($style === '' ? '' : rtrim($style, '; ') . '; ') . 'display: block;';
+                $spec['label_attributes'] = $labelAttributes;
+            }
+            $result[] = $spec;
+        }
+        return $result;
+    }
 }
