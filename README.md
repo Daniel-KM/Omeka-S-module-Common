@@ -44,6 +44,7 @@ copy-paste common code between modules.
   - Media Ingester Select
   - Media Renderer Select
   - Media Type Select
+  - Secret
   - Sites Page Select
   - Optional Checkbox
   - Optional Date
@@ -645,7 +646,7 @@ The button can also be enabled globally for every module config form (even
 modules that do not use the trait) with an option provided by module
 [Easy Admin].
 
-### Secret settings (encrypted at rest)
+### Secret settings (encrypted at rest in database)
 
 To store a sensitive setting (API key, password, token), use the form element
 `Common\Form\Element\Secret` instead of a text or password element:
@@ -665,38 +666,69 @@ $this->add([
 ]);
 ```
 
-The element and its view helper `formSecret` handle the **presentation** only:
+The element and its view helper `formSecret` handle only the presentation:
 
 - the input is a plain text field by default (clearer when typing a value) and
   excluded from autofill; set the element option `masked` to true to render a
   password input instead;
 - a lock icon always marks the field as a secret, and turns green when a value is
   already saved;
-- the stored value is **never echoed** back to the browser;
-- when a value is already set, a companion "remove the saved value" checkbox
-  (`{name}_remove`) and a "leave empty to keep the current value" placeholder are
-  displayed.
+- the stored value is never echoed back to the browser;
+- when a value is already set, a checkbox "remove the saved value" (`{name}_remove`)
+  is appended and the placeholder is replaced by "leave empty to keep the current value".
 
-A form element cannot handle **persistence** (encryption at rest, "keep the
-current value on empty submission", "clear on remove"), because that happens at
-save time, to which the element has no access, and because the element is blanked
-so it does not even know the current value. Where that logic lives depends on how
-the form is saved:
+A form element cannot handle persistence, because that happens at submit time
+and the value is not resent. Where that logic lives depends on how the form is
+saved:
 
-- **Module config form**: nothing to do. The trait `handleConfigForm()` detects
-  the Secret elements, encrypts them with the service `Omeka\Cipher` on save,
-  keeps the current value on empty submission, and clears it when the companion
+- Module config form: nothing to do. The trait `handleConfigForm()` detects the
+  Secret elements, encrypts them with the service `Omeka\Cipher` on save, keeps
+  the current value on empty submission, and clears it when the companion
   `{name}_remove` checkbox is checked. Display is handled by `blankSecretFields()`.
-- **Entity or resource form** (saved through an API adapter, not the trait): apply
+- Entity or resource form  (saved through an api adapter, not the trait): apply
   the same three rules in the adapter `hydrate()`: encrypt the non-empty value
-  with `Omeka\Cipher`, keep the existing stored value when the submission is empty
-  (and no `{name}_remove`), and clear it when `{name}_remove` is checked. Decrypt
-  in the representation when the value is read. The trait cannot reach an entity
-  adapter, so this cannot be shared with it yet.
+  with `Omeka\Cipher`, keep the existing stored value when the submission is
+  empty (and no `{name}_remove`), and clear it when `{name}_remove` is checked.
+  Decrypt in the representation when the value is read. The trait cannot reach
+  an entity adapter, so this cannot be shared with it yet.
 
-Secrets are only encrypted when a key is configured (auto-generated in
-`config/secret_key.php` on install, or the environment variable
-`OMEKA_SECRET_KEY`); otherwise they are stored clear.
+**Important**: the `{name}_remove` checkbox is raw markup injected by the view
+helper at render time, not a Laminas form element. So it is present in the raw
+HTTP post but absent from `$form->getData()`, which only returns the declared
+elements. The trait works because it reads the raw post (`$controller->getRequest()->getPost()->toArray()`).
+A controller that persists through `$form->getData()`, typical for an entity or
+an adapter form, must therefore carry the remove flags over from the raw post
+itself before saving, otherwise removing a secret silently does nothing:
+
+```php
+$data = $form->getData();
+$postClient = $this->params()->fromPost('o:settings')['client'] ?? [];
+foreach (['password_remove', 'admin_password_remove'] as $key) {
+    if (!empty($postClient[$key])) {
+        $data['o:settings']['client'][$key] = $postClient[$key];
+    }
+}
+// ... then hydrate/save $data; the adapter reads the *_remove flags.
+```
+
+Secrets are only encrypted when a key is configured (auto-generated in `config/secret_key.php`
+on install, or the environment variable `OMEKA_SECRET_KEY`); otherwise they are
+stored clear.
+
+**Scope / current limitation.** The trait wires the Secret handling
+(`blankSecretFields` on display, `applySecretFields` on save) only in the module
+**config form** (`getConfigForm()` / `handleConfigForm()`). It is **not** applied
+to the main settings, site settings, user settings, or theme settings pages:
+`handleAnySettings()` builds the fieldset but calls neither, and there is no
+theme-settings handler at all. A Secret element placed in a `SettingsFieldset`,
+`SiteSettingsFieldset`, `UserSettingsFieldset`, or a theme's settings would
+therefore be rendered with its stored value in the HTML (no blanking) and saved
+as-is (no encryption) — worse than a plain text field. Until this is wired,
+
+- use `Secret` only in a module **config form**, or
+- handle encryption, blanking, keep-on-empty and the raw-post `{name}_remove`
+  flag yourself in whatever code builds and saves that particular form (see the
+  entity/adapter case above).
 
 ### Installing resources
 
@@ -723,6 +755,7 @@ TODO
 
 - [ ] Use key "psr_log" instead of "log" (see https://docs.laminas.dev/laminas-log/service-manager/#psrloggerabstractadapterfactory).
 - [ ] Use materialized views for EasyMeta?
+- [ ] Wire the Secret handling (blank/encrypt/keep/remove) into main/site/user/theme settings pages, not only module config forms (see [pull request #2529](https://github.com/omeka/omeka-s/pull/2529)).
 
 
 Warning
