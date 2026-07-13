@@ -12,7 +12,7 @@ class CipherTest extends TestCase
         return base64_encode(str_repeat($byte, SODIUM_CRYPTO_SECRETBOX_KEYBYTES));
     }
 
-    public function testRoundTrip()
+    public function testRoundTrip(): void
     {
         $cipher = new Cipher($this->key());
         $this->assertTrue($cipher->isEnabled());
@@ -21,7 +21,7 @@ class CipherTest extends TestCase
         $this->assertSame('secret-value', $cipher->decrypt($encrypted));
     }
 
-    public function testDecryptsAValueEncryptedWithAPreviousKey()
+    public function testDecryptsAValueEncryptedWithAPreviousKey(): void
     {
         $old = $this->key("\x01");
         $new = $this->key("\x02");
@@ -31,7 +31,7 @@ class CipherTest extends TestCase
         $this->assertSame('secret-value', (new Cipher([$new, $old]))->decrypt($encrypted));
     }
 
-    public function testEncryptsWithTheCurrentKey()
+    public function testEncryptsWithTheCurrentKey(): void
     {
         $old = $this->key("\x01");
         $new = $this->key("\x02");
@@ -41,26 +41,26 @@ class CipherTest extends TestCase
         $this->assertSame('', (new Cipher($old))->decrypt($encrypted));
     }
 
-    public function testEncryptionIsNonDeterministic()
+    public function testEncryptionIsNonDeterministic(): void
     {
         $cipher = new Cipher($this->key());
         $this->assertNotSame($cipher->encrypt('x'), $cipher->encrypt('x'));
     }
 
-    public function testEncryptIsIdempotentOnCiphertext()
+    public function testEncryptIsIdempotentOnCiphertext(): void
     {
         $cipher = new Cipher($this->key());
         $encrypted = $cipher->encrypt('x');
         $this->assertSame($encrypted, $cipher->encrypt($encrypted));
     }
 
-    public function testEmptyValueIsNotEncrypted()
+    public function testEmptyValueIsNotEncrypted(): void
     {
         $cipher = new Cipher($this->key());
         $this->assertSame('', $cipher->encrypt(''));
     }
 
-    public function testLegacyClearValueIsReturnedAsIs()
+    public function testLegacyClearValueIsReturnedAsIs(): void
     {
         $cipher = new Cipher($this->key());
         $this->assertSame('plain-legacy', $cipher->decrypt('plain-legacy'));
@@ -69,7 +69,7 @@ class CipherTest extends TestCase
     /**
      * @dataProvider invalidKeyProvider
      */
-    public function testDisabledWithoutValidKey($invalidKey)
+    public function testDisabledWithoutValidKey($invalidKey): void
     {
         $cipher = new Cipher($invalidKey);
         $this->assertFalse($cipher->isEnabled());
@@ -87,19 +87,19 @@ class CipherTest extends TestCase
         ];
     }
 
-    public function testDisabledCipherCannotReadCiphertext()
+    public function testDisabledCipherCannotReadCiphertext(): void
     {
         $encrypted = (new Cipher($this->key()))->encrypt('x');
         $this->assertSame('', (new Cipher(null))->decrypt($encrypted));
     }
 
-    public function testWrongKeyFailsToDecrypt()
+    public function testWrongKeyFailsToDecrypt(): void
     {
         $encrypted = (new Cipher($this->key("\x01")))->encrypt('x');
         $this->assertSame('', (new Cipher($this->key("\x02")))->decrypt($encrypted));
     }
 
-    public function testTamperedCiphertextFailsToDecrypt()
+    public function testTamperedCiphertextFailsToDecrypt(): void
     {
         $cipher = new Cipher($this->key());
         $this->assertSame('', $cipher->decrypt(Cipher::PREFIX . base64_encode('too-short')));

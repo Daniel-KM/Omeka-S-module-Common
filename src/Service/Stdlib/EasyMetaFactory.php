@@ -3,8 +3,8 @@
 namespace Common\Service\Stdlib;
 
 use Common\Stdlib\EasyMeta;
-use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Psr\Container\ContainerInterface;
 
 class EasyMetaFactory implements FactoryInterface
 {

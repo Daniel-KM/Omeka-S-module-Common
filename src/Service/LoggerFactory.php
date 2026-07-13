@@ -3,12 +3,12 @@
 namespace Common\Service;
 
 use Common\Log\Formatter\PsrLogSimple as PsrLogSimpleFormatter;
-use Psr\Container\ContainerInterface;
 use Laminas\Log\Filter\Priority;
 use Laminas\Log\Logger;
 use Laminas\Log\Writer\Noop;
 use Laminas\Log\Writer\Stream;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * Logger factory.

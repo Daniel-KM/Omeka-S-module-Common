@@ -3,7 +3,6 @@
 namespace Common\View\Helper;
 
 use Laminas\View\Helper\AbstractHelper;
-use Omeka\Api\Representation\SiteRepresentation;
 
 /**
  * Get the configured default site, or the first public site, or the first site.

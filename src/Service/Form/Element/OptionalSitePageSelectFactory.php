@@ -3,8 +3,8 @@
 namespace Common\Service\Form\Element;
 
 use Common\Form\Element\OptionalSitePageSelect;
-use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Psr\Container\ContainerInterface;
 
 class OptionalSitePageSelectFactory implements FactoryInterface
 {

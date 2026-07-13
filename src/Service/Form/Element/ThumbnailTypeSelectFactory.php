@@ -3,8 +3,8 @@
 namespace Common\Service\Form\Element;
 
 use Common\Form\Element\ThumbnailTypeSelect;
-use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Psr\Container\ContainerInterface;
 
 class ThumbnailTypeSelectFactory implements FactoryInterface
 {

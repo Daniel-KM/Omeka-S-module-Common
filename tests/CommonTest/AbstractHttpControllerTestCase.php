@@ -108,7 +108,7 @@ abstract class AbstractHttpControllerTestCase extends LaminasAbstractHttpControl
      * @param array $params Request parameters.
      * @param bool $isXmlHttpRequest Whether this is an AJAX request.
      */
-    public function dispatch($url, $method = null, $params = [], $isXmlHttpRequest = false)
+    public function dispatch($url, $method = null, $params = [], $isXmlHttpRequest = false): void
     {
         // Reset application to get clean state.
         $this->reset();
@@ -200,7 +200,7 @@ abstract class AbstractHttpControllerTestCase extends LaminasAbstractHttpControl
      * @param array $params Request parameters.
      * @param bool $isXmlHttpRequest Whether this is an AJAX request.
      */
-    public function dispatchUnauthenticated($url, $method = null, $params = [], $isXmlHttpRequest = false)
+    public function dispatchUnauthenticated($url, $method = null, $params = [], $isXmlHttpRequest = false): void
     {
         // Temporarily disable login requirement.
         $originalRequiresLogin = $this->requiresLogin;

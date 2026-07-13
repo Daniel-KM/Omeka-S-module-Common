@@ -3,9 +3,9 @@
 namespace Common\Service\ViewHelper;
 
 use Common\View\Helper\AssetUrl;
-use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Omeka\Module\Manager as ModuleManager;
+use Psr\Container\ContainerInterface;
 
 /**
  * Service factory for the assetUrl view helper.

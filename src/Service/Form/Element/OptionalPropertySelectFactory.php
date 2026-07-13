@@ -3,9 +3,9 @@
 namespace Common\Service\Form\Element;
 
 use Common\Form\Element\OptionalPropertySelect;
-use Psr\Container\ContainerInterface;
 use Laminas\I18n\Translator\TranslatorInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Psr\Container\ContainerInterface;
 
 class OptionalPropertySelectFactory implements FactoryInterface
 {

@@ -2,8 +2,8 @@
 
 namespace Common\Service\Delegator;
 
-use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\DelegatorFactoryInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * Delegator to restructure admin site navigation based on parent keys in config.

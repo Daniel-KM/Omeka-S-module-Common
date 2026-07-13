@@ -3,8 +3,8 @@
 namespace Common\Service\Delegator;
 
 use Common\I18n\Translator;
-use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\DelegatorFactoryInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * Override the Omeka TranslatorDelegatorFactory to manage PsrMessage.

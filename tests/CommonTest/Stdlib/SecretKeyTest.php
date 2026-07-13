@@ -23,38 +23,38 @@ class SecretKeyTest extends TestCase
         putenv(SecretKey::ENV);
     }
 
-    public function testGenerateIsBase64Of32RandomBytes()
+    public function testGenerateIsBase64Of32RandomBytes(): void
     {
         $key = SecretKey::generate();
         $this->assertSame(32, strlen((string) base64_decode($key, true)));
         $this->assertNotSame(SecretKey::generate(), SecretKey::generate());
     }
 
-    public function testResolveReturnsEmptyArrayWhenNothingIsSet()
+    public function testResolveReturnsEmptyArrayWhenNothingIsSet(): void
     {
         $this->assertSame([], SecretKey::resolve($this->dir));
     }
 
-    public function testStoreThenResolveRoundTrip()
+    public function testStoreThenResolveRoundTrip(): void
     {
         $key = SecretKey::generate();
         $this->assertTrue(SecretKey::store($key, $this->dir));
         $this->assertSame([$key], SecretKey::resolve($this->dir));
     }
 
-    public function testResolveReturnsAllKeysFromFileInOrder()
+    public function testResolveReturnsAllKeysFromFileInOrder(): void
     {
         file_put_contents($this->dir . '/' . SecretKey::FILE, "<?php return ['current', 'previous'];");
         $this->assertSame(['current', 'previous'], SecretKey::resolve($this->dir));
     }
 
-    public function testResolveNormalizesALegacyStringFile()
+    public function testResolveNormalizesALegacyStringFile(): void
     {
         file_put_contents($this->dir . '/' . SecretKey::FILE, "<?php return 'legacy';");
         $this->assertSame(['legacy'], SecretKey::resolve($this->dir));
     }
 
-    public function testFileTakesPrecedenceOverEnvironment()
+    public function testFileTakesPrecedenceOverEnvironment(): void
     {
         $fileKey = SecretKey::generate();
         SecretKey::store($fileKey, $this->dir);
@@ -62,13 +62,13 @@ class SecretKeyTest extends TestCase
         $this->assertSame([$fileKey], SecretKey::resolve($this->dir));
     }
 
-    public function testEnvironmentIsUsedWhenThereIsNoFile()
+    public function testEnvironmentIsUsedWhenThereIsNoFile(): void
     {
         putenv(SecretKey::ENV . '=env-key');
         $this->assertSame(['env-key'], SecretKey::resolve($this->dir));
     }
 
-    public function testStoreReturnsFalseWhenDirectoryIsNotWritable()
+    public function testStoreReturnsFalseWhenDirectoryIsNotWritable(): void
     {
         $this->assertFalse(SecretKey::store(SecretKey::generate(), $this->dir . '/missing'));
     }

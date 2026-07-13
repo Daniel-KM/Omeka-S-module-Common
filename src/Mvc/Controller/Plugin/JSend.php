@@ -39,7 +39,7 @@ class JSend extends AbstractPlugin
         $message = null,
         ?int $httpStatusCode = null,
         ?int $code = null
-    ) /* JsonModel|self */ {
+    ) { /* JsonModel|self */
         if ($status === null) {
             return $this;
         }
@@ -169,7 +169,7 @@ class JSend extends AbstractPlugin
             return (string) $messages;
         }
         $flat = [];
-        array_walk_recursive($messages, function ($v) use (&$flat) {
+        array_walk_recursive($messages, function ($v) use (&$flat): void {
             if ($v !== null && $v !== '') {
                 $flat[] = (string) $v;
             }

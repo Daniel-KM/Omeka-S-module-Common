@@ -4,9 +4,9 @@ namespace Common\Service\ViewHelper;
 
 use Common\View\Helper\DataType;
 use Common\View\Helper\DataTypeBefore420;
-use Psr\Container\ContainerInterface;
 use Laminas\EventManager\Event;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * Service factory for the dataType view helper.

@@ -3,8 +3,8 @@
 namespace Common\Service\ViewHelper;
 
 use Common\View\Helper\Translator;
-use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Psr\Container\ContainerInterface;
 
 class TranslatorFactory implements FactoryInterface
 {

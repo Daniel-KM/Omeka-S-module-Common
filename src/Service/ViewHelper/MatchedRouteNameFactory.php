@@ -3,8 +3,8 @@
 namespace Common\Service\ViewHelper;
 
 use Common\View\Helper\MatchedRouteName;
-use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Psr\Container\ContainerInterface;
 
 class MatchedRouteNameFactory implements FactoryInterface
 {

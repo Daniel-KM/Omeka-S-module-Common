@@ -3,8 +3,8 @@
 namespace Common\Service\ViewHelper;
 
 use Common\View\Helper\DefaultSite;
-use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * Service factory to get default site, or the first public, or the first one.

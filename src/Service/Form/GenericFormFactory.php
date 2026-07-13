@@ -2,8 +2,8 @@
 
 namespace Common\Service\Form;
 
-use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * The factory allows to pass options without issue when getForm() is used.

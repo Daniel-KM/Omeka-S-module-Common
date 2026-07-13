@@ -3,8 +3,8 @@
 namespace Common\Service\File;
 
 use Common\File\TempFileFactory;
-use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Psr\Container\ContainerInterface;
 
 class TempFileFactoryFactory implements FactoryInterface
 {

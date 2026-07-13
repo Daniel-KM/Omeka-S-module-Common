@@ -2,9 +2,9 @@
 
 namespace Common\Service\Delegator;
 
-use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\DelegatorFactoryInterface;
 use Omeka\Site\Navigation\Translator;
+use Psr\Container\ContainerInterface;
 
 /**
  * Delegator to protect against missing routes in navigation.
