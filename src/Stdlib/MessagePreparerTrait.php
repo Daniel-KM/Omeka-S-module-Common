@@ -138,7 +138,13 @@ trait MessagePreparerTrait
             $placeholders['resource_id'] = $resource->id();
             $placeholders['resource_title'] = $resource->displayTitle();
             $placeholders['resource_url'] = $resource->siteUrl(null, true);
+            $placeholders['resource'] = $placeholders['resource_url'];
             $placeholders['resource_url_admin'] = $resource->adminUrl(null, true);
+            $placeholders['resource_link'] = sprintf(
+                '<a href="%1$s">%2$s</a>',
+                $placeholders['resource_url'],
+                $placeholders['resource_title']
+            );
         }
 
         // Merge with additional placeholders registered by modules.
@@ -167,6 +173,16 @@ trait MessagePreparerTrait
             $allPlaceholders = array_merge($allPlaceholders, $propertyPlaceholders);
         }
 
+        // Add multi-resource placeholders when a list of ids and a site are in
+        // context ({resources}, {resources_url}, {resources::term}…).
+        if (!empty($context['resource_ids']) && !empty($context['site'])) {
+            $matches = [];
+            preg_match_all('~\{resources::(?<term>[a-zA-Z0-9_-]+:[a-zA-Z0-9_-]+)\}~m', $message, $matches);
+            $ids = is_array($context['resource_ids']) ? $context['resource_ids'] : [$context['resource_ids']];
+            $resourcesPlaceholders = $this->getResourcesPlaceholders($ids, $context['site'], array_unique($matches['term'] ?? []));
+            $allPlaceholders = array_merge($allPlaceholders, $resourcesPlaceholders);
+        }
+
         // Build replacement array with braces.
         $replace = [];
         foreach ($allPlaceholders as $key => $value) {
@@ -193,7 +209,15 @@ trait MessagePreparerTrait
             '{resource_id}' => '',
             '{resource_title}' => '',
             '{resource_url}' => '',
+            '{resource}' => '',
             '{resource_url_admin}' => '',
+            '{resource_link}' => '',
+            '{resources}' => '',
+            '{resources_ids}' => '',
+            '{resources_urls}' => '',
+            '{resources_url}' => '',
+            '{resources_url_admin}' => '',
+            '{resources_links}' => '',
         ];
         $replace += $defaultPlaceholders;
 
@@ -221,6 +245,93 @@ trait MessagePreparerTrait
             // Use the first value if available.
             $placeholders[$term] = $value ? (string) $value : '';
         }
+
+        return $placeholders;
+    }
+
+    /**
+     * Build the multi-resource placeholders for a list of resource ids.
+     *
+     * Uses the resource own controller name (item, item-set, media, and module
+     * ones like digital-object), so no entity/controller map is needed.
+     *
+     * @param int[] $ids
+     * @param \Omeka\Api\Representation\SiteRepresentation $site
+     * @param string[] $resourceTerms Property terms found in the message, for
+     *   the {resources::term} placeholders (slower, filled only when present).
+     */
+    protected function getResourcesPlaceholders(array $ids, $site, array $resourceTerms = []): array
+    {
+        $placeholders = [];
+        if (!$ids || !$site) {
+            return $placeholders;
+        }
+
+        /** @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation[] $resources */
+        $resources = $this->api->search('resources', ['id' => $ids])->getContent();
+        if (!$resources) {
+            return $placeholders;
+        }
+
+        $urls = [];
+        $titles = [];
+        $byController = [];
+        foreach ($resources as $resource) {
+            $rid = $resource->id();
+            $controller = $resource->getControllerName();
+            $titles[$rid] = $resource->displayTitle();
+            $byController[$controller][] = $rid;
+            $urls[$rid] = $this->urlFromRoute(
+                'site/resource-id',
+                ['site-slug' => $site->slug(), 'controller' => $controller, 'id' => $rid],
+                ['force_canonical' => true]
+            );
+        }
+
+        // {resources}, {resources_urls} (alias) and {resources_ids}.
+        $placeholders['resources'] = implode(', ', $urls);
+        $placeholders['resources_urls'] = implode(', ', $urls);
+        $placeholders['resources_ids'] = implode(', ', array_keys($urls));
+
+        // {resources_url} and {resources_url_admin}: one browse url per type.
+        $publicBrowse = [];
+        $adminBrowse = [];
+        foreach ($byController as $controller => $cids) {
+            $publicBrowse[] = $this->urlFromRoute(
+                'site/resource',
+                ['site-slug' => $site->slug(), 'controller' => $controller],
+                ['query' => ['id' => implode(',', $cids)], 'force_canonical' => true]
+            );
+            $adminBrowse[] = $this->urlFromRoute(
+                'admin/default',
+                ['controller' => $controller],
+                ['query' => ['id' => implode(',', $cids)], 'force_canonical' => true]
+            );
+        }
+        $placeholders['resources_url'] = implode(' ', $publicBrowse);
+        $placeholders['resources_url_admin'] = implode(' ', $adminBrowse);
+
+        // {resources::property term}: list of values per term.
+        foreach ($resourceTerms as $term) {
+            $termVals = [];
+            foreach ($resources as $resource) {
+                $value = $resource->value($term);
+                if ($value) {
+                    $termVals[] = (string) $value;
+                }
+            }
+            $placeholders['resources::' . $term] = implode(', ', $termVals);
+        }
+
+        // {resources_links}: html list of links.
+        $placeholders['resources_links'] = implode(', ', array_map(
+            fn ($rid) => sprintf(
+                '<a href="%s">%s</a>',
+                htmlspecialchars((string) $urls[$rid]),
+                htmlspecialchars((string) $titles[$rid])
+            ),
+            array_keys($urls)
+        ));
 
         return $placeholders;
     }
