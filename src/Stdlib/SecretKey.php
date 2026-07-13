@@ -58,11 +58,17 @@ final class SecretKey
     public static function store(string $base64Key, ?string $configDir = null): bool
     {
         $file = self::filePath($configDir);
-        $content = "<?php\n"
-            . "// Application secret keys. The first is the current key (used to\n"
-            . "// encrypt); add previous keys after it to keep decrypting old values\n"
-            . "// during rotation.\n"
-            . "return [\n    " . var_export($base64Key, true) . ",\n];\n";
+        $exportKey = var_export($base64Key, true);
+        $content = <<<PHP
+            <?php
+            // Application secret keys.
+            // The first is the current key (used to encrypt).
+            // Add previous keys after it to keep decrypting old values during rotation.
+            return [
+                $exportKey,
+            ];
+
+            PHP;
         if (@file_put_contents($file, $content, LOCK_EX) === false) {
             return false;
         }
