@@ -1,0 +1,493 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR [EMAIL@ADDRESS](mailto:EMAIL@ADDRESS), YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-06 00:00+0000\n"
+"PO-Revision-Date: 2026-07-28 14:12+0300\n"
+"Last-Translator: Matti Lassila <matti.lassila@gmail.com>\n"
+"Language-Team: Finnish (Finland) (https://app.transifex.com/omeka/teams/14184/fi_FI/)\n"
+"Language: fi_FI\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.9\n"
+
+#: src/Form/View/Helper/FormSecret.php:45 src/TraitModule.php:444
+msgid "Leave empty to keep the current value"
+msgstr "Jätä tyhjäksi, jos haluat säilyttää nykyisen arvon"
+
+#: src/Form/View/Helper/FormSecret.php:55
+msgid "A value is already saved"
+msgstr "Arvo on jo tallennettu"
+
+#: src/Form/View/Helper/FormSecret.php:56
+msgid "This value is secret"
+msgstr "Tämä arvo on salainen"
+
+#: src/Form/View/Helper/FormSecret.php:76
+msgid "Remove the saved value"
+msgstr "Poista tallennettu arvo"
+
+#: src/Mvc/Controller/Plugin/JSend.php:78
+msgid "Check your input for invalid data."
+msgstr "Tarkista, ettei syötteessä ole virheellisiä tietoja."
+
+#: src/Mvc/Controller/Plugin/JSend.php:97
+msgid "An internal error has occurred."
+msgstr "Tapahtui sisäinen virhe."
+
+#: src/Mvc/Controller/Plugin/JSend.php:112
+#, php-format
+msgid "The status \"%s\" is not supported by jSend."
+msgstr "jSend ei tue tilaa \"%s\"."
+
+#: src/Mvc/Controller/Plugin/JSend.php:247
+msgid "Not found."
+msgstr "Ei löytynyt."
+
+#: src/Stdlib/PsrMessage.php:165
+msgid "default"
+msgstr "oletus"
+
+#: data/scripts/upgrade.php:118
+msgid "The dialog template and related view helpers have been improved for accessibility (ARIA): proper heading level (h2), aria-labelledby/aria-describedby on the dialog, aria-label on close buttons, role/aria-live on messages. Modules and themes overriding this template or using its CSS classes should be reviewed and updated accordingly."
+msgstr "Valintaikkunan mallipohjaa ja siihen liittyviä näkymäapureita on parannettu saavutettavuuden (ARIA) osalta: oikea otsikkotaso (h2), valintaikkunan aria-labelledby- ja aria-describedby-määritteet, sulkemispainikkeiden aria-label-määritteet sekä viestien role- ja aria-live-määritteet. Tätä mallipohjaa korvaavat tai sen CSS-luokkia käyttävät moduulit ja teemat tulee tarkistaa ja päivittää vastaavasti."
+
+#: Module.php:87
+msgid "A secret key was generated in config/secret_key.php to encrypt secrets."
+msgstr "Salaisten tietojen salaamista varten luotiin salausavain tiedostoon config/secret_key.php."
+
+#: Module.php:90
+msgid "The secret key could not be created: set it manually in config/secret_key.php or set the environment variable \"OMEKA_SECRET_KEY\" to encrypt secrets (module api keys, etc.)."
+msgstr "Salausavainta ei voitu luoda: määritä se manuaalisesti tiedostossa config/secret_key.php tai aseta ympäristömuuttuja \"OMEKA_SECRET_KEY\", jotta salaiset tiedot (moduulien API-avaimet jne.) voidaan salata."
+
+#: Module.php:121
+msgid "The php extension \"intl\" is not available. It is recommended to install it to manage diacritics and non-latin characters and to translate dates, numbers and more."
+msgstr "PHP-laajennus \"intl\" ei ole käytettävissä. Sen asentamista suositellaan diakriittisten merkkien ja muiden kuin latinalaisten merkkien käsittelyyn sekä päivämäärien, lukujen ja muun sisällön lokalisointiin."
+
+#: Module.php:309
+msgid "Added {count} database indexes: {list}."
+msgstr "Tietokantaindeksejä lisättiin {count}: {list}."
+
+#: Module.php:315
+msgid "Failed to add {count} database indexes: {list}."
+msgstr "{count} tietokantaindeksin lisääminen epäonnistui: {list}."
+
+#: Module.php:347
+msgid "PHP-CLI unavailable for {count} large-table indexes ({list}). Ask your DBA to run: {sql}"
+msgstr "PHP-CLI ei ole käytettävissä {count} suuren taulun indeksille ({list}). Pyydä tietokannan ylläpitäjää suorittamaan: {sql}"
+
+#: Module.php:359
+msgid "{count} large-table indexes are being added in background with online DDL ({list}). Track progress in logs/common-add-index.log."
+msgstr "{count} suuren taulun indeksiä lisätään taustalla online DDL -toiminnolla ({list}). Seuraa edistymistä tiedostosta logs/common-add-index.log."
+
+#: Module.php:395
+msgid "The module Generic is no longer needed and can be removed."
+msgstr "Generic-moduulia ei enää tarvita, ja se voidaan poistaa."
+
+#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:176
+msgid "Xml parsing error level {level}, code {code}, for file \"{file}\" (media #{media_id}), line {line}, column {column}: {message}"
+msgstr "XML-jäsennysvirheen taso {level}, koodi {code}, tiedostossa \"{file}\" (media #{media_id}), rivillä {line}, sarakkeessa {column}: {message}"
+
+#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:198
+msgid "The file \"{file}\" (media #{media_id}) is not parsable by xml reader neither dom."
+msgstr "Tiedostoa \"{file}\" (media #{media_id}) ei voida jäsentää XML-lukijalla eikä DOMilla."
+
+#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:546
+msgid "Warning: some files contain invalid unicode characters and cannot be processed directly."
+msgstr "Varoitus: jotkin tiedostot sisältävät virheellisiä Unicode-merkkejä, eikä niitä voida käsitellä suoraan."
+
+#: src/Mvc/Controller/Plugin/PrepareMessage.php:106
+msgid "Empty message."
+msgstr "Tyhjä viesti."
+
+#: src/Mvc/Controller/Plugin/PrepareMessage.php:113
+msgid "Too long message."
+msgstr "Viesti on liian pitkä."
+
+#: src/Mvc/Controller/Plugin/PrepareMessage.php:140
+msgid "Too long subject."
+msgstr "Aihe on liian pitkä."
+
+#: src/Mvc/Controller/Plugin/SendEmail.php:88
+msgid "Email not sent: the content is missing (subject: {subject})."
+msgstr "Sähköpostia ei lähetetty: sisältö puuttuu (aihe: {subject})."
+
+#: src/Mvc/Controller/Plugin/SendEmail.php:100
+msgid "Email not sent: there is no recipient (subject: {subject})."
+msgstr "Sähköpostia ei lähetetty: vastaanottajaa ei ole (aihe: {subject})."
+
+#: src/Mvc/Controller/Plugin/SendEmail.php:129
+msgid "Email not sent: the sender \"{sender}\" is not valid (subject: {subject})."
+msgstr "Sähköpostia ei lähetetty: lähettäjä \"{sender}\" ei ole kelvollinen (aihe: {subject})."
+
+#: src/Mvc/Controller/Plugin/SendEmail.php:136
+msgid "Email not sent: the sender email \"{sender}\" is invalid (subject: {subject})."
+msgstr "Sähköpostia ei lähetetty: lähettäjän sähköpostiosoite \"{sender}\" on virheellinen (aihe: {subject})."
+
+#: src/Mvc/Controller/Plugin/SendEmail.php:146
+msgid "Email not sent: this is a spam with \"{keyword}\" (To: {to}; From: {from}): {body}"
+msgstr "Sähköpostia ei lähetetty: viesti on roskapostia avainsanan \"{keyword}\" vuoksi (Vastaanottaja: {to}; Lähettäjä: {from}): {body}"
+
+#: src/Mvc/Controller/Plugin/SendEmail.php:217
+msgid "Email not sent: the cc emails {list} are invalid (subject: {subject})."
+msgstr "Sähköpostia ei lähetetty: cc-osoitteet {list} ovat virheellisiä (aihe: {subject})."
+
+#: src/Mvc/Controller/Plugin/SendEmail.php:229
+msgid "Email not sent: the bcc emails {list} are invalid (subject: {subject})."
+msgstr "Sähköpostia ei lähetetty: bcc-osoitteet {list} ovat virheellisiä (aihe: {subject})."
+
+#: src/Mvc/Controller/Plugin/SendEmail.php:241
+msgid "Email not sent: the reply-to emails {list} are invalid (subject: {subject})."
+msgstr "Sähköpostia ei lähetetty: vastausosoitteet {list} ovat virheellisiä (aihe: {subject})."
+
+#: src/Mvc/Controller/Plugin/SendEmail.php:257
+msgid "An email was sent to {recipients} with subject: {subject}"
+msgstr "Sähköposti lähetettiin vastaanottajille {recipients} aiheella: {subject}"
+
+#: src/View/Helper/MediaTypeSelect.php:40
+#: src/Service/Form/Element/MediaTypeSelectFactory.php:35
+msgid "Select media type…"
+msgstr "Valitse mediatyyppi…"
+
+#: src/I18n/Translator.php:45
+msgid "A message to translate should be stringable."
+msgstr "Käännettävän viestin on oltava muunnettavissa merkkijonoksi."
+
+#: src/Job/AddDatabaseIndexes.php:63
+msgid "All database indexes already exist."
+msgstr "Kaikki tietokantaindeksit ovat jo olemassa."
+
+#: src/Job/AddDatabaseIndexes.php:69
+msgid "Adding {count} database indexes: {list}"
+msgstr "Lisätään {count} tietokantaindeksiä: {list}"
+
+#: src/Job/AddDatabaseIndexes.php:89
+msgid "Adding index `{index}` on table `{table}`."
+msgstr "Lisätään indeksi `{index}` tauluun `{table}`."
+
+#: src/Job/AddDatabaseIndexes.php:99
+msgid "Successfully added index `{index}` on table `{table}`."
+msgstr "Indeksi `{index}` lisättiin onnistuneesti tauluun `{table}`."
+
+#: src/Job/AddDatabaseIndexes.php:104
+msgid "Unable to add index `{index}` on table `{table}`: {msg}"
+msgstr "Indeksiä `{index}` ei voitu lisätä tauluun `{table}`: {msg}"
+
+#: src/Job/AddDatabaseIndexes.php:116
+msgid "Successfully added {count} database indexes: {list}"
+msgstr "{count} tietokantaindeksiä lisättiin onnistuneesti: {list}"
+
+#: src/Validator/Ini.php:38
+msgid "The string is not formatted as ini"
+msgstr "Merkkijonoa ei ole muotoiltu INI-muotoon"
+
+#: src/Validator/Ini.php:39
+msgid "The string is incorrectly formatted"
+msgstr "Merkkijono on muotoiltu virheellisesti"
+
+#: src/Validator/Ini.php:40
+msgid "The string contains invalid characters like double quotes"
+msgstr "Merkkijono sisältää virheellisiä merkkejä, kuten kaksoislainausmerkkejä"
+
+#: src/Validator/Ini.php:41
+msgid "The string contains invalid characters"
+msgstr "Merkkijono sisältää virheellisiä merkkejä"
+
+#: src/Validator/Ini.php:42
+msgid "Invalid type given. String expected"
+msgstr "Annettu tyyppi on virheellinen. Odotettiin merkkijonoa"
+
+#: src/Validator/ReadableDirectory.php:21
+msgid "The path should not contain double dot or be hidden."
+msgstr "Polku ei saa sisältää kahta pistettä peräkkäin eikä olla piilotettu."
+
+#: src/Validator/ReadableDirectory.php:22
+msgid "The path does not exist."
+msgstr "Polkua ei ole olemassa."
+
+#: src/Validator/ReadableDirectory.php:23
+msgid "The path is not a directory"
+msgstr "Polku ei ole hakemisto"
+
+#: src/Validator/ReadableDirectory.php:24
+msgid "The path is not readable"
+msgstr "Polkua ei voi lukea"
+
+#: src/Validator/ReadableDirectory.php:25
+msgid "The path is not inside the restricted path"
+msgstr "Polku ei sijaitse rajoitetun polun sisällä"
+
+#: src/Form/Element/AbstractGroupBySiteSelect.php:159
+msgid "[No site]"
+msgstr "[Ei sivustoa]"
+
+#: src/Form/Element/IniTextarea.php:142
+msgid "Invalid ini string or values with double quotes"
+msgstr "Virheellinen INI-merkkijono tai kaksoislainausmerkkejä sisältäviä arvoja"
+
+#: src/Form/Element/IniTextarea.php:186
+msgid "The field {label} has an issue: {msg}"
+msgstr "Kentässä {label} on ongelma: {msg}"
+
+#: src/Form/SendMessageForm.php:87
+msgid "Message"
+msgstr "Viesti"
+
+#: src/Form/SendMessageForm.php:107
+msgid "Mark not submitted"
+msgstr "Merkitse lähettämättömäksi"
+
+#: src/Form/SendMessageForm.php:122
+msgid "Add myself as"
+msgstr "Lisää minut seuraavaan kenttään"
+
+#: src/Form/SendMessageForm.php:124
+msgid "cc"
+msgstr "cc"
+
+#: src/Form/SendMessageForm.php:125
+msgid "bcc"
+msgstr "bcc"
+
+#: src/Form/SendMessageForm.php:126
+msgid "Reply to"
+msgstr "Vastausosoite"
+
+#: src/Form/SendMessageForm.php:142
+msgid "Add specific emails as cc"
+msgstr "Lisää tietyt sähköpostiosoitteet cc-kenttään"
+
+#: src/Form/SendMessageForm.php:143
+msgid "Use \"=\" to separate multiple emails."
+msgstr "Erota useat sähköpostiosoitteet merkillä \"=\"."
+
+#: src/Form/SendMessageForm.php:159
+msgid "Add specific emails as bcc"
+msgstr "Lisää tietyt sähköpostiosoitteet bcc-kenttään"
+
+#: src/Form/SendMessageForm.php:175
+msgid "Add specific emails as reply-to"
+msgstr "Lisää tietyt sähköpostiosoitteet vastausosoitteiksi"
+
+#: src/Form/SendMessageForm.php:190
+msgid "Send message"
+msgstr "Lähetä viesti"
+
+#: src/File/Validator.php:29
+msgid "Error validating \"{filename}\". Cannot store files with the media type \"{mediatype}\"."
+msgstr "Tiedoston \"{filename}\" tarkistuksessa tapahtui virhe. Mediatyypin \"{mediatype}\" tiedostoja ei voi tallentaa."
+
+#: src/File/Validator.php:42
+msgid "Error validating \"{filename}\". Cannot store files with the resolved extension \"{extension}\"."
+msgstr "Tiedoston \"{filename}\" tarkistuksessa tapahtui virhe. Päätellyn tiedostopäätteen \"{extension}\" tiedostoja ei voi tallentaa."
+
+#: src/ManageModuleAndResources.php:93
+msgid "An error occured when loading vocabulary file \"{vocabulary}\": file has no json content."
+msgstr "Sanastotiedoston \"{vocabulary}\" lataamisessa tapahtui virhe: tiedosto ei sisällä JSON-sisältöä."
+
+#: src/ManageModuleAndResources.php:100
+msgid "An error occured when adding the prefix \"{prefix}\": another vocabulary exists. Resolve the conflict before installing this module."
+msgstr "Etuliitteen \"{prefix}\" lisäämisessä tapahtui virhe: toinen sanasto on jo olemassa. Ratkaise ristiriita ennen tämän moduulin asentamista."
+
+#: src/ManageModuleAndResources.php:112 src/ManageModuleAndResources.php:865
+msgid "An error occured when loading custom vocab file \"{file}\": file has no json content."
+msgstr "Mukautetun sanastotiedoston \"{file}\" lataamisessa tapahtui virhe: tiedosto ei sisällä JSON-sisältöä."
+
+#: src/ManageModuleAndResources.php:119
+msgid "A custom vocab exists for \"{name}\". Remove it or rename it before installing this module."
+msgstr "Nimellä \"{name}\" on jo mukautettu sanasto. Poista se tai nimeä se uudelleen ennen tämän moduulin asentamista."
+
+#: src/ManageModuleAndResources.php:130
+msgid "An error occured when loading resource template file \"{file}\": file has no json content."
+msgstr "Resurssimallitiedoston \"{file}\" lataamisessa tapahtui virhe: tiedosto ei sisällä JSON-sisältöä."
+
+#: src/ManageModuleAndResources.php:137
+msgid "A resource template exists for {template}. Rename it or remove it before installing this module."
+msgstr "Resurssimalli {template} on jo olemassa. Nimeä se uudelleen tai poista se ennen tämän moduulin asentamista."
+
+#: src/ManageModuleAndResources.php:426
+msgid "The vocabulary \"{vocabulary}\" was already installed and was kept."
+msgstr "Sanasto \"{vocabulary}\" oli jo asennettu, joten se säilytettiin."
+
+#: src/ManageModuleAndResources.php:436
+msgid "An error occured when adding the prefix \"{prefix}\": another vocabulary exists with the same prefix. Resolve the conflict before installing this module."
+msgstr "Etuliitteen \"{prefix}\" lisäämisessä tapahtui virhe: samalla etuliitteellä on jo toinen sanasto. Ratkaise ristiriita ennen tämän moduulin asentamista."
+
+#: src/ManageModuleAndResources.php:448
+msgid "An error occured when adding the prefix \"{prefix}\" and the associated properties: {message}"
+msgstr "Etuliitteen \"{prefix}\" ja siihen liittyvien ominaisuuksien lisäämisessä tapahtui virhe: {message}"
+
+#: src/ManageModuleAndResources.php:527 src/ManageModuleAndResources.php:536
+msgid "An error occured when updating vocabulary \"{prefix}\" and the associated properties: {message}"
+msgstr "Sanaston \"{prefix}\" ja siihen liittyvien ominaisuuksien päivittämisessä tapahtui virhe: {message}"
+
+#: src/ManageModuleAndResources.php:631
+msgid "The following \"{name}\" of the vocabulary \"{label}\" were replaced: {members}"
+msgstr "Sanaston \"{label}\" seuraavat \"{name}\"-kohteet korvattiin: {members}"
+
+#: src/ManageModuleAndResources.php:641
+msgid "Resources, values and templates were updated, but you may check settings where the old ones were used."
+msgstr "Resurssit, arvot ja mallipohjat päivitettiin, mutta tarkista asetukset, joissa vanhoja käytettiin."
+
+#: src/ManageModuleAndResources.php:671
+msgid "The resource template named \"{template}\" is already available and is skipped."
+msgstr "Resurssimalli nimeltä \"{template}\" on jo käytettävissä, joten se ohitetaan."
+
+#: src/ManageModuleAndResources.php:877
+msgid "The custom vocab named \"{custom_vocab}\" is not available."
+msgstr "Mukautettua sanastoa nimeltä \"{custom_vocab}\" ei ole saatavilla."
+
+#: src/ManageModuleAndResources.php:1099
+msgid "The file path {file} does not exist or is empty."
+msgstr "Tiedostopolkua {file} ei ole olemassa tai se on tyhjä."
+
+#: src/ManageModuleAndResources.php:1111
+msgid "The file path {file} does not contain a json array."
+msgstr "Tiedostopolku {file} ei sisällä JSON-taulukkoa."
+
+#: src/ManageModuleAndResources.php:1163
+msgid "No file or url set for the vocabulary."
+msgstr "Sanastolle ei ole määritetty tiedostoa tai URL-osoitetta."
+
+#: src/ManageModuleAndResources.php:1172
+msgid "The file \"{file}\" cannot be read. Check the url."
+msgstr "Tiedostoa \"{file}\" ei voida lukea. Tarkista URL-osoite."
+
+#: src/ManageModuleAndResources.php:1183
+msgid "The file \"{file}\" cannot be read. Check the file."
+msgstr "Tiedostoa \"{file}\" ei voida lukea. Tarkista tiedosto."
+
+#: src/ManageModuleAndResources.php:1204
+msgid "A vocabulary must have a namespace uri and a prefix."
+msgstr "Sanastolla on oltava nimiavaruuden URI ja etuliite."
+
+#: src/TraitModule.php:142 src/TraitModule.php:1303
+msgid "This module requires the module \"{module}\"."
+msgstr "Tämä moduuli vaatii moduulin \"{module}\"."
+
+#: src/TraitModule.php:147
+msgid "This module requires modules \"{modules}\"."
+msgstr "Tämä moduuli vaatii moduulit \"{modules}\"."
+
+#: src/TraitModule.php:156
+msgid "This module has resources that cannot be installed."
+msgstr "Tässä moduulissa on resursseja, joita ei voida asentaa."
+
+#: src/TraitModule.php:164
+msgid "This module cannot install its tables, because they exist already. Try to remove them first."
+msgstr "Tämä moduuli ei voi asentaa taulujaan, koska ne ovat jo olemassa. Yritä poistaa ne ensin."
+
+#: src/TraitModule.php:667
+msgid "The module removed tables \"{tables}\" from a previous broken install."
+msgstr "Moduuli poisti aiemman epäonnistuneen asennuksen taulut \"{tables}\"."
+
+#: src/TraitModule.php:1298
+msgid "This module requires the module \"{module}\", version {version} or above."
+msgstr "Tämä moduuli vaatii moduulin \"{module}\" version {version} tai uudemman."
+
+#: src/TraitModule.php:1410
+msgid "The module \"{module}\" was automatically deactivated because the dependencies are unavailable."
+msgstr "Moduuli \"{module}\" poistettiin automaattisesti käytöstä, koska riippuvuudet eivät ole saatavilla."
+
+#: src/TraitModule.php:1440
+msgid "The directory \"{path}\" cannot be created: {error}."
+msgstr "Hakemistoa \"{path}\" ei voida luoda: {error}."
+
+#: src/TraitModule.php:1451
+msgid "The path \"{path}\" is not a readable and writeable directory."
+msgstr "Polku \"{path}\" ei ole hakemisto, johon on luku- ja kirjoitusoikeus."
+
+#: src/TraitModule.php:1462
+msgid "The directory \"{path}\" is not writeable: {error}."
+msgstr "Hakemistoon \"{path}\" ei voi kirjoittaa: {error}."
+
+#: src/Service/Form/Element/MediaIngesterSelectFactory.php:26
+msgid "Select media ingesters…"
+msgstr "Valitse median tuontitavat…"
+
+#: src/Service/Form/Element/MediaRendererSelectFactory.php:31
+msgid "Select media renderers…"
+msgstr "Valitse median esitystavat…"
+
+#: src/Stdlib/EasyMeta.php:77
+msgid "annotation"
+msgstr "annotaatio"
+
+#: src/Stdlib/EasyMeta.php:79
+msgid "digital object"
+msgstr "digitaalinen objekti"
+
+#: src/Stdlib/EasyMeta.php:83
+msgid "resource"
+msgstr "resurssi"
+
+#: src/Stdlib/EasyMeta.php:84
+msgid "property"
+msgstr "ominaisuus"
+
+#: src/Stdlib/EasyMeta.php:85
+msgid "resource class"
+msgstr "resurssiluokka"
+
+#: src/Stdlib/EasyMeta.php:93
+msgid "annotations"
+msgstr "annotaatiot"
+
+#: src/Stdlib/EasyMeta.php:94
+msgid "assets"
+msgstr "tiedostot"
+
+#: src/Stdlib/EasyMeta.php:95
+msgid "digital objects"
+msgstr "digitaaliset objektit"
+
+#: src/Stdlib/EasyMeta.php:96
+msgid "items"
+msgstr "kohteet"
+
+#: src/Stdlib/EasyMeta.php:97
+msgid "item sets"
+msgstr "kohdejoukot"
+
+#: src/Stdlib/EasyMeta.php:99
+msgid "resources"
+msgstr "resurssit"
+
+#: src/Stdlib/EasyMeta.php:100
+msgid "properties"
+msgstr "ominaisuudet"
+
+#: src/Stdlib/EasyMeta.php:101
+msgid "resource classes"
+msgstr "resurssiluokat"
+
+#: src/Stdlib/EasyMeta.php:102
+msgid "resource templates"
+msgstr "resurssimallit"
+
+#: src/Stdlib/EasyMeta.php:103
+msgid "vocabularies"
+msgstr "sanastot"
+
+#: src/Stdlib/EasyMeta.php:104
+msgid "sites"
+msgstr "sivustot"
+
+#: config/module.config.php:169
+msgid "An error occurred."
+msgstr "Tapahtui virhe."
+
+#: config/module.config.php:173
+msgid "Information"
+msgstr "Tiedot"
+
+#: config/module.config.php:175
+msgid "OK"
+msgstr "OK"
