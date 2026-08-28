@@ -119,3 +119,16 @@ if (version_compare($oldVersion, '3.4.85', '<')) {
     );
     $messenger->addWarning($message);
 }
+
+if (version_compare($oldVersion, '3.4.89', '<')) {
+    // Protect the shared sensitive directories with a deny-all .htaccess: the
+    // Omeka logs and the sensitive sub-directories of "files/". Idempotent.
+    $config = $services->get('Config');
+    $basePath = $config['file_store']['local']['base_path'] ?? null ?: (OMEKA_PATH . '/files');
+    // The module is not active during its own upgrade, so its config is not
+    // merged and its services are not registered: build the directory manager
+    // directly.
+    $directoryManager = new \Common\Stdlib\DirectoryManager($services->get('Omeka\Logger'));
+    $directoryManager->protectDirectory(OMEKA_PATH . '/logs');
+    $directoryManager->protectSensitiveDirectories($basePath);
+}

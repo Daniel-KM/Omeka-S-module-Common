@@ -41,6 +41,7 @@ namespace Common;
  *
  * See readme.
  *
+ * @deprecated Use Common\TraitModule instead. Will be removed in next version.
  * @todo Check if this class is still used. It was used for the migration from AbstractModule to TraitModule.
  */
 abstract class AbstractModule extends \Omeka\Module\AbstractModule

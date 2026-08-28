@@ -304,8 +304,14 @@ trait TraitModule
         // When the form declares element groups, render them as sections via
         // the dedicated helper, since the default formCollection() ignores the
         // "element_groups" option.
-        if ($form->getOption('element_groups') && $helpers->has('formCollectionElementGroups')) {
-            return $renderer->formCollectionElementGroups($form);
+        if ($form->getOption('element_groups')) {
+            // The nested renderer keeps the fieldsets that are a real group of
+            // values, unlike the core one that flattens them.
+            foreach (['formCollectionElementGroupsNested', 'formCollectionElementGroups'] as $helper) {
+                if ($helpers->has($helper)) {
+                    return $renderer->$helper($form);
+                }
+            }
         }
 
         return $renderer->formCollection($form);
@@ -1425,48 +1431,17 @@ trait TraitModule
      * existing files can be overwritten: a file may belong to another user even
      * when the directory itself is writeable.
      *
+     * When $protect is true, a "deny all" .htaccess is dropped in the directory
+     * so it is not served directly by Apache. Filesystem access is unaffected.
+     *
      * @param string $dirPath Absolute path of the directory to check.
+     * @param bool $protect Deny direct web access to the directory.
      * @return string|null The dirpath if valid, else null.
      */
-    protected function checkDestinationDir(string $dirPath): ?string
+    protected function checkDestinationDir(string $dirPath, bool $protect = false): ?string
     {
-        // Create the directory if needed, tolerating a concurrent creation
-        // (mkdir then fails but the directory exists). The mkdir mode is
-        // altered by the umask, so group-write is enforced afterwards for
-        // shared/multi-process setups (fails silently when not the owner).
-        if (!file_exists($dirPath)) {
-            if (!@mkdir($dirPath, 0775, true) && !is_dir($dirPath)) {
-                $this->getServiceLocator()->get('Omeka\Logger')->err(
-                    'The directory "{path}" cannot be created: {error}.', // @translate
-                    ['path' => $dirPath, 'error' => error_get_last()['message'] ?? 'unknown error']
-                );
-                return null;
-            }
-            @chmod($dirPath, 0775);
-        }
-
-        // Fast checks first: cheap rejection without touching the filesystem.
-        if (!is_dir($dirPath) || !is_readable($dirPath) || !is_writeable($dirPath)) {
-            $this->getServiceLocator()->get('Omeka\Logger')->err(
-                'The path "{path}" is not a readable and writeable directory.', // @translate
-                ['path' => $dirPath]
-            );
-            return null;
-        }
-
-        // Definitive writability test: is_writeable() does not check the
-        // execute bit nor ACLs, so actually create and remove a probe file.
-        $probe = $dirPath . '/.omeka-write-test-' . getmypid() . '-' . uniqid('', true);
-        if (@file_put_contents($probe, '') === false) {
-            $this->getServiceLocator()->get('Omeka\Logger')->err(
-                'The directory "{path}" is not writeable: {error}.', // @translate
-                ['path' => $dirPath, 'error' => error_get_last()['message'] ?? 'unknown error']
-            );
-            return null;
-        }
-        @unlink($probe);
-
-        return $dirPath;
+        return $this->getServiceLocator()->get('Common\DirectoryManager')
+            ->checkDestinationDir($dirPath, $protect);
     }
 
     /**

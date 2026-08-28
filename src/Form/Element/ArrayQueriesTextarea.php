@@ -7,6 +7,13 @@ use Omeka\Form\Element\ArrayTextarea;
 class ArrayQueriesTextarea extends ArrayTextarea
 {
     /**
+     * Store each query as a parsed array or a raw query string (textarea).
+     *
+     * @var bool
+     */
+    protected $asArray = true;
+
+    /**
      * @var bool
      */
     protected $removeArgumentsPageAndSort = false;
@@ -19,12 +26,28 @@ class ArrayQueriesTextarea extends ArrayTextarea
     public function setOptions($options)
     {
         parent::setOptions($options);
+        if (array_key_exists('as_array', $this->options)) {
+            $this->setAsArray($this->options['as_array']);
+        }
         if (array_key_exists('remove_arguments_page_and_sort', $this->options)) {
             $this->setRemoveArgumentsPageAndSort($this->options['remove_arguments_page_and_sort']);
         }
         if (array_key_exists('remove_arguments_useless', $this->options)) {
             $this->setRemoveArgumentsUseless($this->options['remove_arguments_useless']);
         }
+
+        // The javascript editor targets the textarea by this class and reads
+        // the options through data attributes; the assets are enqueued by the
+        // render helper FormArrayQueriesTextarea.
+        $class = trim((string) $this->getAttribute('class'));
+        if (strpos(" $class ", ' common-array-queries-textarea ') === false) {
+            $this->setAttribute('class', trim($class . ' common-array-queries-textarea'));
+        }
+        $this
+            ->setAttribute('data-as-key-value', $this->asKeyValue ? '1' : '0')
+            ->setAttribute('data-key-value-separator', (string) $this->keyValueSeparator)
+            ->setAttribute('data-query-resource-type', (string) ($this->options['query_resource_type'] ?? 'items'));
+
         return $this;
     }
 
@@ -60,6 +83,11 @@ class ArrayQueriesTextarea extends ArrayTextarea
 
     public function stringToArray($string)
     {
+        // Keep the raw query strings when the array storage is disabled.
+        if (!$this->asArray) {
+            return parent::stringToArray($string);
+        }
+
         if (is_array($string)) {
             return $string;
         }
@@ -156,6 +184,17 @@ class ArrayQueriesTextarea extends ArrayTextarea
             }
         }
         return $array;
+    }
+
+    public function setAsArray($asArray): self
+    {
+        $this->asArray = (bool) $asArray;
+        return $this;
+    }
+
+    public function getAsArray(): bool
+    {
+        return $this->asArray;
     }
 
     public function setRemoveArgumentsPageAndSort($removeArgumentsPageAndSort): self

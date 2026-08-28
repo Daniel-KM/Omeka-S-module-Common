@@ -3,6 +3,7 @@
 namespace Common\View\Helper;
 
 use Laminas\Form\Fieldset;
+use Laminas\Form\FieldsetInterface;
 use Laminas\Form\Form;
 use Laminas\View\Helper\AbstractHelper;
 
@@ -59,6 +60,10 @@ class FormTabs extends AbstractHelper
                 continue;
             }
             $subForm = new Fieldset();
+            // Keep the groups, else the elements of a tab are rendered as a
+            // flat list while the ones of the fallback tab keep their sections.
+            // The groups without any element in the tab are not rendered.
+            $subForm->setOption('element_groups', $form->getOption('element_groups'));
             foreach ((array) $tab['elements'] as $name) {
                 if (!$form->has($name)) {
                     continue;
@@ -127,17 +132,16 @@ class FormTabs extends AbstractHelper
             return [];
         }
 
+        // Iterate on the form itself and not on getElements() then
+        // getFieldsets(): the order of insertion must be kept, else a form
+        // where a fieldset is only a title followed by elements of the first
+        // level, like the one of CleanUrl, would display all its elements
+        // first, then all its empty titles.
         $grouped = array_fill_keys(array_keys($elementTabs), []);
-        foreach ($form->getElements() as $element) {
-            $tab = $element->getOption('tab');
+        foreach ($form as $child) {
+            $tab = $child->getOption('tab');
             if ($tab && isset($grouped[$tab])) {
-                $grouped[$tab][] = $element->getName();
-            }
-        }
-        foreach ($form->getFieldsets() as $fieldset) {
-            $tab = $fieldset->getOption('tab');
-            if ($tab && isset($grouped[$tab])) {
-                $grouped[$tab][] = $fieldset->getName();
+                $grouped[$tab][] = $child->getName();
             }
         }
 
@@ -156,9 +160,35 @@ class FormTabs extends AbstractHelper
     {
         $view = $this->getView();
         $hasGroups = (bool) $fieldset->getOption('element_groups');
-        if ($hasGroups && $view->getHelperPluginManager()->has('formCollectionElementGroups')) {
-            return $view->plugin('formCollectionElementGroups')->render($fieldset);
+        if ($hasGroups) {
+            // The nested renderer keeps the fieldsets that are a real group of
+            // values, unlike the core one that flattens them.
+            $helpers = $view->getHelperPluginManager();
+            foreach (['formCollectionElementGroupsNested', 'formCollectionElementGroups'] as $helper) {
+                if ($helpers->has($helper)) {
+                    return $view->plugin($helper)->render($fieldset);
+                }
+            }
         }
-        return $view->formCollection($fieldset, false);
+
+        // The content of a tab is not wrapped in a fieldset, since the tab is
+        // already a section. But formCollection() applies its "wrap" argument
+        // to the whole descendance, so a nested fieldset would lose its own
+        // "<fieldset><legend>" too, and the sections of a form built with
+        // fieldsets would all disappear. So render each child directly.
+        $markup = '';
+        foreach ($fieldset as $child) {
+            // A fieldset may declare its own helper via the option
+            // "render_helper", for example a collection with its own editor.
+            $helper = $child->getOption('render_helper');
+            if ($helper && $view->getHelperPluginManager()->has($helper)) {
+                $markup .= (string) $view->plugin($helper)->__invoke($child);
+                continue;
+            }
+            $markup .= $child instanceof FieldsetInterface
+                ? $view->formCollection($child)
+                : $view->formRow($child);
+        }
+        return $markup;
     }
 }

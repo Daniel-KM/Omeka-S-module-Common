@@ -14,6 +14,12 @@ if (!class_exists('Omeka\Stdlib\PsrMessage', false)
     require_once __DIR__ . '/data/compat/PsrMessage.php';
 }
 
+// Load the module dependencies when installed as a zip.
+// With composer, libraries are stored in omeka vendor/ and the module has none.
+if (file_exists(__DIR__ . '/vendor/autoload.php')) {
+    require_once __DIR__ . '/vendor/autoload.php';
+}
+
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Omeka\Module\AbstractModule;
 
@@ -49,6 +55,29 @@ class Module extends AbstractModule
         $this->fixIndexes();
         $this->checkGeneric();
         $this->ensureSecretKey();
+        $this->protectDirectories();
+    }
+
+    /**
+     * Protect the sensitive server side directories with a deny-all .htaccess.
+     *
+     * As a base module of the ecosystem, Common is the right place to secure
+     * the shared sensitive directories: the logs of Omeka and the sensitive
+     * sub-directories of "files/" (backup, import, export, result…) that a
+     * module may create. Public media directories are never touched and an
+     * existing .htaccess is never overwritten.
+     */
+    protected function protectDirectories(): void
+    {
+        $services = $this->getServiceLocator();
+        $config = $services->get('Config');
+        $basePath = $config['file_store']['local']['base_path'] ?? null ?: (OMEKA_PATH . '/files');
+        // The module is not active yet during install, so its config is not
+        // merged and its services are not registered: build the directory
+        // manager directly, like the psr-4 namespace registered above.
+        $directoryManager = new \Common\Stdlib\DirectoryManager($services->get('Omeka\Logger'));
+        $directoryManager->protectDirectory(OMEKA_PATH . '/logs');
+        $directoryManager->protectSensitiveDirectories($basePath);
     }
 
     public function upgrade($oldVersion, $newVersion, ServiceLocatorInterface $services): void
@@ -203,10 +232,12 @@ class Module extends AbstractModule
             ['resource' => 'resource_type'],
             ['resource' => ['idx_type_created' => '`resource_type`, `created`']],
             ['resource' => ['idx_type_modified' => '`resource_type`, `modified`']],
+            ['item_site' => ['idx_site_item' => '`site_id`, `item_id`']],
+            // Speed searches and references.
             ['value' => 'type'],
             ['value' => 'lang'],
             ['value' => ['idx_property_value' => '`property_id`, `value`(190)']],
-            ['item_site' => ['idx_site_item' => '`site_id`, `item_id`']],
+            ['value' => ['idx_property_value_resource' => '`property_id`, `value_resource_id`']],
             // Keep session last, because it may fail on a big database.
             ['session' => 'modified'],
         ];

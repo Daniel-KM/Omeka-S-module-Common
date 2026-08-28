@@ -19,6 +19,8 @@ class FormElementDelegatorFactory implements DelegatorFactoryInterface
     ) {
         $formElement = $callback();
         $formElement->addType('note', 'formNote');
+        $formElement->addClass('Common\Form\Element\ArrayQueriesTextarea', 'formArrayQueriesTextarea');
+        $formElement->addClass('Common\Form\Element\FieldsTextarea', 'formFieldsTextarea');
         $formElement->addClass('Omeka\Form\Element\Secret', 'formSecret');
         $formElement->addClass('Common\Form\Element\Secret', 'formSecret');
         return $formElement;

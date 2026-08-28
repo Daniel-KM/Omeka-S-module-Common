@@ -20,11 +20,12 @@
         "issues": "https://gitlab.com/Daniel-KM/Omeka-S-module-Common/-/issues",
         "forum": "https://forum.omeka.org/"
     },
-    "_require (not set until Omeka S merges PR #2412)": {
+    "_require (not set until Omeka S merges PR #2432)": {
         "omeka/omeka-s": "^4.0"
     },
     "require": {
         "ext-sodium": "*",
+        "symfony/yaml": "^5.4 || ^6.4",
         "sempia/common-symlink": "^1.0",
         "sempia/external-assets": "^1.1"
     },
@@ -50,7 +51,8 @@
     "extra": {
         "installer-name": "Common",
         "external-assets": {
-            "asset/vendor/jquery-autocomplete/jquery.autocomplete.min.js": "https://gitlab.com/Daniel-KM/jQuery-Autocomplete/-/raw/master/dist/jquery.autocomplete.min.js"
+            "asset/vendor/jquery-autocomplete/jquery.autocomplete.min.js": "https://gitlab.com/Daniel-KM/jQuery-Autocomplete/-/raw/master/dist/jquery.autocomplete.min.js",
+            "asset/vendor/js-yaml/js-yaml.min.js": "https://unpkg.com/js-yaml@4.1.0/dist/js-yaml.min.js"
         }
     }
 }

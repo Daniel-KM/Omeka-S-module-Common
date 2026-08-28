@@ -8,6 +8,13 @@ use Laminas\InputFilter\InputProviderInterface;
 class UrlQuery extends Text implements InputProviderInterface
 {
     /**
+     * Store the query as a parsed array or a raw query string (textarea).
+     *
+     * @var bool
+     */
+    protected $asArray = true;
+
+    /**
      * @var bool
      */
     protected $removeArgumentsPageAndSort = false;
@@ -20,6 +27,9 @@ class UrlQuery extends Text implements InputProviderInterface
     public function setOptions($options)
     {
         parent::setOptions($options);
+        if (array_key_exists('as_array', $this->options)) {
+            $this->setAsArray($this->options['as_array']);
+        }
         if (array_key_exists('remove_arguments_page_and_sort', $this->options)) {
             $this->setRemoveArgumentsPageAndSort($this->options['remove_arguments_page_and_sort']);
         }
@@ -45,11 +55,28 @@ class UrlQuery extends Text implements InputProviderInterface
                 [
                     'name' => \Laminas\Filter\Callback::class,
                     'options' => [
-                        'callback' => [$this, 'queryToArray'],
+                        'callback' => $this->asArray ? [$this, 'queryToArray'] : [$this, 'queryToString'],
                     ],
                 ],
             ],
         ];
+    }
+
+    /**
+     * Normalize a query into the raw query string.
+     *
+     * It is used when the option "as_array" is false.
+     */
+    public function queryToString($string): string
+    {
+        if (is_array($string)) {
+            return $this->arrayToQuery($string);
+        }
+        $string = ltrim((string) $string, "? \t\n\r\0\x0B");
+        // Clean via an array round-trip only when a cleanup is requested.
+        return $this->removeArgumentsPageAndSort || $this->removeArgumentsUseless
+            ? $this->arrayToQuery($this->queryToArray($string))
+            : $string;
     }
 
     public function arrayToQuery($array): string
@@ -129,6 +156,17 @@ class UrlQuery extends Text implements InputProviderInterface
             }
         }
         return $array;
+    }
+
+    public function setAsArray($asArray): self
+    {
+        $this->asArray = (bool) $asArray;
+        return $this;
+    }
+
+    public function getAsArray(): bool
+    {
+        return $this->asArray;
     }
 
     public function setRemoveArgumentsPageAndSort($removeArgumentsPageAndSort): self

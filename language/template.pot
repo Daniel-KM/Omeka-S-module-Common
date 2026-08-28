@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-06 00:00+0000\n"
+"POT-Creation-Date: 2026-08-03 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/Form/View/Helper/FormSecret.php:45 src/TraitModule.php:444
+#: src/Form/View/Helper/FormSecret.php:45 src/TraitModule.php:450
 msgid "Leave empty to keep the current value"
 msgstr ""
 
@@ -54,6 +54,84 @@ msgstr ""
 msgid "default"
 msgstr ""
 
+#: src/View/Helper/ArrayQueriesTextareaAssets.php:36
+msgid "Edit with the query builder"
+msgstr ""
+
+#: src/View/Helper/ArrayQueriesTextareaAssets.php:37
+#: src/View/Helper/FieldsTextareaAssets.php:44
+msgid "Edit as text"
+msgstr ""
+
+#: src/View/Helper/ArrayQueriesTextareaAssets.php:42
+msgid "Add a query"
+msgstr ""
+
+#: src/View/Helper/ArrayQueriesTextareaAssets.php:43
+#: src/View/Helper/FieldsTextareaAssets.php:58
+msgid "key"
+msgstr ""
+
+#: src/View/Helper/FieldsTextareaAssets.php:43
+msgid "Edit as a form"
+msgstr ""
+
+#: src/View/Helper/FieldsTextareaAssets.php:46
+msgid "Hide preview"
+msgstr ""
+
+#: src/View/Helper/FieldsTextareaAssets.php:48
+msgid "Add a field"
+msgstr ""
+
+#: src/View/Helper/FieldsTextareaAssets.php:50
+msgid "label"
+msgstr ""
+
+#: src/View/Helper/FieldsTextareaAssets.php:51
+msgid "required"
+msgstr ""
+
+#: src/View/Helper/FieldsTextareaAssets.php:54
+msgid "Attributes"
+msgstr ""
+
+#: src/View/Helper/FieldsTextareaAssets.php:55
+msgid "Add a value"
+msgstr ""
+
+#: src/View/Helper/FieldsTextareaAssets.php:56
+msgid "Add an option"
+msgstr ""
+
+#: src/View/Helper/FieldsTextareaAssets.php:57
+msgid "Add an attribute"
+msgstr ""
+
+#: src/View/Helper/FieldsTextareaAssets.php:59
+msgid "value"
+msgstr ""
+
+#: src/View/Helper/FieldsTextareaAssets.php:60
+msgid "Delete this field"
+msgstr ""
+
+#: src/View/Helper/FieldsTextareaAssets.php:62
+msgid "Move"
+msgstr ""
+
+#: src/View/Helper/FieldsTextareaAssets.php:63
+msgid "Move up"
+msgstr ""
+
+#: src/View/Helper/FieldsTextareaAssets.php:64
+msgid "Move down"
+msgstr ""
+
+#: src/View/Helper/FieldsTextareaAssets.php:65
+msgid "The YAML cannot be parsed. Fix it before switching to the form."
+msgstr ""
+
 #: data/scripts/upgrade.php:118
 msgid ""
 "The dialog template and related view helpers have been improved for "
@@ -63,45 +141,45 @@ msgid ""
 "classes should be reviewed and updated accordingly."
 msgstr ""
 
-#: Module.php:87
+#: Module.php:113
 msgid "A secret key was generated in config/secret_key.php to encrypt secrets."
 msgstr ""
 
-#: Module.php:90
+#: Module.php:116
 msgid ""
 "The secret key could not be created: set it manually in config/"
 "secret_key.php or set the environment variable \"OMEKA_SECRET_KEY\" to "
 "encrypt secrets (module api keys, etc.)."
 msgstr ""
 
-#: Module.php:121
+#: Module.php:147
 msgid ""
 "The php extension \"intl\" is not available. It is recommended to install it "
 "to manage diacritics and non-latin characters and to translate dates, "
 "numbers and more."
 msgstr ""
 
-#: Module.php:309
+#: Module.php:337
 msgid "Added {count} database indexes: {list}."
 msgstr ""
 
-#: Module.php:315
+#: Module.php:343
 msgid "Failed to add {count} database indexes: {list}."
 msgstr ""
 
-#: Module.php:347
+#: Module.php:375
 msgid ""
 "PHP-CLI unavailable for {count} large-table indexes ({list}). Ask your DBA "
 "to run: {sql}"
 msgstr ""
 
-#: Module.php:359
+#: Module.php:387
 msgid ""
 "{count} large-table indexes are being added in background with online DDL "
 "({list}). Track progress in logs/common-add-index.log."
 msgstr ""
 
-#: Module.php:395
+#: Module.php:423
 msgid "The module Generic is no longer needed and can be removed."
 msgstr ""
 
@@ -121,18 +199,6 @@ msgstr ""
 msgid ""
 "Warning: some files contain invalid unicode characters and cannot be "
 "processed directly."
-msgstr ""
-
-#: src/Mvc/Controller/Plugin/PrepareMessage.php:106
-msgid "Empty message."
-msgstr ""
-
-#: src/Mvc/Controller/Plugin/PrepareMessage.php:113
-msgid "Too long message."
-msgstr ""
-
-#: src/Mvc/Controller/Plugin/PrepareMessage.php:140
-msgid "Too long subject."
 msgstr ""
 
 #: src/Mvc/Controller/Plugin/SendEmail.php:88
@@ -260,6 +326,12 @@ msgstr ""
 
 #: src/Form/Element/IniTextarea.php:186
 msgid "The field {label} has an issue: {msg}"
+msgstr ""
+
+#: src/Form/Element/FieldsTextarea.php:119
+msgid ""
+"Invalid fields: check the yaml syntax, the field names (ascii, no space), "
+"the types and, for select/radio/multicheckbox, the list of values."
 msgstr ""
 
 #: src/Form/SendMessageForm.php:87
@@ -423,7 +495,7 @@ msgstr ""
 msgid "A vocabulary must have a namespace uri and a prefix."
 msgstr ""
 
-#: src/TraitModule.php:142 src/TraitModule.php:1303
+#: src/TraitModule.php:142 src/TraitModule.php:1309
 msgid "This module requires the module \"{module}\"."
 msgstr ""
 
@@ -441,31 +513,19 @@ msgid ""
 "remove them first."
 msgstr ""
 
-#: src/TraitModule.php:667
+#: src/TraitModule.php:673
 msgid "The module removed tables \"{tables}\" from a previous broken install."
 msgstr ""
 
-#: src/TraitModule.php:1298
+#: src/TraitModule.php:1304
 msgid ""
 "This module requires the module \"{module}\", version {version} or above."
 msgstr ""
 
-#: src/TraitModule.php:1410
+#: src/TraitModule.php:1416
 msgid ""
 "The module \"{module}\" was automatically deactivated because the "
 "dependencies are unavailable."
-msgstr ""
-
-#: src/TraitModule.php:1440
-msgid "The directory \"{path}\" cannot be created: {error}."
-msgstr ""
-
-#: src/TraitModule.php:1451
-msgid "The path \"{path}\" is not a readable and writeable directory."
-msgstr ""
-
-#: src/TraitModule.php:1462
-msgid "The directory \"{path}\" is not writeable: {error}."
 msgstr ""
 
 #: src/Service/Form/Element/MediaIngesterSelectFactory.php:26
@@ -476,78 +536,121 @@ msgstr ""
 msgid "Select media renderers…"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:77
+#: src/Stdlib/UpgradeJobDispatch.php:103
+msgid ""
+"The job #{job_id} is still starting after the sleep delay. It may need to be "
+"relaunched manually."
+msgstr ""
+
+#: src/Stdlib/EasyMeta.php:81
 msgid "annotation"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:79
-msgid "digital object"
-msgstr ""
-
 #: src/Stdlib/EasyMeta.php:83
-msgid "resource"
+msgid "concept"
 msgstr ""
 
 #: src/Stdlib/EasyMeta.php:84
+msgid "digital object"
+msgstr ""
+
+#: src/Stdlib/EasyMeta.php:88
+msgid "resource"
+msgstr ""
+
+#: src/Stdlib/EasyMeta.php:89
 msgid "property"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:85
+#: src/Stdlib/EasyMeta.php:90
 msgid "resource class"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:93
+#: src/Stdlib/EasyMeta.php:98
 msgid "annotations"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:94
+#: src/Stdlib/EasyMeta.php:99
 msgid "assets"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:95
-msgid "digital objects"
-msgstr ""
-
-#: src/Stdlib/EasyMeta.php:96
-msgid "items"
-msgstr ""
-
-#: src/Stdlib/EasyMeta.php:97
-msgid "item sets"
-msgstr ""
-
-#: src/Stdlib/EasyMeta.php:99
-msgid "resources"
-msgstr ""
-
 #: src/Stdlib/EasyMeta.php:100
-msgid "properties"
+msgid "concepts"
 msgstr ""
 
 #: src/Stdlib/EasyMeta.php:101
-msgid "resource classes"
+msgid "digital objects"
 msgstr ""
 
 #: src/Stdlib/EasyMeta.php:102
-msgid "resource templates"
+msgid "items"
 msgstr ""
 
 #: src/Stdlib/EasyMeta.php:103
+msgid "item sets"
+msgstr ""
+
+#: src/Stdlib/EasyMeta.php:105
+msgid "resources"
+msgstr ""
+
+#: src/Stdlib/EasyMeta.php:106
+msgid "properties"
+msgstr ""
+
+#: src/Stdlib/EasyMeta.php:107
+msgid "resource classes"
+msgstr ""
+
+#: src/Stdlib/EasyMeta.php:108
+msgid "resource templates"
+msgstr ""
+
+#: src/Stdlib/EasyMeta.php:109
 msgid "vocabularies"
 msgstr ""
 
-#: src/Stdlib/EasyMeta.php:104
+#: src/Stdlib/EasyMeta.php:110
 msgid "sites"
 msgstr ""
 
-#: config/module.config.php:169
+#: src/Stdlib/MessagePreparerTrait.php:50
+msgid "Empty message."
+msgstr ""
+
+#: src/Stdlib/MessagePreparerTrait.php:57
+msgid "Too long message."
+msgstr ""
+
+#: src/Stdlib/MessagePreparerTrait.php:77
+msgid "Too long subject."
+msgstr ""
+
+#: src/Stdlib/DirectoryManager.php:53
+msgid "The directory \"{path}\" cannot be created: {error}."
+msgstr ""
+
+#: src/Stdlib/DirectoryManager.php:64
+msgid "The path \"{path}\" is not a readable and writeable directory."
+msgstr ""
+
+#: src/Stdlib/DirectoryManager.php:75
+msgid "The directory \"{path}\" is not writeable: {error}."
+msgstr ""
+
+#: src/Stdlib/DirectoryManager.php:110
+msgid ""
+"The directory \"{path}\" could not be protected with a .htaccess: {error}."
+msgstr ""
+
+#: config/module.config.php:179
 msgid "An error occurred."
 msgstr ""
 
-#: config/module.config.php:173
+#: config/module.config.php:183
 msgid "Information"
 msgstr ""
 
-#: config/module.config.php:175
+#: config/module.config.php:185
 msgid "OK"
 msgstr ""

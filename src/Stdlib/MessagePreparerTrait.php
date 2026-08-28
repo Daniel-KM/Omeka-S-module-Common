@@ -219,6 +219,21 @@ trait MessagePreparerTrait
             '{resources_url_admin}' => '',
             '{resources_links}' => '',
         ];
+
+        // Empty default for any unresolved "{resources::term}" placeholder.
+        if (preg_match_all('~\{resources::[a-zA-Z0-9_-]+:[a-zA-Z0-9_-]+\}~m', $message, $unresolved)) {
+            foreach ($unresolved[0] as $placeholder) {
+                $defaultPlaceholders[$placeholder] ??= '';
+            }
+        }
+
+        // Empty for unresolved property term "{prefix:local}" placeholder.
+        if (preg_match_all('~\{[a-zA-Z][a-zA-Z0-9]*:[a-zA-Z][a-zA-Z0-9_]*\}~m', $message, $unresolvedTerms)) {
+            foreach ($unresolvedTerms[0] as $placeholder) {
+                $defaultPlaceholders[$placeholder] ??= '';
+            }
+        }
+
         $replace += $defaultPlaceholders;
 
         return strtr($message, $replace);

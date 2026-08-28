@@ -277,6 +277,26 @@ class MessagePreparerTraitTest extends TestCase
         $this->assertStringContainsString('creators=Ada', $out);
     }
 
+    public function testResourcesPropertyTermPlaceholderEmptyWithoutResources(): void
+    {
+        $out = $this->preparer([])->fillMessage(
+            'titles={resources::dcterms:title}',
+            [],
+            ['site' => $this->site()]
+        );
+        $this->assertSame('titles=', $out);
+    }
+
+    public function testSingleResourcePropertyTermEmptyWithoutResource(): void
+    {
+        $out = $this->preparer([])->fillMessage(
+            'title={dcterms:title}',
+            [],
+            []
+        );
+        $this->assertSame('title=', $out);
+    }
+
     public function testMultipleResourcesIgnoredWithoutSite(): void
     {
         $resources = [new FakeResource(1, 'item', 'Alpha')];

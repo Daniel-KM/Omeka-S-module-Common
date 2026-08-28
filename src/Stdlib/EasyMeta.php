@@ -22,6 +22,8 @@ class EasyMeta
         'annotation' => 'resource',
         // Module DigitalObject.
         'resource:digitalobject' => 'resource',
+        // Module Thesaurus.
+        'resource:concept' => 'resource',
         // Module DataTypeGeometry.
         'geography' => 'literal',
         'geography:coordinates' => 'literal',
@@ -52,6 +54,7 @@ class EasyMeta
     const RESOURCE_CLASSES = [
         'annotations' => \Annotate\Entity\Annotation::class,
         'assets' => \Omeka\Entity\Asset::class,
+        'concepts' => \Thesaurus\Entity\Concept::class,
         'digital_objects' => \DigitalObject\Entity\DigitalObject::class,
         'items' => \Omeka\Entity\Item::class,
         'item_sets' => \Omeka\Entity\ItemSet::class,
@@ -65,6 +68,7 @@ class EasyMeta
 
     const RESOURCE_RESOURCE_CLASSES = [
         'annotations' => \Annotate\Entity\Annotation::class,
+        'concepts' => \Thesaurus\Entity\Concept::class,
         'digital_objects' => \DigitalObject\Entity\DigitalObject::class,
         'items' => \Omeka\Entity\Item::class,
         'item_sets' => \Omeka\Entity\ItemSet::class,
@@ -76,6 +80,7 @@ class EasyMeta
     const RESOURCE_LABELS = [
         'annotations' => 'annotation', // @translate
         'assets' => 'asset', // @translate
+        'concepts' => 'concept', // @translate
         'digital_objects' => 'digital object', // @translate
         'items' => 'item', // @translate
         'item_sets' => 'item set', // @translate
@@ -92,6 +97,7 @@ class EasyMeta
     const RESOURCE_LABELS_PLURAL = [
         'annotations' => 'annotations', // @translate
         'assets' => 'assets', // @translate
+        'concepts' => 'concepts', // @translate
         'digital_objects' => 'digital objects', // @translate
         'items' => 'items', // @translate
         'item_sets' => 'item sets', // @translate
@@ -295,11 +301,28 @@ class EasyMeta
         \DoctrineProxies\__CG__\DigitalObject\Entity\DigitalObject::class => 'digital_objects',
         'DigitalObject\Controller\Admin\DigitalObject' => 'digital_objects',
         'DigitalObject\Controller\Admin\DigitalObjectController' => 'digital_objects',
+        // Module Thesaurus.
+        'concepts' => 'concepts',
+        'o:Concept' => 'concepts',
+        'o:concept' => 'concepts',
+        'o:concepts' => 'concepts',
+        'concept' => 'concepts',
+        'Concept' => 'concepts',
+        'ConceptController' => 'concepts',
+        'resource:concept' => 'concepts',
+        'resource:concepts' => 'concepts',
+        'o-module-thesaurus:Concept' => 'concepts',
+        \Thesaurus\Api\Representation\ConceptRepresentation::class => 'concepts',
+        \Thesaurus\Entity\Concept::class => 'concepts',
+        \DoctrineProxies\__CG__\Thesaurus\Entity\Concept::class => 'concepts',
+        'Thesaurus\Controller\Admin\Concept' => 'concepts',
+        'Thesaurus\Controller\Admin\ConceptController' => 'concepts',
     ];
 
     const RESOURCE_TABLES = [
         'annotations' => 'annotation',
         'assets' => 'asset',
+        'concepts' => 'concept',
         'digital_objects' => 'digital_object',
         'items' => 'item',
         'item_sets' => 'item_set',
@@ -314,6 +337,7 @@ class EasyMeta
     const RESOURCE_TYPES = [
         'annotations' => 'annotation',
         'assets' => 'asset',
+        'concepts' => 'concept',
         'digital_objects' => 'digital-object',
         'items' => 'item',
         'item_sets' => 'item-set',
@@ -793,6 +817,10 @@ class EasyMeta
         }
         if (substr($dataType, 0, 12) === 'customvocab:') {
             return $this->dataTypeMainCustomVocab($dataType);
+        }
+        // Module Thesaurus: a data type by thesaurus, storing a concept.
+        if (substr($dataType, 0, 10) === 'thesaurus:') {
+            return 'resource';
         }
         return null;
     }

@@ -1,3 +1,8 @@
+/* Manage sub-menus above right sidebar */
+#page-actions {
+    z-index: 1001;
+}
+
 #page-actions .page-action-menu {
     display: inline-block;
     position: relative;

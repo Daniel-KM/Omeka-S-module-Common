@@ -1,0 +1,253 @@
+/**
+ * Manage form element FieldsTextarea in Omeka admin context.
+ */
+
+@media all {
+    .common-fields-textarea-actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+        margin-top: 6px;
+
+        & .common-fields-textarea-toggle,
+        & .cft-preview-toggle {
+            margin-left: auto !important;
+        }
+
+        & .common-fields-textarea-toggle + .cft-preview-toggle {
+            margin-left: 0 !important;
+        }
+    }
+
+    .common-fields-textarea-editor {
+        margin: 0.25rem 0;
+    }
+
+    .common-fields-textarea-editor .cft-row {
+        margin-bottom: 0.25rem;
+        padding: 0.25rem;
+        background: rgba(0, 0, 0, 0.03);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 3px;
+    }
+
+    .common-fields-textarea-editor .cft-line {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .common-fields-textarea-editor .cft-line1 {
+        flex-wrap: nowrap;
+        margin-bottom: 0.25rem;
+    }
+
+    .common-fields-textarea-editor .cft-row input,
+    .common-fields-textarea-editor .cft-row select {
+        width: auto !important;
+        min-width: 0;
+        margin: 0;
+        display: inline-block;
+    }
+
+    .common-fields-textarea-editor .cft-drag {
+        cursor: move;
+        padding: 0 0.25rem;
+        color: #888;
+    }
+
+    .common-fields-textarea-editor .cft-move {
+        display: inline-flex;
+        flex-direction: column;
+        flex: 0 0 auto;
+        border: 1px solid #bbb;
+        border-radius: 3px;
+        overflow: hidden;
+        line-height: 1;
+    }
+
+    .common-fields-textarea-editor .cft-move button {
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: #f4f4f4 !important;
+        color: #555;
+        cursor: pointer;
+        padding: 1px 5px !important;
+        margin: 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+        font-size: 0.8em;
+        line-height: 1.1;
+    }
+
+    .common-fields-textarea-editor .cft-move button + button {
+        border-top: 1px solid #bbb !important;
+    }
+
+    .common-fields-textarea-editor .cft-move button:disabled {
+        opacity: 0.35;
+        cursor: default;
+    }
+
+    .common-fields-textarea-editor .cft-name {
+        flex: 0 0 7rem;
+    }
+
+    .common-fields-textarea-editor .cft-type {
+        flex: 0 0 8rem;
+    }
+
+    .common-fields-textarea-editor .cft-label {
+        flex: 1 1 5rem;
+        min-width: 3rem;
+    }
+
+    .common-fields-textarea-editor .cft-required-wrap {
+        flex: 0 0 auto;
+        width: auto !important;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.15rem;
+        margin: 0 auto 0 1.25em;
+        white-space: nowrap;
+    }
+
+    .common-fields-textarea-editor .cft-remove-field {
+        flex: 0 0 auto;
+        border: 0 !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        padding: 0 !important;
+        color: #999;
+        cursor: pointer;
+    }
+
+    .common-fields-textarea-editor .cft-remove-field:hover {
+        color: #b00;
+    }
+
+    .common-fields-textarea-editor .cft-drag {
+        cursor: grab;
+    }
+
+    .common-fields-textarea-editor .cft-row.cft-dragging {
+        opacity: 0.5;
+    }
+
+    .common-fields-textarea-editor .cft-subactions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 0.75rem;
+        margin: 0.25rem 0;
+    }
+
+    .common-fields-textarea-editor .cft-subaction {
+        border: 0 !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        cursor: pointer;
+        color: #555;
+        font-size: 0.85em;
+        padding: 0;
+    }
+
+    .common-fields-textarea-editor .cft-subaction:focus-visible,
+    .common-fields-textarea-editor .cft-remove-field:focus-visible,
+    .common-fields-textarea-editor .cft-pair-del:focus-visible {
+        outline: 2px solid #555 !important;
+        outline-offset: 1px;
+    }
+
+    .common-fields-textarea-editor .cft-move:has(button:focus-visible) {
+        outline: 2px solid #555;
+        outline-offset: 1px;
+    }
+
+    .common-fields-textarea-editor .o-icon-add::before,
+    .common-fields-textarea-actions .o-icon-add::before {
+        margin-right: 0.35em;
+    }
+
+    .common-fields-textarea-editor .cft-sub {
+        margin: 0.25rem 0 0 2rem;
+        padding-left: 0.5rem;
+        border-left: 2px solid rgba(0, 0, 0, 0.12);
+    }
+
+    .common-fields-textarea-editor .cft-sub-title {
+        display: block;
+        font-weight: bold;
+        font-size: 0.85em;
+        color: #555;
+        margin-bottom: 0.15rem;
+    }
+
+    .common-fields-textarea-editor .cft-pair {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: 0.25rem;
+        margin-bottom: 0.15rem;
+    }
+
+    .common-fields-textarea-editor .cft-pk {
+        flex: 0 0 10rem;
+    }
+
+    .common-fields-textarea-editor .cft-pv {
+        flex: 1 1 10rem;
+    }
+
+    .common-fields-textarea-editor .cft-pair-del {
+        flex: 0 0 auto;
+        cursor: pointer;
+        border: 0;
+        background: transparent;
+        color: #999;
+    }
+
+    .common-fields-textarea-editor .cft-pair-del:hover {
+        color: #666;
+    }
+
+    .cft-preview-panel {
+        margin: 0.5rem 0;
+        padding: 0.75rem;
+        background: #fff;
+        border: 1px dashed rgba(0, 0, 0, 0.25);
+        border-radius: 3px;
+    }
+
+    .cft-preview-field {
+        margin-bottom: 0.5rem;
+    }
+
+    .cft-preview-field > label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 0.15rem;
+    }
+
+    .cft-preview-field input:not([type=checkbox]):not([type=radio]),
+    .cft-preview-field select,
+    .cft-preview-field textarea {
+        width: 100%;
+        max-width: 30rem;
+    }
+
+    .cft-preview-choice {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.15rem;
+        margin-right: 0.75rem;
+        font-weight: normal;
+    }
+
+    .cft-preview-actions {
+        margin-top: 0.5rem;
+    }
+}

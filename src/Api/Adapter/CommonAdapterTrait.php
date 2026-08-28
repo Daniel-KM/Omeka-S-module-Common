@@ -52,8 +52,8 @@ trait CommonAdapterTrait
         'neq' => '<>',
         */
         /* @todo Use operators ∃ and ∄ (\u2203/\u2204) for is not null/is null.
-        '∄' => 'IS NULL',
-        '∃' => 'IS NOT NULL',
+        '∄' => 'IS NULL', // Unicode: There does not exist.
+        '∃' => 'IS NOT NULL', // Unicode: There exists.
         */
     ];
 
@@ -113,6 +113,7 @@ trait CommonAdapterTrait
      *   zero (0) means to search empty values (0 or null).
      *   Note that values are casted first to integer in all cases.
      * - "id" is like a simplified "int_empty", because the id is never 0.
+     *   Support id = 0 (no id) and id < 0 (not the specified id).
      *   Furthermore, a join may be added in a future version if really needed.
      * - For datetime, it is simpler to use the mathematical operators that are
      *   more versatile, but the key names are used for compatibility with omeka
@@ -184,11 +185,36 @@ trait CommonAdapterTrait
                     break;
 
                 case 'id':
-                    // Unlike main AbstractEntityAdapter, an id may be "0" to search empty values.
+                    // Unlike main AbstractEntityAdapter, supports:
+                    // - an id may be "0" to search empty values;
+                    // - a negative id "-N" means to exclude the id N.
                     // TODO In AbstractResourceEntityAdapter, a join is added for id. It may manage rights, but is it still useful?
-                    $values = is_array($value)
-                        ? array_values(array_unique(array_map('intval', $value)))
+                    $rawValues = is_array($value)
+                        ? array_map('intval', $value)
                         : [(int) $value];
+                    $include = [];
+                    $exclude = [];
+                    foreach ($rawValues as $v) {
+                        if ($v < 0) {
+                            $exclude[] = -$v;
+                        } else {
+                            $include[] = $v;
+                        }
+                    }
+                    if ($exclude) {
+                        $exclude = array_values(array_unique($exclude));
+                        $fieldAlias = $this->createAlias();
+                        $qb
+                            ->andWhere($expr->orX(
+                                $expr->isNull($entityAlias . '.' . $field),
+                                $expr->notIn($entityAlias . '.' . $field, ':' . $fieldAlias)
+                            ))
+                            ->setParameter($fieldAlias, $exclude, Connection::PARAM_INT_ARRAY);
+                    }
+                    if (!$include) {
+                        break;
+                    }
+                    $values = array_values(array_unique($include));
                     if ($values === [0]) {
                         // Unlike "int_empty", an "id" is never 0.
                         $qb

@@ -87,6 +87,10 @@
 	.dialog-footer {
         margin-top: 1em;
     }
+    /* Keep margin below contents symmetric to top margin above. */
+    .dialog-contents {
+        margin-bottom: 1em;
+    }
     dialog .dialog-header-close-button {
         position: absolute;
         top: 0.5em;
@@ -202,8 +206,7 @@
             text-indent: initial;
             padding-left: 8px;
         }
-        /* Center action-bar icons (no margin) so glyphs of different widths align
-        and spacing stays even across spans, buttons and links. */
+        /* Center action-bar icons so glyphs of different widths stays. */
         & .single-action span.fas,
         & .no-action span.fas {
             display: block;
