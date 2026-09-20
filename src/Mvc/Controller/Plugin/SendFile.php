@@ -2,6 +2,7 @@
 
 namespace Common\Mvc\Controller\Plugin;
 
+use Common\Stdlib\TextTransliterator;
 use finfo;
 use Laminas\Http\Response as HttpResponse;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
@@ -215,35 +216,11 @@ class SendFile extends AbstractPlugin
     }
 
     /**
-     * Fold a UTF-8 filename to a plain ASCII equivalent (e.g. "École.pdf" →
-     * "Ecole.pdf"). Preserves alphanumerics, dot, dash, underscore and space;
-     * unknown characters are replaced by "_" so the fallback stays a valid,
-     * non-empty filename.
+     * Fold a UTF-8 filename to a plain ASCII equivalent ("École.pdf" is folded
+     * to "Ecole.pdf").
      */
     protected function toAsciiFilename(string $filename): string
     {
-        if ($filename === '' || preg_match('//u', $filename) !== 1) {
-            return $filename;
-        }
-        $ascii = null;
-        if (class_exists(\Transliterator::class)) {
-            $tr = \Transliterator::create('Any-Latin; Latin-ASCII; [:Nonspacing Mark:] Remove; NFC');
-            if ($tr) {
-                $ascii = $tr->transliterate($filename);
-            }
-        }
-        if ($ascii === null || $ascii === false) {
-            $prev = setlocale(LC_CTYPE, '0');
-            setlocale(LC_CTYPE, 'C.UTF-8', 'en_US.UTF-8', 'C');
-            $ascii = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $filename);
-            if ($prev !== false) {
-                setlocale(LC_CTYPE, $prev);
-            }
-        }
-        if ($ascii === false || $ascii === null) {
-            $ascii = $filename;
-        }
-        $ascii = preg_replace(['/[^A-Za-z0-9._\- ]/', '/_+/'], ['_', '_'], $ascii);
-        return $ascii === '' ? 'file' : $ascii;
+        return TextTransliterator::toAsciiFilename($filename);
     }
 }
