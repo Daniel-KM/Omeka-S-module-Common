@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-31 00:00+0000\n"
+"POT-Creation-Date: 2026-09-21 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/Form/View/Helper/FormSecret.php:45 src/TraitModule.php:450
+#: src/Form/View/Helper/FormSecret.php:45 src/TraitModule.php:453
 msgid "Leave empty to keep the current value"
 msgstr ""
 
@@ -167,189 +167,26 @@ msgid ""
 "classes should be reviewed and updated accordingly."
 msgstr ""
 
-#: Module.php:116
-msgid "A secret key was generated in config/secret_key.php to encrypt secrets."
+#: config/module.config.php:184
+msgid "An error occurred."
 msgstr ""
 
-#: Module.php:119
-msgid ""
-"The secret key could not be created: set it manually in config/"
-"secret_key.php or set the environment variable \"OMEKA_SECRET_KEY\" to "
-"encrypt secrets (module api keys, etc.)."
+#: config/module.config.php:188
+msgid "Information"
 msgstr ""
 
-#: Module.php:150
-msgid ""
-"The php extension \"intl\" is not available. It is recommended to install it "
-"to manage diacritics and non-latin characters and to translate dates, "
-"numbers and more."
-msgstr ""
-
-#: Module.php:340
-msgid "Added {count} database indexes: {list}."
-msgstr ""
-
-#: Module.php:346
-msgid "Failed to add {count} database indexes: {list}."
-msgstr ""
-
-#: Module.php:378
-msgid ""
-"PHP-CLI unavailable for {count} large-table indexes ({list}). Ask your DBA "
-"to run: {sql}"
-msgstr ""
-
-#: Module.php:390
-msgid ""
-"{count} large-table indexes are being added in background with online DDL "
-"({list}). Track progress in logs/common-add-index.log."
-msgstr ""
-
-#: Module.php:426
-msgid "The module Generic is no longer needed and can be removed."
-msgstr ""
-
-#: src/Log/Writer/Messenger.php:93
-msgid ""
-"Only the first {count} messages are displayed: see the job log for the other "
-"ones."
-msgstr ""
-
-#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:176
-msgid ""
-"Xml parsing error level {level}, code {code}, for file \"{file}\" (media "
-"#{media_id}), line {line}, column {column}: {message}"
-msgstr ""
-
-#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:198
-msgid ""
-"The file \"{file}\" (media #{media_id}) is not parsable by xml reader "
-"neither dom."
-msgstr ""
-
-#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:546
-msgid ""
-"Warning: some files contain invalid unicode characters and cannot be "
-"processed directly."
-msgstr ""
-
-#: src/Mvc/Controller/Plugin/SendEmail.php:88
-msgid "Email not sent: the content is missing (subject: {subject})."
-msgstr ""
-
-#: src/Mvc/Controller/Plugin/SendEmail.php:100
-msgid "Email not sent: there is no recipient (subject: {subject})."
-msgstr ""
-
-#: src/Mvc/Controller/Plugin/SendEmail.php:129
-msgid ""
-"Email not sent: the sender \"{sender}\" is not valid (subject: {subject})."
-msgstr ""
-
-#: src/Mvc/Controller/Plugin/SendEmail.php:136
-msgid ""
-"Email not sent: the sender email \"{sender}\" is invalid (subject: "
-"{subject})."
-msgstr ""
-
-#: src/Mvc/Controller/Plugin/SendEmail.php:146
-msgid ""
-"Email not sent: this is a spam with \"{keyword}\" (To: {to}; From: {from}): "
-"{body}"
-msgstr ""
-
-#: src/Mvc/Controller/Plugin/SendEmail.php:217
-msgid "Email not sent: the cc emails {list} are invalid (subject: {subject})."
-msgstr ""
-
-#: src/Mvc/Controller/Plugin/SendEmail.php:229
-msgid "Email not sent: the bcc emails {list} are invalid (subject: {subject})."
-msgstr ""
-
-#: src/Mvc/Controller/Plugin/SendEmail.php:241
-msgid ""
-"Email not sent: the reply-to emails {list} are invalid (subject: {subject})."
-msgstr ""
-
-#: src/Mvc/Controller/Plugin/SendEmail.php:257
-msgid "An email was sent to {recipients} with subject: {subject}"
-msgstr ""
-
-#: src/View/Helper/MediaTypeSelect.php:40
-#: src/Service/Form/Element/MediaTypeSelectFactory.php:35
-msgid "Select media type…"
-msgstr ""
-
-#: src/I18n/Translator.php:45
-msgid "A message to translate should be stringable."
-msgstr ""
-
-#: src/Job/AddDatabaseIndexes.php:63
-msgid "All database indexes already exist."
-msgstr ""
-
-#: src/Job/AddDatabaseIndexes.php:69
-msgid "Adding {count} database indexes: {list}"
-msgstr ""
-
-#: src/Job/AddDatabaseIndexes.php:89
-msgid "Adding index `{index}` on table `{table}`."
-msgstr ""
-
-#: src/Job/AddDatabaseIndexes.php:99
-msgid "Successfully added index `{index}` on table `{table}`."
-msgstr ""
-
-#: src/Job/AddDatabaseIndexes.php:104
-msgid "Unable to add index `{index}` on table `{table}`: {msg}"
-msgstr ""
-
-#: src/Job/AddDatabaseIndexes.php:116
-msgid "Successfully added {count} database indexes: {list}"
-msgstr ""
-
-#: src/Validator/Ini.php:38
-msgid "The string is not formatted as ini"
-msgstr ""
-
-#: src/Validator/Ini.php:39
-msgid "The string is incorrectly formatted"
-msgstr ""
-
-#: src/Validator/Ini.php:40
-msgid "The string contains invalid characters like double quotes"
-msgstr ""
-
-#: src/Validator/Ini.php:41
-msgid "The string contains invalid characters"
-msgstr ""
-
-#: src/Validator/Ini.php:42
-msgid "Invalid type given. String expected"
-msgstr ""
-
-#: src/Validator/ReadableDirectory.php:21
-msgid "The path should not contain double dot or be hidden."
-msgstr ""
-
-#: src/Validator/ReadableDirectory.php:22
-msgid "The path does not exist."
-msgstr ""
-
-#: src/Validator/ReadableDirectory.php:23
-msgid "The path is not a directory"
-msgstr ""
-
-#: src/Validator/ReadableDirectory.php:24
-msgid "The path is not readable"
-msgstr ""
-
-#: src/Validator/ReadableDirectory.php:25
-msgid "The path is not inside the restricted path"
+#: config/module.config.php:190
+msgid "OK"
 msgstr ""
 
 #: src/Form/Element/AbstractGroupBySiteSelect.php:159
 msgid "[No site]"
+msgstr ""
+
+#: src/Form/Element/FieldsTextarea.php:119
+msgid ""
+"Invalid fields: check the yaml syntax, the field names (ascii, no space), "
+"the types and, for select/radio/multicheckbox, the list of values."
 msgstr ""
 
 #: src/Form/Element/IniTextarea.php:147
@@ -358,12 +195,6 @@ msgstr ""
 
 #: src/Form/Element/IniTextarea.php:191
 msgid "The field {label} has an issue: {msg}"
-msgstr ""
-
-#: src/Form/Element/FieldsTextarea.php:119
-msgid ""
-"Invalid fields: check the yaml syntax, the field names (ascii, no space), "
-"the types and, for select/radio/multicheckbox, the list of values."
 msgstr ""
 
 #: src/Form/SendMessageForm.php:87
@@ -410,16 +241,90 @@ msgstr ""
 msgid "Send message"
 msgstr ""
 
-#: src/File/Validator.php:29
-msgid ""
-"Error validating \"{filename}\". Cannot store files with the media type "
-"\"{mediatype}\"."
+#: src/TraitModule.php:145 src/TraitModule.php:1312
+msgid "This module requires the module \"{module}\"."
 msgstr ""
 
-#: src/File/Validator.php:42
+#: src/TraitModule.php:150
+msgid "This module requires modules \"{modules}\"."
+msgstr ""
+
+#: src/TraitModule.php:159
+msgid "This module has resources that cannot be installed."
+msgstr ""
+
+#: src/TraitModule.php:167
 msgid ""
-"Error validating \"{filename}\". Cannot store files with the resolved "
-"extension \"{extension}\"."
+"This module cannot install its tables, because they exist already. Try to "
+"remove them first."
+msgstr ""
+
+#: src/TraitModule.php:676
+msgid "The module removed tables \"{tables}\" from a previous broken install."
+msgstr ""
+
+#: src/TraitModule.php:1307
+msgid ""
+"This module requires the module \"{module}\", version {version} or above."
+msgstr ""
+
+#: src/TraitModule.php:1443
+msgid ""
+"The module \"{module}\" was automatically deactivated because the "
+"dependencies are unavailable."
+msgstr ""
+
+#: src/Validator/ReadableDirectory.php:21
+msgid "The path should not contain double dot or be hidden."
+msgstr ""
+
+#: src/Validator/ReadableDirectory.php:22
+msgid "The path does not exist."
+msgstr ""
+
+#: src/Validator/ReadableDirectory.php:23
+msgid "The path is not a directory"
+msgstr ""
+
+#: src/Validator/ReadableDirectory.php:24
+msgid "The path is not readable"
+msgstr ""
+
+#: src/Validator/ReadableDirectory.php:25
+msgid "The path is not inside the restricted path"
+msgstr ""
+
+#: src/Validator/Ini.php:38
+msgid "The string is not formatted as ini"
+msgstr ""
+
+#: src/Validator/Ini.php:39
+msgid "The string is incorrectly formatted"
+msgstr ""
+
+#: src/Validator/Ini.php:40
+msgid "The string contains invalid characters like double quotes"
+msgstr ""
+
+#: src/Validator/Ini.php:41
+msgid "The string contains invalid characters"
+msgstr ""
+
+#: src/Validator/Ini.php:42
+msgid "Invalid type given. String expected"
+msgstr ""
+
+#: src/Service/Form/Element/MediaTypeSelectFactory.php:35
+#: src/View/Helper/MediaTypeSelect.php:40
+msgid "Select media type…"
+msgstr ""
+
+#: src/Service/Form/Element/MediaIngesterSelectFactory.php:26
+msgid "Select media ingesters…"
+msgstr ""
+
+#: src/Service/Form/Element/MediaRendererSelectFactory.php:31
+msgid "Select media renderers…"
 msgstr ""
 
 #: src/ManageModuleAndResources.php:93
@@ -527,53 +432,6 @@ msgstr ""
 msgid "A vocabulary must have a namespace uri and a prefix."
 msgstr ""
 
-#: src/TraitModule.php:142 src/TraitModule.php:1309
-msgid "This module requires the module \"{module}\"."
-msgstr ""
-
-#: src/TraitModule.php:147
-msgid "This module requires modules \"{modules}\"."
-msgstr ""
-
-#: src/TraitModule.php:156
-msgid "This module has resources that cannot be installed."
-msgstr ""
-
-#: src/TraitModule.php:164
-msgid ""
-"This module cannot install its tables, because they exist already. Try to "
-"remove them first."
-msgstr ""
-
-#: src/TraitModule.php:673
-msgid "The module removed tables \"{tables}\" from a previous broken install."
-msgstr ""
-
-#: src/TraitModule.php:1304
-msgid ""
-"This module requires the module \"{module}\", version {version} or above."
-msgstr ""
-
-#: src/TraitModule.php:1440
-msgid ""
-"The module \"{module}\" was automatically deactivated because the "
-"dependencies are unavailable."
-msgstr ""
-
-#: src/Service/Form/Element/MediaIngesterSelectFactory.php:26
-msgid "Select media ingesters…"
-msgstr ""
-
-#: src/Service/Form/Element/MediaRendererSelectFactory.php:31
-msgid "Select media renderers…"
-msgstr ""
-
-#: src/Stdlib/UpgradeJobDispatch.php:103
-msgid ""
-"The job #{job_id} is still starting after the sleep delay. It may need to be "
-"relaunched manually."
-msgstr ""
-
 #: src/Stdlib/EasyMeta.php:81
 msgid "annotation"
 msgstr ""
@@ -646,15 +504,21 @@ msgstr ""
 msgid "sites"
 msgstr ""
 
-#: src/Stdlib/MessagePreparerTrait.php:50
+#: src/Stdlib/UpgradeJobDispatch.php:103
+msgid ""
+"The job #{job_id} is still starting after the sleep delay. It may need to be "
+"relaunched manually."
+msgstr ""
+
+#: src/Stdlib/MessagePreparerTrait.php:55
 msgid "Empty message."
 msgstr ""
 
-#: src/Stdlib/MessagePreparerTrait.php:57
+#: src/Stdlib/MessagePreparerTrait.php:62
 msgid "Too long message."
 msgstr ""
 
-#: src/Stdlib/MessagePreparerTrait.php:77
+#: src/Stdlib/MessagePreparerTrait.php:82
 msgid "Too long subject."
 msgstr ""
 
@@ -675,14 +539,150 @@ msgid ""
 "The directory \"{path}\" could not be protected with a .htaccess: {error}."
 msgstr ""
 
-#: config/module.config.php:183
-msgid "An error occurred."
+#: src/I18n/Translator.php:45
+msgid "A message to translate should be stringable."
 msgstr ""
 
-#: config/module.config.php:187
-msgid "Information"
+#: src/Log/Writer/Messenger.php:93
+msgid ""
+"Only the first {count} messages are displayed: see the job log for the other "
+"ones."
 msgstr ""
 
-#: config/module.config.php:189
-msgid "OK"
+#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:176
+msgid ""
+"Xml parsing error level {level}, code {code}, for file \"{file}\" (media "
+"#{media_id}), line {line}, column {column}: {message}"
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:198
+msgid ""
+"The file \"{file}\" (media #{media_id}) is not parsable by xml reader "
+"neither dom."
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:546
+msgid ""
+"Warning: some files contain invalid unicode characters and cannot be "
+"processed directly."
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/SendEmail.php:88
+msgid "Email not sent: the content is missing (subject: {subject})."
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/SendEmail.php:100
+msgid "Email not sent: there is no recipient (subject: {subject})."
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/SendEmail.php:129
+msgid ""
+"Email not sent: the sender \"{sender}\" is not valid (subject: {subject})."
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/SendEmail.php:136
+msgid ""
+"Email not sent: the sender email \"{sender}\" is invalid (subject: "
+"{subject})."
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/SendEmail.php:146
+msgid ""
+"Email not sent: this is a spam with \"{keyword}\" (To: {to}; From: {from}): "
+"{body}"
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/SendEmail.php:217
+msgid "Email not sent: the cc emails {list} are invalid (subject: {subject})."
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/SendEmail.php:229
+msgid "Email not sent: the bcc emails {list} are invalid (subject: {subject})."
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/SendEmail.php:241
+msgid ""
+"Email not sent: the reply-to emails {list} are invalid (subject: {subject})."
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/SendEmail.php:257
+msgid "An email was sent to {recipients} with subject: {subject}"
+msgstr ""
+
+#: src/Job/AddDatabaseIndexes.php:63
+msgid "All database indexes already exist."
+msgstr ""
+
+#: src/Job/AddDatabaseIndexes.php:69
+msgid "Adding {count} database indexes: {list}"
+msgstr ""
+
+#: src/Job/AddDatabaseIndexes.php:89
+msgid "Adding index `{index}` on table `{table}`."
+msgstr ""
+
+#: src/Job/AddDatabaseIndexes.php:99
+msgid "Successfully added index `{index}` on table `{table}`."
+msgstr ""
+
+#: src/Job/AddDatabaseIndexes.php:104
+msgid "Unable to add index `{index}` on table `{table}`: {msg}"
+msgstr ""
+
+#: src/Job/AddDatabaseIndexes.php:116
+msgid "Successfully added {count} database indexes: {list}"
+msgstr ""
+
+#: src/File/Validator.php:29
+msgid ""
+"Error validating \"{filename}\". Cannot store files with the media type "
+"\"{mediatype}\"."
+msgstr ""
+
+#: src/File/Validator.php:42
+msgid ""
+"Error validating \"{filename}\". Cannot store files with the resolved "
+"extension \"{extension}\"."
+msgstr ""
+
+#: Module.php:116
+msgid "A secret key was generated in config/secret_key.php to encrypt secrets."
+msgstr ""
+
+#: Module.php:119
+msgid ""
+"The secret key could not be created: set it manually in config/"
+"secret_key.php or set the environment variable \"OMEKA_SECRET_KEY\" to "
+"encrypt secrets (module api keys, etc.)."
+msgstr ""
+
+#: Module.php:150
+msgid ""
+"The php extension \"intl\" is not available. It is recommended to install it "
+"to manage diacritics and non-latin characters and to translate dates, "
+"numbers and more."
+msgstr ""
+
+#: Module.php:340
+msgid "Added {count} database indexes: {list}."
+msgstr ""
+
+#: Module.php:346
+msgid "Failed to add {count} database indexes: {list}."
+msgstr ""
+
+#: Module.php:378
+msgid ""
+"PHP-CLI unavailable for {count} large-table indexes ({list}). Ask your DBA "
+"to run: {sql}"
+msgstr ""
+
+#: Module.php:390
+msgid ""
+"{count} large-table indexes are being added in background with online DDL "
+"({list}). Track progress in logs/common-add-index.log."
+msgstr ""
+
+#: Module.php:426
+msgid "The module Generic is no longer needed and can be removed."
 msgstr ""
