@@ -17,7 +17,8 @@ class MatchedRouteName extends AbstractHelper
     }
 
     /**
-     * Get the route name for the current request.
+     * Get the route name for the current request, or an empty string when
+     * there is no routed request, for example in a background job.
      *
      * It is not available in view, neither in view status, unlike controller.
      * @see \Omeka\View\Helper\Status

@@ -13,7 +13,8 @@ class PrepareMessageFactory implements FactoryInterface
         return new PrepareMessage(
             $services->get('Omeka\ApiManager'),
             $services->get('Omeka\Mailer'),
-            $services->get('Omeka\Settings')
+            $services->get('Omeka\Settings'),
+            $services->get('ViewHelperManager')->get('defaultSite')
         );
     }
 }

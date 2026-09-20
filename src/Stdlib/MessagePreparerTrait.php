@@ -36,6 +36,11 @@ trait MessagePreparerTrait
     protected $additionalPlaceholders = [];
 
     /**
+     * @var \Common\View\Helper\DefaultSite|null
+     */
+    protected $defaultSite;
+
+    /**
      * Assemble an absolute (or relative) url from a route, in the host context.
      */
     abstract protected function urlFromRoute(string $route, array $params = [], array $options = []): string;
@@ -137,7 +142,13 @@ trait MessagePreparerTrait
             $resource = $context['resource'];
             $placeholders['resource_id'] = $resource->id();
             $placeholders['resource_title'] = $resource->displayTitle();
-            $placeholders['resource_url'] = $resource->siteUrl(null, true);
+            // The site slug is passed explicitly, because there is no current
+            // site out of a site request, in particular in a background job.
+            try {
+                $placeholders['resource_url'] = $resource->siteUrl($this->currentOrDefaultSiteSlug($context), true);
+            } catch (\Throwable $e) {
+                $placeholders['resource_url'] = '';
+            }
             $placeholders['resource'] = $placeholders['resource_url'];
             $placeholders['resource_url_admin'] = $resource->adminUrl(null, true);
             $placeholders['resource_link'] = sprintf(
@@ -151,6 +162,26 @@ trait MessagePreparerTrait
         $placeholders = array_merge($placeholders, $this->additionalPlaceholders);
 
         return $placeholders;
+    }
+
+    /**
+     * Get the slug of the site of the context, else the one of the default site.
+     *
+     * The slug should be explicit, because there is no current site out of a
+     * site request, in particular in a background job or in admin, so the
+     * method siteUrl() would fail on the missing route match.
+     *
+     * @see \Common\View\Helper\DefaultSite
+     */
+    protected function currentOrDefaultSiteSlug(array $context): ?string
+    {
+        if (!empty($context['site'])) {
+            return $context['site']->slug();
+        }
+
+        return $this->defaultSite
+            ? ($this->defaultSite)('slug')
+            : null;
     }
 
     public function fillMessage(?string $message, array $placeholders = [], array $context = []): string

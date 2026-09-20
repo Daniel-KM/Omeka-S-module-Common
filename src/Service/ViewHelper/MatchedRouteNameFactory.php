@@ -10,8 +10,11 @@ class MatchedRouteNameFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $services, $requestedName, ?array $options = null)
     {
+        // There is no route match outside of a routed http request, in
+        // particular in a background job or in a cli process.
+        $routeMatch = $services->get('Application')->getMvcEvent()->getRouteMatch();
         return new MatchedRouteName(
-            $services->get('Application')->getMvcEvent()->getRouteMatch()->getMatchedRouteName()
+            $routeMatch ? (string) $routeMatch->getMatchedRouteName() : ''
         );
     }
 }

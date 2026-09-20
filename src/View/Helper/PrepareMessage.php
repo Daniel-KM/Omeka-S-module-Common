@@ -5,6 +5,7 @@ namespace Common\View\Helper;
 use Common\Stdlib\MessagePreparerInterface;
 use Common\Stdlib\MessagePreparerTrait;
 use Laminas\View\Helper\AbstractHelper;
+use Common\View\Helper\DefaultSite;
 use Omeka\Api\Manager as ApiManager;
 use Omeka\Settings\Settings;
 use Omeka\Stdlib\Mailer;
@@ -24,11 +25,13 @@ class PrepareMessage extends AbstractHelper implements MessagePreparerInterface
     public function __construct(
         ApiManager $api,
         Mailer $mailer,
-        Settings $settings
+        Settings $settings,
+        ?DefaultSite $defaultSite = null
     ) {
         $this->api = $api;
         $this->mailer = $mailer;
         $this->settings = $settings;
+        $this->defaultSite = $defaultSite;
     }
 
     /**
