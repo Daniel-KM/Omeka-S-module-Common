@@ -28,7 +28,7 @@ class MessagePreparerTraitTest extends TestCase
      */
     private const HOST = 'http://example.org';
 
-    private function preparer(array $resources = [], ?Settings $settings = null): TestableMessagePreparer
+    private function preparer(array $resources = [], ?Settings $settings = null, ?callable $defaultSite = null): TestableMessagePreparer
     {
         $mailer = $this->createMock(Mailer::class);
         $mailer->method('getInstallationTitle')->willReturn('Test Install');
@@ -38,7 +38,7 @@ class MessagePreparerTraitTest extends TestCase
         $api = $this->createMock(ApiManager::class);
         $api->method('search')->willReturn($response);
 
-        return new TestableMessagePreparer($api, $mailer, $settings ?? $this->createMock(Settings::class));
+        return new TestableMessagePreparer($api, $mailer, $settings ?? $this->createMock(Settings::class), $defaultSite);
     }
 
     private function site(): FakeSite
@@ -152,6 +152,52 @@ class MessagePreparerTraitTest extends TestCase
         $this->assertStringStartsWith('http://', $admin);
         $this->assertSame('http://example.org/admin/item/9', $admin);
         $this->assertStringContainsString('href="http://example.org/s/my-site/item/9"', $link);
+    }
+
+    /**
+     * Out of a site request (background job, admin), siteUrl() has no current
+     * site to fall back on and fails, so the url must be empty and the other
+     * placeholders must still be filled.
+     */
+    public function testSingleResourceUrlWithoutCurrentSite(): void
+    {
+        $resource = new FakeResourceRequiringSlug(7, 'item', 'Job Doc', [], '', '/admin/item/7');
+        $out = $this->preparer()->fillMessage(
+            'id={resource_id} url={resource_url} admin={resource_url_admin}',
+            [],
+            ['resource' => $resource]
+        );
+        $this->assertSame('id=7 url= admin=http://example.org/admin/item/7', $out);
+    }
+
+    /**
+     * The slug of the site of the context is passed to siteUrl(), so the url is
+     * built even when there is no current site.
+     */
+    public function testSingleResourceUrlUsesSiteOfContext(): void
+    {
+        $resource = new FakeResourceRequiringSlug(8, 'item', 'Job Doc', [], '', '/admin/item/8');
+        $out = $this->preparer()->fillMessage(
+            '{resource_url}',
+            [],
+            ['resource' => $resource, 'site' => $this->site()]
+        );
+        $this->assertSame('http://example.org/s/my-site/item/8', $out);
+    }
+
+    /**
+     * Without a site in the context, the slug comes from the helper defaultSite.
+     */
+    public function testSingleResourceUrlUsesDefaultSite(): void
+    {
+        $resource = new FakeResourceRequiringSlug(10, 'item', 'Job Doc', [], '', '/admin/item/10');
+        $defaultSite = fn ($metadata = null) => $metadata === 'slug' ? 'default-site' : null;
+        $out = $this->preparer([], null, $defaultSite)->fillMessage(
+            '{resource_url}',
+            [],
+            ['resource' => $resource]
+        );
+        $this->assertSame('http://example.org/s/default-site/item/10', $out);
     }
 
     public function testSingleResourcePropertyValue(): void
@@ -383,11 +429,12 @@ class TestableMessagePreparer implements MessagePreparerInterface
 
     private const HOST = 'http://example.org';
 
-    public function __construct($api, $mailer, $settings)
+    public function __construct($api, $mailer, $settings, $defaultSite = null)
     {
         $this->api = $api;
         $this->mailer = $mailer;
         $this->settings = $settings;
+        $this->defaultSite = $defaultSite;
     }
 
     protected function urlFromRoute(string $route, array $params = [], array $options = []): string
@@ -404,6 +451,22 @@ class TestableMessagePreparer implements MessagePreparerInterface
             $url .= '?' . implode('&', $pairs);
         }
         return $url;
+    }
+}
+
+/**
+ * Resource whose siteUrl() fails without an explicit slug, like the real
+ * representation out of a site request.
+ */
+class FakeResourceRequiringSlug extends FakeResource
+{
+    public function siteUrl($siteSlug = null, $canonical = false): string
+    {
+        if (!$siteSlug) {
+            throw new \Error('Call to a member function getParam() on null');
+        }
+        return ($canonical ? 'http://example.org' : '')
+            . '/s/' . $siteSlug . '/' . $this->getControllerName() . '/' . $this->id();
     }
 }
 
