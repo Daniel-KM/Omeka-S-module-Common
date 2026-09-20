@@ -50,7 +50,7 @@
 
     .field .messages {
         width: 70%;
-        color: lighten(#a91919, 45%);
+        color: #a91919;
         margin-left: auto;
 
         & li {
@@ -60,7 +60,7 @@
 
     .error,
     .error a {
-        color: lighten(#a91919, 45%);;
+        color: #a91919;
     }
     .success,
     .success a {
