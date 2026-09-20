@@ -16,7 +16,21 @@ namespace Common\Form\Element;
  *   quoted, typed), or "list" (one value by line, no key column).
  * - separator (string): the separator between key and value (default "=").
  * - key_label, value_label (string): the headers of the columns.
- * - value_type (string): "text" (default) or "number".
+ * - value_type (string): "text" (default), "number", or the name of a widget
+ *   registered in "CommonPairsEditor.valueWidgets", that builds the cell of
+ *   the value instead of a plain input. Common provides "select" (a closed
+ *   list) and "asset" (selected with the sidebar of Omeka). A module may
+ *   register its own widget for an item set, a query, etc.
+ * - key_element, value_element (array): a laminas element specification
+ *   ("type", "options", "attributes") rendered once as the template of the
+ *   cell, then cloned for each row. It is the way to use a real element of
+ *   Omeka, with its own rendering and its own script: ItemSetSelect, Query,
+ *   Asset, OptionalNumber, etc. "value_element" takes precedence over
+ *   "value_type", and "key_element" over "key_select".
+ * - value_options (array): the options given to the widget of the value. For
+ *   "select", "options" is a map "value => label" and "source" a css selector
+ *   of another select. For "asset", the keys "sidebarUrl" and "apiUrl" are
+ *   filled automatically by the view helper when they are not set.
  * - sortable (bool): the rows can be reordered (default true).
  * - keys (array): the known keys with their default value or label, used to
  *   fill a picker "Add…" and, when "key_fill" is set, the value of the row.
@@ -86,6 +100,14 @@ trait TraitPairsEditor
         }
         if (!empty($options['key_pattern'])) {
             $attributes['data-pairs-key-pattern'] = $options['key_pattern'];
+        }
+        if (!empty($options['value_options'])) {
+            $attributes['data-pairs-value-options'] = json_encode($options['value_options'], 320);
+        }
+        // The elements are rendered by the view helper, that owns the
+        // renderer, and that sets the attributes pointing to the templates.
+        if (!empty($options['value_element'])) {
+            $attributes['data-pairs-value-type'] = 'element';
         }
         foreach ($attributes as $name => $value) {
             $this->setAttribute($name, $value);

@@ -25,13 +25,160 @@
         });
     };
 
+    // ---- Widgets of the value column --------------------------------------
+
+    /**
+     * A widget builds the cell of the value of a row. It receives an object
+     * {value, options, changed} and returns an element that contains, or is,
+     * a field with the class "common-pairs-value": its value is the one
+     * written in the textarea.
+     */
+    const valueWidgets = {};
+
+    /**
+     * Display the name and the thumbnail of an asset already selected.
+     */
+    const fillAsset = function (cell, apiUrl) {
+        const hidden = cell.querySelector('.common-pairs-value');
+        const selected = cell.querySelector('.selected-asset');
+        const name = cell.querySelector('.selected-asset-name');
+        const image = cell.querySelector('.selected-asset-image');
+        const id = (hidden.value || '').trim();
+        // The class "empty" belongs to the element of Omeka: its own css hides
+        // "[No asset selected]" and the button to clear it accordingly.
+        (cell.querySelector('.asset-form-element') || cell).classList.toggle('empty', !id);
+        selected.style.display = id ? '' : 'none';
+        if (!id) {
+            name.textContent = '';
+            image.removeAttribute('src');
+            return;
+        }
+        // Without the api, the id is the only thing to display.
+        name.textContent = '#' + id;
+        if (!apiUrl) return;
+        fetch(apiUrl.replace(/\/$/, '') + '/' + encodeURIComponent(id), {headers: {Accept: 'application/json'}})
+            .then(function (response) { return response.ok ? response.json() : null; })
+            .then(function (asset) {
+                if (!asset || hidden.value.trim() !== id) return;
+                name.textContent = asset['o:name'] || ('#' + id);
+                if (asset['o:asset_url']) image.src = asset['o:asset_url'];
+            })
+            .catch(function () {});
+    };
+
+    /**
+     * Build the cell of the value from the template rendered by php.
+     *
+     * The names and the ids are removed: the cells are never posted, the value
+     * is only stored in the textarea, and duplicated ids would break the
+     * labels and the scripts of the page.
+     */
+    const cloneCellTemplate = function (templateId, value, label, apiUrl, cellClass) {
+        const template = document.getElementById(templateId);
+        if (!template || !template.content) return null;
+
+        const cell = document.createElement('span');
+        cell.className = 'common-pairs-cell-' + cellClass + ' common-pairs-element';
+        cell.appendChild(template.content.cloneNode(true));
+
+        cell.querySelectorAll('[id]').forEach(function (node) { node.removeAttribute('id'); });
+        cell.querySelectorAll('[for]').forEach(function (node) { node.removeAttribute('for'); });
+
+        const fields = cell.querySelectorAll('input, select, textarea');
+        fields.forEach(function (field) { field.removeAttribute('name'); });
+
+        // The field that holds the value: the hidden one when the element has
+        // its own interface (asset, query), else the first real field.
+        const field = cell.querySelector('input[type=hidden]')
+            || cell.querySelector('select, textarea, input');
+        if (field) {
+            field.classList.add('common-pairs-' + cellClass);
+            field.value = value || '';
+            if (label) field.setAttribute('aria-label', label);
+        }
+
+        // An asset already saved: the template is rendered without value, so
+        // its name and its thumbnail are fetched here.
+        if (value && cell.querySelector('.asset-form-element')) {
+            fillAsset(cell, apiUrl);
+        }
+
+        // Chosen is initialized once on load by Omeka, so a select added later
+        // must be initialized here.
+        if (window.jQuery && window.jQuery.fn.chosen) {
+            setTimeout(function () {
+                cell.querySelectorAll('select.chosen-select').forEach(function (select) {
+                    window.jQuery(select).chosen({width: '100%'});
+                });
+            }, 0);
+        }
+
+        return cell;
+    };
+
+    /**
+     * A closed list of values, from the options or from another select of the
+     * page. A value that is not in the list any more remains selected.
+     */
+    valueWidgets.select = function (context) {
+        const valueOptions = context.options.valueOptions || {};
+        const select = document.createElement('select');
+        select.className = 'common-pairs-value common-pairs-cell-value';
+        select.setAttribute('aria-label', context.options.valueLabel || '');
+
+        const empty = document.createElement('option');
+        empty.value = '';
+        empty.textContent = '';
+        select.appendChild(empty);
+
+        const values = new Map();
+        const list = valueOptions.options || {};
+        if (Array.isArray(list)) {
+            list.forEach(function (pair) {
+                if (Array.isArray(pair)) values.set(String(pair[0]), pair[1]);
+                else values.set(String(pair), pair);
+            });
+        } else {
+            Object.keys(list).forEach(function (key) { values.set(String(key), list[key]); });
+        }
+        if (valueOptions.source) {
+            const source = document.querySelector(valueOptions.source);
+            if (source) {
+                Array.prototype.forEach.call(source.options, function (option) {
+                    if (option.value !== '') values.set(String(option.value), option.textContent);
+                });
+            }
+        }
+        values.forEach(function (label, value) {
+            const option = document.createElement('option');
+            option.value = value;
+            option.textContent = label && label !== value ? label + ' (' + value + ')' : value;
+            select.appendChild(option);
+        });
+        if (context.value && !values.has(String(context.value))) {
+            const option = document.createElement('option');
+            option.value = context.value;
+            option.textContent = context.value;
+            select.appendChild(option);
+        }
+        select.value = context.value || '';
+        return select;
+    };
     // ---- Core editor -----------------------------------------------------
 
     const defaultEditorOptions = {
         keyLabel: '',
         valueLabel: '',
         // "text" or "number"; "none" hides the value column (simple list).
+        // Any other name is a widget registered in "valueWidgets", for example
+        // "asset", that selects the value in a sidebar instead of typing it.
         valueType: 'text',
+        // Options given to the widget of the value, as a plain object.
+        valueOptions: {},
+        // Id of a <template> rendered by php: its content is cloned as the
+        // cell of each row, so any element of Omeka is usable.
+        keyTemplate: '',
+        valueTemplate: '',
         sortable: true,
         // Known keys: {key: default value or label}.
         keys: {},
@@ -87,8 +234,22 @@
      *
      * @return {object} {element, list, getRows, setRows, addRow, count}
      */
+    let editorIndex = 0;
+
+    const editors = [];
+
+    // An element of Omeka (asset, query) fills its hidden input from its own
+    // script, with jQuery val(), that emits no event. Rather than knowing each
+    // of them, the rows are compared after a click anywhere in the page.
+    document.addEventListener('click', function () {
+        setTimeout(function () {
+            editors.forEach(function (editor) { editor.syncIfChanged(); });
+        }, 0);
+    });
+
     const createEditor = function (mount, userOptions, initialRows) {
         const options = Object.assign({}, defaultEditorOptions, userOptions || {});
+        editorIndex++;
         options.keyLabel = options.keyLabel || t('key', 'key');
         options.valueLabel = options.valueLabel || t('value', 'value');
         const isList = options.valueType === 'none';
@@ -117,6 +278,13 @@
         actions.className = 'common-pairs-actions';
         element.appendChild(actions);
 
+        // The known keys are proposed inside the key of each row, and not
+        // only in the picker below the list: the user adds a row first, so a
+        // picker apart is easily missed. A datalist keeps the input free, so
+        // a new key can still be typed.
+        let datalist = null;
+        const datalistId = 'common-pairs-keys-' + editorIndex;
+
         let picker = null;
         const countKeys = Array.isArray(options.keys) ? options.keys.length : Object.keys(options.keys || {}).length;
         // With a select by row, the picker of keys would be a second way to do
@@ -128,6 +296,12 @@
             picker.setAttribute('aria-label', t('pick', 'Add…'));
             actions.appendChild(picker);
         }
+        if (hasKeys && options.freeKeys) {
+            datalist = document.createElement('datalist');
+            datalist.id = datalistId;
+            element.appendChild(datalist);
+        }
+
         let addButton = null;
         if (options.actions && (options.freeKeys || options.keySelect)) {
             addButton = document.createElement('button');
@@ -141,10 +315,23 @@
 
         const getRows = function () {
             return Array.from(list.children).map(function (row) {
+                const keyField = row.querySelector('.common-pairs-key');
+                const valueField = isList ? null : row.querySelector('.common-pairs-value');
                 return {
-                    key: row.querySelector('.common-pairs-key').value,
-                    value: isList ? '' : row.querySelector('.common-pairs-value').value,
+                    key: keyField ? keyField.value : '',
+                    value: valueField ? valueField.value : '',
                 };
+            });
+        };
+
+        const refreshDatalist = function () {
+            if (!datalist) return;
+            datalist.innerHTML = '';
+            knownKeys(options).forEach(function (label, key) {
+                const opt = document.createElement('option');
+                opt.value = key;
+                if (label && label !== key) opt.label = label;
+                datalist.appendChild(opt);
             });
         };
 
@@ -208,7 +395,11 @@
             return true;
         };
 
+        let lastRows = '';
+
         const changed = function () {
+            lastRows = JSON.stringify(getRows());
+            refreshDatalist();
             refreshPicker();
             refreshMoves();
             if (options.onChange) options.onChange(getRows());
@@ -239,7 +430,13 @@
             // The key is a select when the keys are a closed list, so the
             // user picks it instead of typing an id or a slug.
             let key;
-            if (options.keySelect) {
+            const keyCell = options.keyTemplate
+                ? cloneCellTemplate(options.keyTemplate, pair.key, options.keyLabel, '', 'key')
+                : null;
+            if (keyCell) {
+                row.appendChild(keyCell);
+                key = keyCell.querySelector('.common-pairs-key');
+            } else if (options.keySelect) {
                 key = document.createElement('select');
                 key.className = 'common-pairs-key common-pairs-cell-key';
                 const keys = knownKeys(options);
@@ -281,18 +478,37 @@
                 key = document.createElement('input');
                 key.type = 'text';
                 key.value = pair.key || '';
+                if (datalist) {
+                    key.setAttribute('list', datalistId);
+                    key.setAttribute('autocomplete', 'off');
+                }
             }
-            key.className = 'common-pairs-key common-pairs-cell-key';
-            key.setAttribute('aria-label', options.keyLabel);
-            if (options.keyReadonly) {
+            if (!keyCell) {
+                key.className = 'common-pairs-key common-pairs-cell-key';
+                key.setAttribute('aria-label', options.keyLabel);
+                row.appendChild(key);
+            }
+            if (key && options.keyReadonly) {
                 if (key.tagName === 'SELECT') {
                     key.disabled = true;
                 } else {
                     key.readOnly = true;
                 }
             }
-            row.appendChild(key);
-            if (!isList) {
+            let cell = null;
+            if (!isList && options.valueTemplate) {
+                cell = cloneCellTemplate(options.valueTemplate, pair.value, options.valueLabel,
+                    (options.valueOptions || {}).apiUrl || '', 'value');
+            }
+            if (cell) {
+                row.appendChild(cell);
+            } else if (!isList && valueWidgets[options.valueType]) {
+                row.appendChild(valueWidgets[options.valueType]({
+                    value: pair.value || '',
+                    options: options,
+                    changed: changed,
+                }));
+            } else if (!isList) {
                 const value = document.createElement('input');
                 value.type = options.valueType === 'number' ? 'number' : 'text';
                 if (options.valueType === 'number') value.step = 'any';
@@ -328,6 +544,7 @@
         const setRows = function (rows) {
             list.innerHTML = '';
             (rows || []).forEach(function (pair) { list.appendChild(makeRow(pair)); });
+            refreshDatalist();
             refreshPicker();
             refreshMoves();
         };
@@ -363,10 +580,14 @@
             if (e.target.classList.contains('common-pairs-key')) checkKey(e.target);
             changed();
         });
-        // A select of keys is edited with "change", and chosen sends it too.
+        // A select of keys or of values is edited with "change", and chosen
+        // sends it too.
         list.addEventListener('change', function (e) {
-            if (!e.target.classList.contains('common-pairs-key')) return;
-            checkKey(e.target);
+            if (e.target.classList.contains('common-pairs-key')) {
+                checkKey(e.target);
+            } else if (!e.target.classList.contains('common-pairs-value')) {
+                return;
+            }
             changed();
         });
         list.addEventListener('click', function (e) {
@@ -458,14 +679,28 @@
 
         setRows(initialRows || []);
 
-        return {
+        const syncIfChanged = function () {
+            if (!element.isConnected) return;
+            const current = JSON.stringify(getRows());
+            if (current === lastRows) return;
+            lastRows = current;
+            changed();
+        };
+
+        const editor = {
             element: element,
             list: list,
             getRows: getRows,
             setRows: setRows,
             addRow: addRow,
             count: function () { return list.children.length; },
+            syncIfChanged: syncIfChanged,
+            // Rebuild the rows, for example when a widget of a module was
+            // registered after the editor was built (deferred script).
+            rebuild: function () { setRows(getRows()); },
         };
+        editors.push(editor);
+        return editor;
     };
 
     // ---- Formats of the textarea -----------------------------------------
@@ -537,6 +772,10 @@
         if (d.pairsKeys) {
             try { keys = JSON.parse(d.pairsKeys) || {}; } catch (e) { keys = {}; }
         }
+        let valueOptions = {};
+        if (d.pairsValueOptions) {
+            try { valueOptions = JSON.parse(d.pairsValueOptions) || {}; } catch (e) { valueOptions = {}; }
+        }
         let skip = [];
         if (d.pairsKeySkip) {
             try { skip = JSON.parse(d.pairsKeySkip) || []; } catch (e) { skip = []; }
@@ -550,7 +789,10 @@
             editor: {
                 keyLabel: d.pairsKeyLabel || '',
                 valueLabel: d.pairsValueLabel || '',
-                valueType: format === 'list' ? 'none' : (d.pairsValueType === 'number' ? 'number' : 'text'),
+                valueType: format === 'list' ? 'none' : (d.pairsValueType || 'text'),
+                valueOptions: valueOptions,
+                keyTemplate: d.pairsKeyTemplate || '',
+                valueTemplate: d.pairsValueTemplate || '',
                 sortable: d.pairsSortable !== '0',
                 keyFill: d.pairsKeyFill === '1',
                 freeKeys: d.pairsFreeKeys !== '0',
@@ -692,6 +934,15 @@
 
     window.CommonPairsEditor = {
         create: createEditor,
+        valueWidgets: valueWidgets,
+        // A module that registers a widget after the editors were built calls
+        // it, so its rows use the widget without depending on the order of
+        // the scripts.
+        rebuildAll: function () {
+            editors.forEach(function (editor) {
+                if (editor.element.isConnected) editor.rebuild();
+            });
+        },
         bind: bindTextarea,
         init: initAll,
     };

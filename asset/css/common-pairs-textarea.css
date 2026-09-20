@@ -129,6 +129,48 @@
     .common-pairs-row input[readonly] {
         background: #f7f7f7;
     }
+
+    .common-pairs-element {
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+        min-width: 0;
+    }
+    .common-pairs-element .asset-form-element,
+    .common-pairs-element .query-form-element {
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+        min-width: 0;
+        flex: 1 1 auto;
+        line-height: normal;
+    }
+    .common-pairs-element .selected-asset {
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+        min-width: 0;
+        flex: 1 1 auto;
+    }
+    .common-pairs-element .selected-asset-image {
+        width: 2.5em;
+        height: 2.5em;
+        object-fit: contain;
+        background: #f7f7f7;
+    }
+    .common-pairs-element .selected-asset-name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        min-width: 0;
+    }
+    .common-pairs-element .asset-form-select,
+    .common-pairs-element .asset-form-clear {
+        flex: 0 0 auto;
+        margin: 0;
+        padding: 0.25em 0.5em;
+        font-size: 0.9em;
+    }
     .common-pairs-remove {
         background: none;
         border: none;

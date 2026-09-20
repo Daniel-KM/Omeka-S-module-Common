@@ -60,7 +60,6 @@ return [
             'formCollectionElementGroupsNested' => Form\View\Helper\FormCollectionElementGroupsNested::class,
             'formFieldsTextarea' => Form\View\Helper\FormFieldsTextarea::class,
             'formNote' => Form\View\Helper\FormNote::class,
-            'formPairsTextarea' => Form\View\Helper\FormPairsTextarea::class,
             'formSecret' => Form\View\Helper\FormSecret::class,
             'isHomePage' => View\Helper\IsHomePage::class,
             'isHtml' => View\Helper\IsHtml::class,
@@ -75,6 +74,7 @@ return [
         ],
         'factories' => array_filter([
             'assetUrl' => Service\ViewHelper\AssetUrlFactory::class,
+            'formPairsTextarea' => Service\Form\View\Helper\FormPairsTextareaFactory::class,
             'dataType' => Service\ViewHelper\DataTypeFactory::class,
             'defaultSite' => Service\ViewHelper\DefaultSiteFactory::class,
             'easyMeta' => Service\ViewHelper\EasyMetaFactory::class,
