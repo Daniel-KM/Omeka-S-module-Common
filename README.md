@@ -952,7 +952,7 @@ Copyright
 [Iiif Server]: https://gitlab.com/Daniel-KM/Omeka-S-module-IiifServer
 [Image Server]: https://gitlab.com/Daniel-KM/Omeka-S-module-ImageServer
 [jQuery-Autocomplete]: https://github.com/devbridge/jQuery-Autocomplete
-[module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-Common/-/issues
+[module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-Common/-/work_items
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
 [FSF]: https://www.fsf.org
