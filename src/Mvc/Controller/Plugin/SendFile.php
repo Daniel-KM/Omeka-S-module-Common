@@ -222,7 +222,7 @@ class SendFile extends AbstractPlugin
      */
     protected function toAsciiFilename(string $filename): string
     {
-        if ($filename === '' || preg_match('//u', $filename) === 0) {
+        if ($filename === '' || preg_match('//u', $filename) !== 1) {
             return $filename;
         }
         $ascii = null;
