@@ -27,7 +27,7 @@
         "ext-sodium": "*",
         "symfony/yaml": "^5.4 || ^6.4",
         "sempia/common-symlink": "^1.0",
-        "sempia/external-assets": "^1.1"
+        "sempia/external-assets": "^1.2"
     },
     "autoload": {
         "psr-4": {
