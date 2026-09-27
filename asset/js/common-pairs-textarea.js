@@ -546,6 +546,8 @@
             (rows || []).forEach(function (pair) { list.appendChild(makeRow(pair)); });
             refreshDatalist();
             refreshPicker();
+            // The rows are the new reference: no pending change to push.
+            lastRows = JSON.stringify(getRows());
             refreshMoves();
         };
 
@@ -680,7 +682,10 @@
         setRows(initialRows || []);
 
         const syncIfChanged = function () {
-            if (!element.isConnected) return;
+            // The editor may be the hidden representation of a textarea, that
+            // holds the real value: it must never write its own empty state
+            // over it.
+            if (!element.isConnected || editor.syncEnabled === false) return;
             const current = JSON.stringify(getRows());
             if (current === lastRows) return;
             lastRows = current;
@@ -689,6 +694,9 @@
 
         const editor = {
             element: element,
+            // Set to false while another element holds the value (a textarea
+            // displayed as a text).
+            syncEnabled: true,
             list: list,
             getRows: getRows,
             setRows: setRows,
@@ -892,6 +900,9 @@
                 notice.hidden = true;
             }
             formMode = form;
+            // In the text mode, the textarea is the reference, so the editor
+            // must not push its rows back into it.
+            editor.syncEnabled = form;
             table.hidden = !form;
             formOnly.forEach(function (el) { el.hidden = !form; });
             textOnly.forEach(function (el) { el.hidden = form; });
