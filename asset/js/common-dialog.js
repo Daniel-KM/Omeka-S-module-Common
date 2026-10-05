@@ -626,11 +626,10 @@ var CommonDialog = (function() {
 })();
 
 document.addEventListener('DOMContentLoaded', function() {
-    if (typeof Omeka === 'undefined') {
-        var Omeka = {};
-    }
-    if (!Omeka.jsTranslate) {
-        Omeka.jsTranslate = (text) => text;
+    // "var Omeka" would be local to this function: use the global object.
+    window.Omeka = window.Omeka || {};
+    if (!window.Omeka.jsTranslate) {
+        window.Omeka.jsTranslate = (text) => text;
     }
 
     CommonDialog.init();
