@@ -36,6 +36,20 @@ var CommonDialog = (function() {
     };
 
     /**
+     * Helper to get the buttons of the message displayed after a jSend action.
+     *
+     * The trigger is passed to the message to get the focus back, but its data
+     * attributes describe its own dialog (a confirmation, a prompt), so the
+     * labels of its buttons must not be reused for the result.
+     */
+    var resultButtons = function() {
+        return {
+            textOk: Omeka.jsTranslate('OK'),
+            textCancel: null,
+        };
+    };
+
+    /**
      * Helper to check if a value is truthy for data attributes.
      */
     var isTruthy = function(value) {
@@ -466,10 +480,10 @@ var CommonDialog = (function() {
             }
             const msg = self.jSendMessage(data);
             if (msg) {
-                self.dialogAlert({
+                self.dialogAlert(Object.assign({
                     message: msg,
                     trigger: context?.target,
-                });
+                }, resultButtons()));
             }
             document.dispatchEvent(new CustomEvent('o:jsend-success', { detail: { data, context } }));
         }
@@ -484,11 +498,11 @@ var CommonDialog = (function() {
     self.jSendFail = function (error, context) {
         error = error.responseJSON || error;
         const msg = self.jSendMessage(error) || Omeka.jsTranslate('An error occurred.');
-        self.dialogAlert({
+        self.dialogAlert(Object.assign({
             message: msg,
             nl2br: true,
             trigger: context?.target,
-        });
+        }, resultButtons()));
         document.dispatchEvent(new CustomEvent('o:jsend-fail', { detail: { error, context } }));
     };
 
