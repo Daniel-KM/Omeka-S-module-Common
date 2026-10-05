@@ -54,6 +54,9 @@ interface MessagePreparerInterface
 
     /**
      * Fill a message with placeholders (moustache style {name}).
+     *
+     * With the context key "remove_empty_lines", the lines whose placeholders
+     * are all empty are removed, and the headers ("Label:") of removed lines.
      */
     public function fillMessage(?string $message, array $placeholders = [], array $context = []): string;
 

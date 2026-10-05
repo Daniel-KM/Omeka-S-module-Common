@@ -267,7 +267,71 @@ trait MessagePreparerTrait
 
         $replace += $defaultPlaceholders;
 
+        if (!empty($context['remove_empty_lines'])) {
+            $message = $this->removeEmptyLines($message, $replace);
+        }
+
         return strtr($message, $replace);
+    }
+
+    /**
+     * Remove the lines whose placeholders are all empty, then the headers whose
+     * lines are all removed.
+     *
+     * Only the lines that are a label and values ("Label: {value}") or values
+     * only ("{fields}") are removed, so a sentence like "Hello {name}," is
+     * kept. A header is a line ending with ":" without placeholder, followed by
+     * its lines until an empty line or the end of the message.
+     */
+    protected function removeEmptyLines(string $message, array $replace): string
+    {
+        $lines = preg_split('~\R~', $message);
+        $removed = [];
+        foreach ($lines as $index => $line) {
+            if (preg_match_all('~\{[^{}\s]+\}~', $line, $matches)) {
+                $text = trim(preg_replace('~\{[^{}\s]+\}~', '', $line));
+                if ($text !== '' && substr($text, -1) !== ':') {
+                    continue;
+                }
+                $removed[$index] = true;
+                foreach ($matches[0] as $placeholder) {
+                    if (!isset($replace[$placeholder]) || $replace[$placeholder] !== '') {
+                        $removed[$index] = false;
+                        break;
+                    }
+                }
+            }
+        }
+        $count = count($lines);
+        foreach ($lines as $index => $line) {
+            if (isset($removed[$index]) || substr(rtrim($line), -1) !== ':') {
+                continue;
+            }
+            $hasRemovedLine = false;
+            for ($next = $index + 1; $next < $count && trim($lines[$next]) !== ''; $next++) {
+                if (empty($removed[$next])) {
+                    continue 2;
+                }
+                $hasRemovedLine = true;
+            }
+            $removed[$index] = $hasRemovedLine;
+        }
+        // Skip an empty line that follows an empty line when lines between
+        // them were removed.
+        $result = [];
+        $hasRemoved = false;
+        foreach ($lines as $index => $line) {
+            if (!empty($removed[$index])) {
+                $hasRemoved = true;
+                continue;
+            }
+            if ($hasRemoved && trim($line) === '' && $result && trim(end($result)) === '') {
+                continue;
+            }
+            $hasRemoved = false;
+            $result[] = $line;
+        }
+        return implode("\n", $result);
     }
 
     /**
