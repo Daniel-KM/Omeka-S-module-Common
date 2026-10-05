@@ -63,6 +63,12 @@ class SendEmail extends AbstractPlugin
      *
      * @see \Laminas\Mail\Address\AddressInterface
      *
+     *
+     * The body is checked against a list of spam keywords, and a spam is not
+     * sent. An email sent on an explicit decision of an admin, for example a
+     * message marked as a false positive and resent, may skip this check, else
+     * it would be blocked again.
+     *
      * @todo Check if the format "name <email>" can be used, in particular when (string) null is used.
      */
     public function __invoke(
@@ -72,7 +78,8 @@ class SendEmail extends AbstractPlugin
         $from = null,
         $cc = null,
         $bcc = null,
-        $replyTo = null
+        $replyTo = null,
+        bool $checkSpam = true
     ): bool {
         /**
          * The method $mailer->createMessage() does not allow to by-pass default
@@ -140,7 +147,7 @@ class SendEmail extends AbstractPlugin
             }
         }
 
-        $spamKeyword = $this->matchSpamKeyword($body);
+        $spamKeyword = $checkSpam ? $this->matchSpamKeyword($body) : null;
         if ($spamKeyword !== null) {
             $this->logger->warn(
                 'Email not sent: this is a spam with "{keyword}" (To: {to}; From: {from}): {body}', // @translate
