@@ -21,6 +21,13 @@
  *         $this->assertResponseStatusCode(200);
  *     }
  *
+ *     public function testAsAnotherUser(): void
+ *     {
+ *         // Kept for the next dispatches, until logout().
+ *         $this->loginAs('editor@example.com');
+ *         $this->dispatch('/admin/my-module');
+ *     }
+ *
  *     public function testRequiresLogin(): void
  *     {
  *         // Test without authentication
@@ -64,6 +71,11 @@ abstract class AbstractHttpControllerTestCase extends LaminasAbstractHttpControl
      * Override in subclass if using different admin credentials.
      */
     protected string $adminEmail = 'admin@example.com';
+
+    /**
+     * Id of the user to dispatch as instead of the admin, until logout().
+     */
+    protected ?int $dispatchUserId = null;
 
     public function setUp(): void
     {
@@ -116,8 +128,10 @@ abstract class AbstractHttpControllerTestCase extends LaminasAbstractHttpControl
         // Ensure application is initialized.
         $this->getApplication();
 
-        // Re-authenticate if login is required.
-        if ($this->requiresLogin) {
+        // Re-authenticate: the reset cleared the identity.
+        if ($this->dispatchUserId) {
+            $this->writeIdentity($this->dispatchUserId);
+        } elseif ($this->requiresLogin) {
             $this->loginAsAdmin();
         }
 
@@ -159,6 +173,44 @@ abstract class AbstractHttpControllerTestCase extends LaminasAbstractHttpControl
     }
 
     /**
+     * Dispatch the next requests as another user than the admin.
+     *
+     * Each dispatch resets the application, so the identity is written again
+     * before each of them, until logout().
+     *
+     * @param User|int|string $user The user, its id or its email.
+     */
+    protected function loginAs($user): void
+    {
+        if ($user instanceof User) {
+            $userId = $user->getId();
+        } elseif (is_int($user)) {
+            $userId = $user;
+        } else {
+            $entity = $this->getEntityManager()->getRepository(User::class)
+                ->findOneBy(['email' => (string) $user]);
+            $userId = $entity ? $entity->getId() : null;
+        }
+        if (!$userId) {
+            throw new \InvalidArgumentException('Unknown user to log in.');
+        }
+        $this->dispatchUserId = $userId;
+        $this->writeIdentity($userId);
+    }
+
+    /**
+     * Write a user as identity of the current application, without adapter.
+     */
+    protected function writeIdentity(int $userId): void
+    {
+        $services = $this->getApplicationServiceLocator();
+        $user = $services->get('Omeka\EntityManager')->find(User::class, $userId);
+        $services->get('Omeka\AuthenticationService')->getStorage()->write($user);
+        // Normally done during bootstrap, before the identity is set in tests.
+        $services->get('Omeka\Settings\User')->setTargetId($userId);
+    }
+
+    /**
      * Login using the authentication adapter (slower but more realistic).
      *
      * Use this when you need to test actual authentication flow.
@@ -188,6 +240,7 @@ abstract class AbstractHttpControllerTestCase extends LaminasAbstractHttpControl
         $services = $this->getApplicationServiceLocator();
         $auth = $services->get('Omeka\AuthenticationService');
         $auth->clearIdentity();
+        $this->dispatchUserId = null;
     }
 
     /**
@@ -204,6 +257,7 @@ abstract class AbstractHttpControllerTestCase extends LaminasAbstractHttpControl
     {
         // Temporarily disable login requirement.
         $originalRequiresLogin = $this->requiresLogin;
+        $originalUserId = $this->dispatchUserId;
         $this->requiresLogin = false;
 
         // Reset and dispatch.
@@ -215,6 +269,7 @@ abstract class AbstractHttpControllerTestCase extends LaminasAbstractHttpControl
 
         // Restore login requirement.
         $this->requiresLogin = $originalRequiresLogin;
+        $this->dispatchUserId = $originalUserId;
     }
 
     /**

@@ -85,6 +85,30 @@ class MessagePreparerTraitTest extends TestCase
         $this->assertSame('[][]', $out);
     }
 
+    public function testRemoveEmptyLines(): void
+    {
+        $message = "Hello {name},\n\nFields:\n{fields}\n\nResources:\n  Ids: {resources_ids}\n  Links: {resources_links}\n\nZip: {zip}\nEnd: {fields}{name}";
+        $out = $this->preparer()->fillMessage($message, ['name' => 'Bob', 'fields' => '', 'zip' => ''], ['remove_empty_lines' => true]);
+        $this->assertSame("Hello Bob,\n\nEnd: Bob", $out);
+        // Without the option, the lines are kept.
+        $out = $this->preparer()->fillMessage("Zip: {zip}\nEnd", ['zip' => '']);
+        $this->assertSame("Zip: \nEnd", $out);
+    }
+
+    public function testRemoveEmptyLinesKeepsSentences(): void
+    {
+        $message = "Hello {name},\n\nSubject: {subject}\nYour message: {message} was received.";
+        $out = $this->preparer()->fillMessage($message, ['name' => '', 'subject' => '', 'message' => ''], ['remove_empty_lines' => true]);
+        $this->assertSame("Hello ,\n\nYour message:  was received.", $out);
+    }
+
+    public function testRemoveEmptyLinesKeepsHeaderWithContent(): void
+    {
+        $message = "Resources:\n  Ids: {resources_ids}\n  Note: {note}";
+        $out = $this->preparer()->fillMessage($message, ['note' => 'kept'], ['remove_empty_lines' => true]);
+        $this->assertSame("Resources:\n  Note: kept", $out);
+    }
+
     public function testUrlEncodedBracesAreFixed(): void
     {
         $out = $this->preparer()->fillMessage('%7Bname%7D', ['name' => 'Bob']);

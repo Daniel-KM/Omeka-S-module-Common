@@ -41,6 +41,16 @@ use Omeka\Test\DbTestCase;
  * );
  * ```
  *
+ * An optional module is installed as soon as it is present, so the suite always
+ * runs with it on a full installation and the code without it is no longer
+ * tested. Set the variable TEST_SKIP_OPTIONAL_MODULES to skip the optional
+ * modules, all of them with "1", or some of them with a list separated by
+ * commas:
+ * ```sh
+ * TEST_SKIP_OPTIONAL_MODULES=1 vendor/bin/phpunit -c modules/AdvancedSearch/phpunit.xml
+ * TEST_SKIP_OPTIONAL_MODULES=Reference vendor/bin/phpunit -c modules/AdvancedSearch/phpunit.xml
+ * ```
+ *
  * Requirements:
  * - Module must have composer.json with autoload/autoload-dev PSR-4 sections
  * - Test directory structure: modules/YourModule/test/YourModuleTest/
@@ -200,6 +210,36 @@ class Bootstrap
     }
 
     /**
+     * Remove the optional modules listed in the variable
+     * TEST_SKIP_OPTIONAL_MODULES.
+     *
+     * The value "1" or "all" skips all the optional modules. A list separated
+     * by commas skips only these ones. The required modules are never skipped.
+     */
+    public static function skipOptionalModules(array $modules, bool $verbose = true): array
+    {
+        $skip = trim((string) getenv('TEST_SKIP_OPTIONAL_MODULES'));
+        if ($skip === '' || $skip === '0') {
+            return $modules;
+        }
+        $skipAll = in_array(strtolower($skip), ['1', 'all', 'true', 'yes'], true);
+        $skipList = $skipAll ? [] : array_filter(array_map('trim', explode(',', $skip)));
+        $result = [];
+        foreach ($modules as $moduleName) {
+            $name = ltrim($moduleName, '?');
+            $isOptional = substr($moduleName, 0, 1) === '?';
+            if ($isOptional && ($skipAll || in_array($name, $skipList, true))) {
+                if ($verbose) {
+                    self::log("  Skipping optional module: $name");
+                }
+                continue;
+            }
+            $result[] = $moduleName;
+        }
+        return $result;
+    }
+
+    /**
      * Install modules in order.
      *
      * Module names prefixed with "?" are optional and will be skipped silently
@@ -211,6 +251,8 @@ class Bootstrap
      */
     public static function installModules(array $modules, bool $verbose = true): void
     {
+        $modules = self::skipOptionalModules($modules, $verbose);
+
         // Register the psr-4 namespaces of the modules to install: during the
         // install, the module is not active yet, so its namespace is not
         // registered by the Omeka module manager and the classes of the module

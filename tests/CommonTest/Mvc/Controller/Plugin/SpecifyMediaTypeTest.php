@@ -278,6 +278,28 @@ class SpecifyMediaTypeTest extends TestCase
             ($this->plugin)($path, 'text/html'));
     }
 
+    public function testXmlDetectedAsHtml(): void
+    {
+        // A tei has elements "head" and "p", so finfo returns "text/html".
+        $plugin = new SpecifyMediaType(
+            $this->createMock(Logger::class),
+            $this->createMock(Connection::class),
+            '/tmp',
+            require dirname(__DIR__, 5) . '/data/media-types/media-type-identifiers.php'
+        );
+        $tei = '<TEI xmlns="http://www.tei-c.org/ns/1.0"><teiHeader/>'
+            . '<text><body><div><head>Chapter</head><p>Text</p></div></body></text></TEI>';
+        $path = $this->fixture('tei.xml', $tei);
+        $this->assertSame('application/tei+xml', $plugin($path, 'text/html'));
+
+        $path = $this->fixture('tei-doctype.xml', '<!DOCTYPE TEI SYSTEM "tei.dtd">' . "\n" . $tei);
+        $this->assertSame('application/tei+xml', $plugin($path, 'text/html'));
+
+        $path = $this->fixture('page.xhtml', '<?xml version="1.0"?>'
+            . '<html xmlns="http://www.w3.org/1999/xhtml"><body><p>Hello</p></body></html>');
+        $this->assertSame('text/html', $plugin($path, 'text/html'));
+    }
+
     // ZIP formats.
 
     public function testUsdz(): void
