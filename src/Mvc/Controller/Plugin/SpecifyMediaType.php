@@ -340,6 +340,15 @@ class SpecifyMediaType extends AbstractPlugin
             return 'text/vnd.hocr+html';
         }
 
+        // finfo may detect a xml file as html, for example a tei, that has the
+        // elements "head" and "p". So check the xml markers of a non-html file.
+        if ($head
+            && !preg_match('~<!DOCTYPE\s+html\b|<html\b~i', $head)
+            && preg_match('~<\?xml\s|<!DOCTYPE\s+[\w:.-]+|\sxmlns(?::[\w.-]+)?\s*=~', $head)
+        ) {
+            return $this->getMediaTypeXml();
+        }
+
         return null;
     }
 
