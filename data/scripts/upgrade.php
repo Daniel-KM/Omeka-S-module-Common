@@ -10,12 +10,13 @@ namespace Common;
  *
  * @var \Doctrine\DBAL\Connection $connection
  * @var \Doctrine\ORM\EntityManager $entityManager
- * @var \Laminas\Mvc\Controller\Plugin\Url $url
+ * @var \Omeka\View\Helper\Url $url
  * @var \Omeka\Api\Manager $api
  * @var \Omeka\Mvc\Controller\Plugin\Messenger $messenger
  */
 $plugins = $services->get('ControllerPluginManager');
-$url = $plugins->get('url');
+$helpers = $services->get('ViewHelperManager');
+$url = $helpers->get('url');
 // Api is not available when upgrading with module AdvancedSearch.
 // $api = $plugins->get('api');
 // $config = require dirname(__DIR__, 2) . '/config/module.config.php';
