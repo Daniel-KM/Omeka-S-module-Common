@@ -37,6 +37,9 @@ return [
             'Laminas\Navigation\Site' => [
                 Service\Delegator\SiteNavigationDelegatorFactory::class,
             ],
+            'Omeka\AuthenticationService' => [
+                Service\Delegator\AuthenticationServiceDelegatorFactory::class,
+            ],
         ],
     ],
     'view_manager' => [
@@ -197,5 +200,8 @@ return [
         ],
     ],
     'common' => [
+        // Paths of the stateless requests, where a session is not started for
+        // anonymous visitors, for example files checked by a module.
+        'session_free_paths' => [],
     ],
 ];
