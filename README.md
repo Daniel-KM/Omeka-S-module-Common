@@ -14,6 +14,8 @@ copy-paste common code between modules.
 - Services, view helpers and controller plugins
 
   - AssetUrl for internal assets
+  - CheckDestinationDir and DirectoryManager, to create the working directories
+    of "files/" and to protect them with a ".htaccess" (Apache only).
   - DefaultSite
   - DeferredJobDispatch, to run multiple individual jobs in bulk
   - EasyMeta to get ids, terms and labels from properties, classes, templates,
@@ -24,21 +26,34 @@ copy-paste common code between modules.
   - IsHtml
   - IsXml
   - JSend to manage exchanges between a module and js part.
+  - FormTabs, to render any form as admin tabs, from the form option
+    `element_tabs` (used automatically for the config forms).
   - MatchedRouteName
+  - ModuleConfigNav, to switch between the config forms of related modules.
   - SendEmail to send email with default values, in particular sender.
+  - SendFilePrivate, to stream a private file confined in a directory.
   - PrepareMessage to validate and fill messages with placeholders.
   - SpecifyMediaType
+  - SynchronousMessenger, a job dispatch strategy that runs the job directly
+    and displays its log to the user.
+  - TextTransliterator, to fold unicode strings to ascii.
+  - Trigger, to fire the event "view.layout" on error pages too, until the fix
+    planned in Omeka S 4.3.
+  - UpgradeJobDispatch, to dispatch a job during the install or the upgrade.
 
 - Form elements
 
   - SendMessageForm (base form for sending messages with placeholders)
   - Array Text
+  - Array Textarea
+  - Array Queries Textarea
   - Custom Vocab MultiCheckbox
   - Custom Vocab Radio
   - Custom Vocab Select
   - Custom Vocabs Select
   - Data Textarea
   - Data Type Select
+  - Fields Textarea (yaml definition of form fields)
   - Group Textarea
   - Ini Textarea
   - Note
@@ -50,10 +65,13 @@ copy-paste common code between modules.
   - Optional Checkbox
   - Optional Date
   - Optional DateTime
+  - Optional DateTime Local
+  - Optional Email
   - Optional Multi Checkbox
   - Optional Number
   - Optional Radio
   - Optional Select
+  - Optional Time
   - Optional Url
   - Optional Item Set Select
   - Optional Property Select
@@ -62,7 +80,9 @@ copy-paste common code between modules.
   - Optional Resource Template Select
   - Optional Role Select
   - Optional Site Select
+  - Optional Site Page Select
   - Optional User Select
+  - Thumbnail Type Select
   - Url Query
 
 - [PSR-3]
@@ -83,6 +103,10 @@ copy-paste common code between modules.
   Eventual install and uninstall sql can be set in `data/install/` and upgrade
   code in `data/scripts`. Another class allows to check and install resources
   (vocabularies, resource templates, custom vocabs, etc.).
+
+  The external assets declared in the key `extra.external-assets` of the file
+  `composer.json` of the module, managed by the composer plugin [external assets],
+  are checked before install, so the module cannot be installed without them.
 
 - Improved media type detection
 
@@ -113,6 +137,7 @@ copy-paste common code between modules.
   - value: type
   - value: lang
   - value: idx_property_value (property_id, value (190))
+  - item_site: idx_site_item (site_id, item_id)
   - session: modified
 
 
@@ -161,6 +186,40 @@ Run them from the root of Omeka:
 ```sh
 vendor/bin/phpunit -c modules/Common/phpunit.xml --testdox
 ```
+
+The test tools of the module can be used by the other modules: the class
+`CommonTest\Bootstrap` drops and creates the test database, then installs the
+required modules, set in the file `tests/bootstrap.php` of the module:
+
+```php
+require dirname(__DIR__, 3) . '/modules/Common/tests/Bootstrap.php';
+
+\CommonTest\Bootstrap::bootstrap(
+    [
+        'Common',
+        // Optional: installed if present, skipped silently if not.
+        '?Reference',
+        'MyModule',
+    ],
+    'MyModuleTest',
+    __DIR__ . '/MyModuleTest'
+);
+```
+
+An optional module is installed as soon as it is present, so run the suite
+without it too, with all optional modules skipped or only some of them:
+
+```sh
+TEST_SKIP_OPTIONAL_MODULES=1 vendor/bin/phpunit -c modules/MyModule/phpunit.xml
+TEST_SKIP_OPTIONAL_MODULES=Reference vendor/bin/phpunit -c modules/MyModule/phpunit.xml
+```
+
+The class `CommonTest\AbstractHttpControllerTestCase` keeps the admin logged in
+across the dispatches, allows to dispatch as another user (`loginAs()`) or
+without authentication (`dispatchUnauthenticated()`), and closes the database
+connection of each application, so a long suite does not exhaust the server
+connections. The trait `CommonTest\JobTestTrait` creates tracked resources,
+runs jobs and removes the tracked resources (`cleanupResources()`).
 
 
 Usage (for developer)
@@ -277,19 +336,21 @@ Real life implementation can be seen in modules [Bulk Import], [Derivative Media
 #### Upgrade Job Dispatch
 
 During a module upgrade, the module state in database is `needs_upgrade`, so
-the module is not registered nor autoloaded. Any job dispatched from an upgrade
-script would fail to bootstrap in its spawned CLI process: the job class does
-not exist for the Module Manager, and `Dispatcher::dispatch()` itself checks
-class existence.
+the module is not registered nor autoloaded. During install, the module is not
+even in the table `module`, because the Module Manager creates its row once
+`install()` returns. Any job dispatched from an install or upgrade script would
+fail to bootstrap in its spawned CLI process: the job class does not exist for
+the Module Manager, and `Dispatcher::dispatch()` itself checks class existence.
 
 The service `Common\UpgradeJobDispatch` works around this: it temporarily writes
-the target version and sets `is_active = 1` in the `module` table, requires the
-job files so `dispatch()` can validate the class, dispatches the job, waits
-briefly for the child process to start, then restores the previous `is_active`
-value. The Module Manager sets the real state and version once `upgrade()`
+the target version and sets `is_active = 1` in the `module` table, or creates
+the row during install, requires the job files so `dispatch()` can validate the
+class, dispatches the job, waits briefly for the child process to start, then
+restores the previous `is_active` value, or removes the temporary row. The
+Module Manager sets the real state and version once `install()` or `upgrade()`
 returns.
 
-Usage from `data/scripts/upgrade.php`:
+Usage from `data/scripts/upgrade.php` (or from `install()`):
 
 ```php
 $upgradeJobDispatch = $services->get('Common\UpgradeJobDispatch');
@@ -321,6 +382,38 @@ too (literal, resource or uri); to get resource api names from any names used in
 Omeka and modules.
 
 To get methods and more details, use the autocompletion of your IDE.
+
+#### File Lock
+
+A file with a fixed path (cache, derivative, tile) may be requested by many
+visitors at the same time. The class `Common\Stdlib\FileLock` allows to build it
+only once: the process that gets the lock builds the file in its own temp file,
+then renames it atomically, so a reader never gets a partial file. The other
+processes skip the build:
+
+```php
+$fileLock = new \Common\Stdlib\FileLock();
+if (!$fileLock->acquire($filepath)) {
+    // Another process builds the file.
+    return;
+}
+$tempFilepath = $fileLock->tempFilepath($filepath);
+// Build the file in $tempFilepath…
+$fileLock->commit($tempFilepath, $filepath);
+$fileLock->release($filepath);
+```
+
+For a quick build, `$fileLock->write($filepath, $content)` writes the content
+atomically without lock.
+
+The lock is a non-blocking `flock()`, released by the system when the process
+ends, even after a crash. The built files share a fixed number of lock files in
+the directory `files/.locks` (or a directory of the system temp directory when
+it is not writeable), so there is no lock file by built file. Use the static
+method `FileLock::isTempOrLockFile()` to skip the temp and lock files when a
+directory is listed or cleaned.
+
+Real life implementation can be seen in module [Derivative Media].
 
 #### FormatNumber
 
@@ -767,6 +860,33 @@ The button can also be enabled globally for every module config form (even
 modules that do not use the trait) with an option provided by module
 [Easy Admin].
 
+### Stateless requests without session
+
+Omeka reads the identity of the user during the bootstrap, so a session is
+started for each request, with a cookie, a row in the database and headers that
+disable the cache. For stateless requests, for example the files checked by a
+module, a module can list paths in the config key `session_free_paths` of the
+module Common in its file `config/module.config.php`:
+
+```php
+    'common' => [
+        'session_free_paths' => [
+            '/access/files/',
+            '/files/',
+        ],
+    ],
+```
+
+For a request whose path, relative to the base path of Omeka, starts with one
+of these paths, a visitor without session cookie is anonymous and no session is
+started. A visitor with a session cookie keeps it, so a logged user keeps its
+rights. The standard authentication of Omeka is kept during install, migration
+and for the requests authenticated with an api key.
+
+When the url is rewritten internally, for example by a rule of the htaccess, the
+path to set is the requested one, not the rewritten one: so the module Access
+sets the paths `/access/files/` and `/files/`.
+
 ### Secret settings (encrypted at rest in database)
 
 To store a sensitive setting (API key, password, token), use the form element
@@ -858,6 +978,10 @@ callable via the module `$this->getManageModuleAndResources()`. It contains
 tools to manage and update vocabs, custom vocabs, and templates via files
 located inside `data/`, that will be automatically imported.
 
+When a vocabulary is updated, its classes and properties renamed or deleted via
+sql before, for example in an upgrade script, are refreshed first, so they are
+not created again as duplicates.
+
 ```php
 if (!class_exists(\Common\ManageModuleAndResources::class, false)) {
     if (file_exists(OMEKA_PATH . '/modules/Common/src/ManageModuleAndResources.php')) {
@@ -937,7 +1061,7 @@ Copyright
 [PSR-3]: http://www.php-fig.org/psr/psr-3
 [PHP-FIG]: http://www.php-fig.org
 [installing a module]: https://omeka.org/s/docs/user-manual/modules/
-[PR #2412]: https://github.com/omeka/omeka-s/pull/2412
+[PR #2432]: https://github.com/omeka/omeka-s/pull/2432
 [Common.zip]: https://gitlab.com/Daniel-KM/Omeka-S-module-Common/-/releases
 [jSend]: https://github.com/omniti-labs/jsend
 [Bot Guard]: https://gitlab.com/Daniel-KM/Omeka-S-module-BotGuard
@@ -959,3 +1083,4 @@ Copyright
 [OSI]: http://opensource.org
 [MIT]: http://opensource.org/licenses/MIT
 [Daniel-KM]: https://gitlab.com/Daniel-KM "Daniel Berthereau"
+[external assets]: https://gitlab.com/sempia/composer-plugin-external-assets
