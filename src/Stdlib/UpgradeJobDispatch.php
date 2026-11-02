@@ -7,16 +7,19 @@ use Omeka\Entity\Job;
 use Omeka\Job\Dispatcher;
 
 /**
- * Dispatch a background job during a module upgrade.
+ * Dispatch a background job during a module upgrade or install.
  *
- * During upgrade, the module classes are not available to the spawned
- * background process, because the module state in the database is still
- * "needs_upgrade".
+ * The spawned background process loads only the modules that are active in the
+ * table "module" (columns id, is_active, version). During upgrade, the row of
+ * the module is still "needs_upgrade" (old version); during install, the row
+ * does not exist yet, because the Module Manager creates it once install()
+ * returns.
  *
- * So this helper temporarily sets the module version and active flag so the
- * spawned process can bootstrap the module, waits for the job to start, then
- * restores the original active flag. The Module Manager sets the real version
- * and state once upgrade() returns.
+ * So this helper temporarily sets the module version and active flag in this
+ * row, or creates it, so the spawned process can bootstrap the module, waits
+ * for the job to start, then restores the original active flag, or removes the
+ * temporary row. The Module Manager sets the real version and state once
+ * upgrade() or install() returns.
  *
  * The module id is derived from the first segment of the job class namespace.
  * The target version is read from the module ini when not passed. The job class
@@ -83,7 +86,9 @@ class UpgradeJobDispatch
         $wasActive = (bool) ($moduleRow['is_active'] ?? false);
 
         $connection->executeStatement(
-            'UPDATE module SET version = :version, is_active = 1 WHERE id = :id',
+            $moduleRow
+                ? 'UPDATE module SET version = :version, is_active = 1 WHERE id = :id'
+                : 'INSERT INTO module (id, is_active, version) VALUES (:id, 1, :version)',
             ['version' => $newVersion, 'id' => $moduleId]
         );
 
@@ -105,7 +110,12 @@ class UpgradeJobDispatch
                 ));
         }
 
-        if (!$wasActive) {
+        if (!$moduleRow) {
+            $connection->executeStatement(
+                'DELETE FROM module WHERE id = :id',
+                ['id' => $moduleId]
+            );
+        } elseif (!$wasActive) {
             $connection->executeStatement(
                 'UPDATE module SET is_active = 0 WHERE id = :id',
                 ['id' => $moduleId]
