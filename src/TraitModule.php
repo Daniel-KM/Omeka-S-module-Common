@@ -154,6 +154,15 @@ trait TraitModule
             throw new ModuleCannotInstallException((string) $message->setTranslator($translator));
         }
 
+        $missingAssets = $this->missingExternalAssets();
+        if ($missingAssets) {
+            $message = new PsrMessage(
+                'Some libraries should be installed: use the release zip of the module or run "composer install --no-dev" in its directory. Missing libraries: {libraries}.', // @translate
+                ['libraries' => implode(', ', $missingAssets)]
+            );
+            throw new ModuleCannotInstallException((string) $message->setTranslator($translator));
+        }
+
         if (!$this->checkAllResourcesToInstall()) {
             $message = new PsrMessage(
                 'This module has resources that cannot be installed.' // @translate
@@ -1277,6 +1286,42 @@ trait TraitModule
     {
         return empty($this->dependencies)
             || $this->areModulesActive($this->dependencies);
+    }
+
+    /**
+     * List the external assets declared in composer.json that are missing.
+     *
+     * The assets are declared in the key "extra.external-assets", managed by
+     * the composer plugin sempia/external-assets. A destination ending with "/"
+     * is a directory that should not be empty, else it is a file.
+     *
+     * @return string[] Missing destinations, relative to the module directory.
+     */
+    protected function missingExternalAssets(): array
+    {
+        $modulePath = $this->modulePath();
+        $filepath = $modulePath . '/composer.json';
+        if (!$this->isFileReadable($filepath)) {
+            return [];
+        }
+
+        $composer = json_decode((string) file_get_contents($filepath), true);
+        $assets = $composer['extra']['external-assets'] ?? null;
+        if (!$assets || !is_array($assets)) {
+            return [];
+        }
+
+        $missing = [];
+        foreach (array_keys($assets) as $destination) {
+            $path = $modulePath . '/' . ltrim((string) $destination, '/');
+            $exists = substr((string) $destination, -1) === '/'
+                ? is_dir($path) && (new \FilesystemIterator($path))->valid()
+                : is_file($path);
+            if (!$exists) {
+                $missing[] = rtrim((string) $destination, '/');
+            }
+        }
+        return $missing;
     }
 
     /**
