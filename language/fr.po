@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-05 00:00+0000\n"
-"PO-Revision-Date: 2026-10-05 00:00+0000\n"
+"POT-Creation-Date: 2026-11-02 00:00+0000\n"
+"PO-Revision-Date: 2026-11-02 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.6\n"
 
-#: src/Form/View/Helper/FormSecret.php:45 src/TraitModule.php:453
+#: src/Form/View/Helper/FormSecret.php:45 src/TraitModule.php:458
 msgid "Leave empty to keep the current value"
 msgstr "Laisser vide pour garder la valeur actuelle"
 
@@ -488,7 +488,7 @@ msgstr ""
 "Une erreur est survenue en ajoutant le préfixe « {prefix} » : un autre "
 "vocabulaire existe. Merci de résoudre le conflit avant d’installer ce module."
 
-#: src/ManageModuleAndResources.php:112 src/ManageModuleAndResources.php:865
+#: src/ManageModuleAndResources.php:112 src/ManageModuleAndResources.php:895
 msgid ""
 "An error occured when loading custom vocab file \"{file}\": file has no json "
 "content."
@@ -542,7 +542,7 @@ msgstr ""
 "Une erreur est survenue en ajoutant le préfixe « {prefix} » et les "
 "propriétés associées : {message}"
 
-#: src/ManageModuleAndResources.php:527 src/ManageModuleAndResources.php:536
+#: src/ManageModuleAndResources.php:529 src/ManageModuleAndResources.php:538
 msgid ""
 "An error occured when updating vocabulary \"{prefix}\" and the associated "
 "properties: {message}"
@@ -550,7 +550,7 @@ msgstr ""
 "Une erreur est survenue lors de la mise à jour du vocabulaire « {prefix} » "
 "et les propriétés associées : {message}"
 
-#: src/ManageModuleAndResources.php:631
+#: src/ManageModuleAndResources.php:661
 msgid ""
 "The following \"{name}\" of the vocabulary \"{label}\" were replaced: "
 "{members}"
@@ -558,7 +558,7 @@ msgstr ""
 "Les « {name} » suivants du vocabulaire « {label} » ont été remplacés : "
 "{members}"
 
-#: src/ManageModuleAndResources.php:641
+#: src/ManageModuleAndResources.php:671
 msgid ""
 "Resources, values and templates were updated, but you may check settings "
 "where the old ones were used."
@@ -566,7 +566,7 @@ msgstr ""
 "Les ressources, valeurs et modèles ont été mis à jour, mais vous pouvez "
 "vérifier les paramètres où les anciennes valeurs étaient utilisées."
 
-#: src/ManageModuleAndResources.php:671
+#: src/ManageModuleAndResources.php:701
 msgid ""
 "The resource template named \"{template}\" is already available and is "
 "skipped."
@@ -574,49 +574,49 @@ msgstr ""
 "Le modèle de ressource nommé « {template} » est déjà disponible et a été "
 "conservé."
 
-#: src/ManageModuleAndResources.php:877
+#: src/ManageModuleAndResources.php:907
 msgid "The custom vocab named \"{custom_vocab}\" is not available."
 msgstr ""
 "Le vocabulaire personnalisé nommé « {custom_vocab} » n’est pas disponible."
 
-#: src/ManageModuleAndResources.php:1099
+#: src/ManageModuleAndResources.php:1129
 msgid "The file path {file} does not exist or is empty."
 msgstr "Le fichier {file} n’existe pas ou est vide."
 
-#: src/ManageModuleAndResources.php:1111
+#: src/ManageModuleAndResources.php:1141
 msgid "The file path {file} does not contain a json array."
 msgstr "Le fichier {file} ne contient pas un objet json."
 
-#: src/ManageModuleAndResources.php:1163
+#: src/ManageModuleAndResources.php:1193
 msgid "No file or url set for the vocabulary."
 msgstr "Pas de fichier ou d’url pour le vocabulaire."
 
-#: src/ManageModuleAndResources.php:1172
+#: src/ManageModuleAndResources.php:1202
 msgid "The file \"{file}\" cannot be read. Check the url."
 msgstr "Le fichier « {file} » ne peut pas être lu. Merci de vérifier l’url."
 
-#: src/ManageModuleAndResources.php:1183
+#: src/ManageModuleAndResources.php:1213
 msgid "The file \"{file}\" cannot be read. Check the file."
 msgstr ""
 "Le fichier « {file} » ne peut pas être lu. Merci de vérifier le fichier."
 
-#: src/ManageModuleAndResources.php:1204
+#: src/ManageModuleAndResources.php:1234
 msgid "A vocabulary must have a namespace uri and a prefix."
 msgstr "Un vocabulaire doit avoir une uri pour l’espace de nom et un préfixe."
 
-#: src/TraitModule.php:145 src/TraitModule.php:1312
+#: src/TraitModule.php:148 src/TraitModule.php:1372
 msgid "This module requires the module \"{module}\"."
 msgstr "Ce module requiert le module « {module} »."
 
-#: src/TraitModule.php:150
+#: src/TraitModule.php:153
 msgid "This module requires modules \"{modules}\"."
 msgstr "Ce module requiert les modules « {modules} »."
 
-#: src/TraitModule.php:159
+#: src/TraitModule.php:162
 msgid "This module has resources that cannot be installed."
 msgstr "Ce module a des ressources qui ne peuvent pas être installées."
 
-#: src/TraitModule.php:167
+#: src/TraitModule.php:170
 msgid ""
 "This module cannot install its tables, because they exist already. Try to "
 "remove them first."
@@ -624,18 +624,28 @@ msgstr ""
 "Ce module ne peut pas installer ses tables car elles existent déjà. Essayez "
 "de les supprimer manuellement."
 
-#: src/TraitModule.php:676
+#: src/TraitModule.php:681
 msgid "The module removed tables \"{tables}\" from a previous broken install."
 msgstr ""
 "Le module a supprimé les tables \"{tables}\" depuis une installation échouée."
 
-#: src/TraitModule.php:1307
+#: src/TraitModule.php:1299
+msgid ""
+"Some libraries should be installed: use the release zip of the module or run "
+"\"composer install --no-dev\" in its directory. Missing libraries: "
+"{libraries}."
+msgstr ""
+"Des dépendances doivent être installées : utilisez le zip de la version "
+"publiée du module ou lancez « composer install --no-dev » dans son dossier. "
+"Dépendances manquantes : {libraries}."
+
+#: src/TraitModule.php:1367
 msgid ""
 "This module requires the module \"{module}\", version {version} or above."
 msgstr ""
 "Ce module requiert le module « {module} », version {version} ou supérieure."
 
-#: src/TraitModule.php:1443
+#: src/TraitModule.php:1503
 msgid ""
 "The module \"{module}\" was automatically deactivated because the "
 "dependencies are unavailable."
@@ -651,7 +661,7 @@ msgstr "Choisir un ingéreur de média…"
 msgid "Select media renderers…"
 msgstr "Choisir un rendu pour le média…"
 
-#: src/Stdlib/UpgradeJobDispatch.php:103
+#: src/Stdlib/UpgradeJobDispatch.php:108
 msgid ""
 "The job #{job_id} is still starting after the sleep delay. It may need to be "
 "relaunched manually."
