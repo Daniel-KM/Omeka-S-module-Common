@@ -1,0 +1,12 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix stale: <https://example.org/vocabs/stale/> .
+
+stale:Thing a rdfs:Class ;
+    rdfs:label "Thing" .
+
+stale:start a rdf:Property ;
+    rdfs:label "Start" .
+
+stale:end a rdf:Property ;
+    rdfs:label "End" .

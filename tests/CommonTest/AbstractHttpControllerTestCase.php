@@ -178,14 +178,12 @@ abstract class AbstractHttpControllerTestCase extends LaminasAbstractHttpControl
                 ->findOneBy(['email' => $this->adminEmail]);
         }
 
+        // Only the id of the cached user is reused: the entity belongs to the
+        // entity manager of a previous application, so writing it as identity
+        // would make Doctrine see a new user when an entity owned by the
+        // current user is flushed.
         if (self::$adminUser) {
-            // Set identity directly in storage (bypasses adapter).
-            $auth->getStorage()->write(self::$adminUser);
-            // Set UserSettings target id (normally done during bootstrap by
-            // MvcListeners::bootstrapLocale, but bootstrap runs before the
-            // identity is set in tests).
-            $services->get('Omeka\Settings\User')
-                ->setTargetId(self::$adminUser->getId());
+            $this->writeIdentity(self::$adminUser->getId());
         }
     }
 

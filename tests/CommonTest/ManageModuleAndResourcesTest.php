@@ -146,6 +146,49 @@ class ManageModuleAndResourcesTest extends AbstractTestCase
         $this->assertFalse($result);
     }
 
+    /**
+     * A property loaded before a rename via sql should not be created again by
+     * the update of the vocabulary.
+     */
+    public function testUpdateVocabularyAfterRenameViaSql(): void
+    {
+        $this->loginAsAdmin();
+        $connection = $this->getService('Omeka\Connection');
+        $data = [
+            'vocabulary' => [
+                'o:namespace_uri' => 'https://example.org/vocabs/stale/',
+                'o:prefix' => 'stale',
+                'o:label' => 'Stale',
+                'o:comment' => 'Test',
+            ],
+            'is_checked' => true,
+            'strategy' => 'file',
+            'options' => [
+                'file' => dirname(__DIR__) . '/fixtures/vocabularies/stale.ttl',
+                'format' => 'turtle',
+            ],
+        ];
+        try {
+            $this->assertTrue($this->manager->createOrUpdateVocabulary($data));
+            $vocabularyId = (int) $connection->fetchOne('SELECT `id` FROM `vocabulary` WHERE `prefix` = "stale"');
+            $this->getEntityManager()->clear();
+
+            $connection->executeStatement('UPDATE `property` SET `local_name` = "dateStart" WHERE `vocabulary_id` = ? AND `local_name` = "start"', [$vocabularyId]);
+            $this->api()->read('properties', ['vocabulary' => $vocabularyId, 'localName' => 'dateStart']);
+            $connection->executeStatement('UPDATE `property` SET `local_name` = "start" WHERE `vocabulary_id` = ? AND `local_name` = "dateStart"', [$vocabularyId]);
+
+            $this->assertTrue($this->manager->createOrUpdateVocabulary($data));
+            $names = $connection->fetchFirstColumn('SELECT `local_name` FROM `property` WHERE `vocabulary_id` = ? ORDER BY `local_name`', [$vocabularyId]);
+            $this->assertSame(['end', 'start'], $names);
+        } finally {
+            foreach (['property', 'resource_class'] as $table) {
+                $connection->executeStatement("DELETE `t` FROM `$table` `t` JOIN `vocabulary` `v` ON `v`.`id` = `t`.`vocabulary_id` WHERE `v`.`prefix` = 'stale'");
+            }
+            $connection->executeStatement('DELETE FROM `vocabulary` WHERE `prefix` = "stale"');
+            $this->getEntityManager()->clear();
+        }
+    }
+
     // =========================================================================
     // Resource template check tests
     // =========================================================================
