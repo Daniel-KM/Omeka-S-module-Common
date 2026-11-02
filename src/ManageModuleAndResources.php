@@ -517,6 +517,8 @@ class ManageModuleAndResources
         $entityManager->flush();
 
         // Upgrade the classes and the properties.
+        $this->refreshVocabularyMembers($vocabulary);
+
         /** @var \Omeka\Stdlib\RdfImporter $rdfImporter */
         $rdfImporter = $this->services->get('Omeka\RdfImporter');
 
@@ -552,6 +554,34 @@ class ManageModuleAndResources
         $this->replaceVocabularyMembers($vocabulary, $vocabularyData);
 
         return true;
+    }
+
+    /**
+     * Refresh the classes and the properties of a vocabulary loaded before.
+     *
+     * The members renamed or deleted via sql, for example during an upgrade,
+     * keep their old data in the entity manager, so the diff of the vocabulary
+     * would create them again (duplicate entry).
+     */
+    protected function refreshVocabularyMembers(Vocabulary $vocabulary): void
+    {
+        $entityManager = $this->services->get('Omeka\EntityManager');
+        $connection = $this->services->get('Omeka\Connection');
+        $identityMap = $entityManager->getUnitOfWork()->getIdentityMap();
+        $vocabularyId = $vocabulary->getId();
+        foreach ([
+            \Omeka\Entity\Property::class => 'property',
+            \Omeka\Entity\ResourceClass::class => 'resource_class',
+        ] as $entityClass => $table) {
+            foreach ($identityMap[$entityClass] ?? [] as $member) {
+                if ($member->getVocabulary()->getId() !== $vocabularyId) {
+                    continue;
+                }
+                $connection->fetchOne("SELECT 1 FROM `$table` WHERE `id` = ?", [$member->getId()])
+                    ? $entityManager->refresh($member)
+                    : $entityManager->detach($member);
+            }
+        }
     }
 
     protected function replaceVocabularyMembers(Vocabulary $vocabulary, array $vocabularyData): bool
