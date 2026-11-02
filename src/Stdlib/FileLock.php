@@ -11,30 +11,45 @@ namespace Common\Stdlib;
  * the previous file is served until the new one is ready. The others skip the
  * build.
  *
- * The lock is a non-blocking flock() on the file "{filepath}.lock", so it is
- * released by the system when the process ends, even after a crash or a kill.
- * The lock files are kept: removing them while another process opens them would
- * break the lock.
+ * The lock is a non-blocking flock(), so it is released by the system when the
+ * process ends, even after a crash or a kill. To avoid a lock file by built
+ * file (millions of tiles), the files share a fixed number of lock files in a
+ * single directory, chosen by a hash of the path: two files with the same lock
+ * file are rarely built at the same time. The lock files are never removed,
+ * because removing them while another process opens them would break the lock.
+ * When a lock file cannot be opened, the file is built without lock.
  *
- * Usage:
- *
- *     $fileLock = new \Common\Stdlib\FileLock(); if
- *     (!$fileLock->acquire($filepath)) {
- *         return null; // In progress.
- *     }
- *     $tempFilepath = $fileLock->tempFilepath($filepath); $result =
- *     buildFile($tempFilepath); $result = $result &&
- *     $fileLock->commit($tempFilepath, $filepath);
- *     $fileLock->release($filepath);
+ * @see \CommonTest\Stdlib\FileLockTest for the usage.
  */
 class FileLock
 {
-    const LOCK_EXTENSION = '.lock';
+    /**
+     * Number of lock files shared by all the built files.
+     */
+    const LOCKS = 4096;
 
     /**
-     * @var resource[] Lock handles by file path.
+     * @var string
+     */
+    protected $lockDir;
+
+    /**
+     * @var array Lock handles by file path, null when built without lock.
      */
     protected $handles = [];
+
+    /**
+     * @param string|null $lockDir Default is "files/.locks" in Omeka. When it
+     *   is not writeable, a directory of the temp directory of the system is
+     *   used, the same for all the processes of the user.
+     */
+    public function __construct(?string $lockDir = null)
+    {
+        $lockDir = $lockDir ?? (defined('OMEKA_PATH') ? OMEKA_PATH . '/files/.locks' : null);
+        $this->lockDir = $lockDir && $this->ensureDir($lockDir)
+            ? $lockDir
+            : sys_get_temp_dir() . '/omeka-locks-' . md5($lockDir ?? __DIR__);
+    }
 
     /**
      * Get the exclusive lock to build a file, without waiting.
@@ -43,14 +58,11 @@ class FileLock
      */
     public function acquire(string $filepath): bool
     {
-        if (isset($this->handles[$filepath])) {
+        if (array_key_exists($filepath, $this->handles)) {
             return false;
         }
-        $handle = @fopen($filepath . self::LOCK_EXTENSION, 'c');
-        if (!$handle) {
-            return false;
-        }
-        if (!flock($handle, LOCK_EX | LOCK_NB)) {
+        $handle = $this->openLockFile($filepath, true);
+        if ($handle && !flock($handle, LOCK_EX | LOCK_NB)) {
             fclose($handle);
             return false;
         }
@@ -60,11 +72,13 @@ class FileLock
 
     public function release(string $filepath): void
     {
-        if (!isset($this->handles[$filepath])) {
+        if (!array_key_exists($filepath, $this->handles)) {
             return;
         }
-        flock($this->handles[$filepath], LOCK_UN);
-        fclose($this->handles[$filepath]);
+        if ($this->handles[$filepath]) {
+            flock($this->handles[$filepath], LOCK_UN);
+            fclose($this->handles[$filepath]);
+        }
         unset($this->handles[$filepath]);
     }
 
@@ -73,20 +87,54 @@ class FileLock
      */
     public function isLocked(string $filepath): bool
     {
-        if (isset($this->handles[$filepath])) {
+        if (array_key_exists($filepath, $this->handles)) {
             return true;
         }
-        $lockFilepath = $filepath . self::LOCK_EXTENSION;
-        if (!file_exists($lockFilepath)) {
-            return false;
-        }
-        $handle = @fopen($lockFilepath, 'r');
+        $handle = $this->openLockFile($filepath, false);
         if (!$handle) {
             return false;
         }
         $isLocked = !flock($handle, LOCK_SH | LOCK_NB);
         fclose($handle);
         return $isLocked;
+    }
+
+    /**
+     * Get the path of the lock file shared by a file.
+     */
+    public function lockFilepath(string $filepath): string
+    {
+        return sprintf('%s/%04d.lock', $this->lockDir, crc32($filepath) % self::LOCKS);
+    }
+
+    /**
+     * Open the lock file of a file, created when needed.
+     *
+     * A flock() does not require to write, so a lock file created by another
+     * user is opened read only.
+     *
+     * @return resource|null
+     */
+    protected function openLockFile(string $filepath, bool $create)
+    {
+        $lockFilepath = $this->lockFilepath($filepath);
+        if (is_file($lockFilepath)) {
+            return @fopen($lockFilepath, 'r') ?: null;
+        }
+        if (!$create || !$this->ensureDir($this->lockDir)) {
+            return null;
+        }
+        $handle = @fopen($lockFilepath, 'c');
+        if ($handle) {
+            @chmod($lockFilepath, 0664);
+        }
+        return $handle ?: null;
+    }
+
+    protected function ensureDir(string $dir): bool
+    {
+        return (is_dir($dir) || @mkdir($dir, 0775, true) || is_dir($dir))
+            && is_writeable($dir);
     }
 
     /**
@@ -138,7 +186,7 @@ class FileLock
      */
     public static function isTempOrLockFile(string $filepath): bool
     {
-        return substr($filepath, -strlen(self::LOCK_EXTENSION)) === self::LOCK_EXTENSION
+        return substr($filepath, -5) === '.lock'
             || (bool) preg_match('~\.\d+-[0-9a-f]{8}\.tmp(\.[^./]+)?$~', $filepath);
     }
 
