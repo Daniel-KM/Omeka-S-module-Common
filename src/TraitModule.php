@@ -138,6 +138,9 @@ trait TraitModule
         /**@var \Laminas\Mvc\I18n\Translator $translator */
         $translator = $services->get(TranslatorInterface::class);
 
+        // Checked first, so nothing is done when the libraries are missing.
+        $this->checkExternalAssets();
+
         $this->preInstall();
         if (!$this->checkDependencies()) {
             if (count($this->dependencies) === 1) {
@@ -151,15 +154,6 @@ trait TraitModule
                     ['modules' => implode('", "', $this->dependencies)]
                 );
             }
-            throw new ModuleCannotInstallException((string) $message->setTranslator($translator));
-        }
-
-        $missingAssets = $this->missingExternalAssets();
-        if ($missingAssets) {
-            $message = new PsrMessage(
-                'Some libraries should be installed: use the release zip of the module or run "composer install --no-dev" in its directory. Missing libraries: {libraries}.', // @translate
-                ['libraries' => implode(', ', $missingAssets)]
-            );
             throw new ModuleCannotInstallException((string) $message->setTranslator($translator));
         }
 
@@ -207,6 +201,8 @@ trait TraitModule
     public function upgrade($oldVersion, $newVersion, ServiceLocatorInterface $services): void
     {
         $this->setServiceLocator($services);
+
+        $this->checkExternalAssets();
 
         $this->preUpgrade($oldVersion, $newVersion);
         $this->postUpgrade($oldVersion, $newVersion);
@@ -1286,6 +1282,25 @@ trait TraitModule
     {
         return empty($this->dependencies)
             || $this->areModulesActive($this->dependencies);
+    }
+
+    /**
+     * Throw an exception when external assets declared in composer.json miss.
+     *
+     * @throws ModuleCannotInstallException
+     */
+    protected function checkExternalAssets(): void
+    {
+        $missingAssets = $this->missingExternalAssets();
+        if (!$missingAssets) {
+            return;
+        }
+        $message = new PsrMessage(
+            'Some libraries should be installed: use the release zip of the module or run "composer install --no-dev" in its directory. Missing libraries: {libraries}.', // @translate
+            ['libraries' => implode(', ', $missingAssets)]
+        );
+        $translator = $this->getServiceLocator()->get(TranslatorInterface::class);
+        throw new ModuleCannotInstallException((string) $message->setTranslator($translator));
     }
 
     /**
