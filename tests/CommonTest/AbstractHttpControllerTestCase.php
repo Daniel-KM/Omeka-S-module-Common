@@ -111,6 +111,23 @@ abstract class AbstractHttpControllerTestCase extends LaminasAbstractHttpControl
     }
 
     /**
+     * Close the database connection before the application is dropped.
+     *
+     * Each application has its own connection, that is never closed, so a
+     * long suite exhausts the connections of the server (error 1040).
+     */
+    public function reset($keepPersistence = false)
+    {
+        if ($this->application) {
+            $services = $this->application->getServiceManager();
+            if ($services->has('Omeka\Connection')) {
+                $services->get('Omeka\Connection')->close();
+            }
+        }
+        return parent::reset($keepPersistence);
+    }
+
+    /**
      * Dispatch the MVC with a URL.
      *
      * Overridden to ensure authentication before dispatch (after reset).
