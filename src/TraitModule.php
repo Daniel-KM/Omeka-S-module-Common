@@ -541,7 +541,7 @@ trait TraitModule
             // Required for the file install.
             /** @var \Laminas\ServiceManager\ServiceLocatorInterface $services */
             $services = $this->getServiceLocator();
-            require_once $filepath;
+            require $filepath;
         }
     }
 
@@ -563,7 +563,7 @@ trait TraitModule
             // Required for the file uninstall.
             /** @var \Laminas\ServiceManager\ServiceLocatorInterface $services */
             $services = $this->getServiceLocator();
-            require_once $filepath;
+            require $filepath;
         }
     }
 
@@ -587,7 +587,7 @@ trait TraitModule
             $services = $this->getServiceLocator();
             // For compatibility with old upgrade files.
             $this->initTranslations();
-            require_once $filepath;
+            require $filepath;
         }
     }
 

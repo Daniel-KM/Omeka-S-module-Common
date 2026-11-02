@@ -85,7 +85,7 @@ class Module extends AbstractModule
         $this->setServiceLocator($services);
         $this->registerModuleNamespace();
         $filepath = __DIR__ . '/data/scripts/upgrade.php';
-        require_once $filepath;
+        require $filepath;
     }
 
     /**
