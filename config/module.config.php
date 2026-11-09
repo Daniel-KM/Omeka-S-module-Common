@@ -13,7 +13,7 @@ return [
             // TODO Use a delegator for file, dispatcher and logger factories? A direct factory is simpler for the same result for these services.
             'Omeka\File\TempFileFactory' => Service\File\TempFileFactoryFactory::class,
             'Omeka\File\Validator' => Service\File\ValidatorFactory::class,
-            // Allow to use the PSR-3 formatter in job.
+            // Job dispatcher with events and a PSR-3 formatter for the job log.
             'Omeka\Job\Dispatcher' => Service\Job\DispatcherFactory::class,
             'Common\Job\DispatchStrategy\SynchronousMessenger' => Service\Job\DispatchStrategy\SynchronousMessengerFactory::class,
             // Allow to add the PSR-3 formatter to default logger.
