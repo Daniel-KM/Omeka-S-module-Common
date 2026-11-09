@@ -9,145 +9,144 @@
  */
 
 @media all {
+	[hidden],
+	.hidden {
+	    display: none;
+	}
 
-    [hidden],
-    .hidden {
-        display: none;
-    }
+	/** Dialog */
 
-    /** Dialog */
-
-    #content dialog {
-        margin: auto;
-    }
-    .dialog-header {
-        position: relative;
-        min-height: 2em;
-    }
-    .dialog-contents,
-    .dialog-heading,
-    .dialog-message,
-    .dialog-body,
+	#content dialog {
+	    margin: auto;
+	}
+	.dialog-header {
+	    position: relative;
+	    min-height: 2em;
+	}
+	.dialog-contents,
+	.dialog-heading,
+	.dialog-message,
+	.dialog-body,
 	.dialog-footer {
-        margin-top: 1em;
-    }
-    dialog .dialog-header-close-button {
-        position: absolute;
-        top: 0.5em;
-        right: 0.5em;
-        background: inherit;
-    }
-    .dialog-close-label {
-        font-size: 0.85em;
-    }
-    .dialog-heading {
-        font-size: 1.25em;
-        font-weight: bold;
-        text-align: center;
-    }
-    dialog form {
-        & input,
-        & select,
-        & textarea {
-            width: 100%;
-        }
-        & textarea {
-            height: 240px;
-        }
-    }
-    .dialog-footer {
-        display: flex;
-        justify-content: center;
-        gap: 1em;
-    }
+	    margin-top: 1em;
+	}
+	dialog .dialog-header-close-button {
+	    position: absolute;
+	    top: 0.5em;
+	    right: 0.5em;
+	    background: inherit;
+	}
+	.dialog-close-label {
+	    font-size: 0.85em;
+	}
+	.dialog-heading {
+	    font-size: 1.25em;
+	    font-weight: bold;
+	    text-align: center;
+	}
+	dialog form {
+	    & input,
+	    & select,
+	    & textarea {
+	        width: 100%;
+	    }
+	    & textarea {
+	        height: 240px;
+	    }
+	}
+	.dialog-footer {
+	    display: flex;
+	    justify-content: center;
+	    gap: 1em;
+	}
 
-    .is-busy span.fas:not(.fa-spin):first-child {
-        display: none;
-    }
-    a .spinner,
-    input .spinner,
-    button .spinner,
-    .is-busy span.fas:first-child {
-        margin-left: 1em;
-    }
-    a span span.fas:first-child + .spinner,
-    input span.fas:first-child + .spinner,
-    button span.fas:first-child + .spinner {
-        margin-left: inherit;
-    }
-    .icons-only a .spinner,
-    .icons-only input .spinner,
-    .icons-only button .spinner,
-    a .spinner.icon-only,
-    input .spinner.icon-only,
-    button .spinner.icon-only {
-        margin-left: inherit;
-    }
-    /* Icon-only buttons: spinner replaces icon without margin */
-    button.is-busy:has(> span.fas:only-of-type) .spinner,
-    a.is-busy:has(> span.fas:only-of-type) .spinner {
-        margin-left: 0;
-    }
-    /* Fallback for browsers without :has() support */
-    .single-action.is-busy .spinner {
-        margin-left: 0;
-    }
+	.is-busy span.fas:not(.fa-spin):first-child {
+	    display: none;
+	}
+	a .spinner,
+	input .spinner,
+	button .spinner,
+	.is-busy span.fas:first-child {
+	    margin-left: 1em;
+	}
+	a span span.fas:first-child + .spinner,
+	input span.fas:first-child + .spinner,
+	button span.fas:first-child + .spinner {
+	    margin-left: inherit;
+	}
+	.icons-only a .spinner,
+	.icons-only input .spinner,
+	.icons-only button .spinner,
+	a .spinner.icon-only,
+	input .spinner.icon-only,
+	button .spinner.icon-only {
+	    margin-left: inherit;
+	}
+	/* Icon-only buttons: spinner replaces icon without margin */
+	button.is-busy:has(> span.fas:only-of-type) .spinner,
+	a.is-busy:has(> span.fas:only-of-type) .spinner {
+	    margin-left: 0;
+	}
+	/* Fallback for browsers without :has() support */
+	.single-action.is-busy .spinner {
+	    margin-left: 0;
+	}
 
-    /** Actions */
+	/** Actions */
 
-    /* Fix omeka text-indent -9999px for single buttons, that are not used in omeka for now. */
-    .actions .no-action,
-    .actions .single-action {
-        text-indent: initial;
-        padding-left: 8px;
-    }
-    /* Center action-bar icons (no margin) so glyphs of different widths align
-       and spacing stays even across spans, buttons and links. */
-    .actions .single-action span.fas,
-    .actions .no-action span.fas {
-        display: block;
-        width: 100%;
-        text-align: center;
-        margin-left: 0;
-        margin-right: 0;
-    }
+	/* Fix omeka text-indent -9999px for single buttons, that are not used in omeka for now. */
+	.actions {
+		& .no-action,
+		& .single-action {
+			text-indent: initial;
+			padding-left: 8px;
+		}
+		/* Center action-bar icons, so glyphs stays stable even across spans, buttons and links. */
+		& .single-action span.fas,
+		& .no-action span.fas {
+			display: block;
+			width: 100%;
+			text-align: center;
+			margin-left: 0;
+			margin-right: 0;
+		}
+	}
 
-    /** Form dialogs: add class "dialog-form" to any dialog wrapping a form. */
+	/** Form dialogs: add class "dialog-form" to any dialog wrapping a form. */
 
-    dialog.dialog-form,
-    dialog.dialog-generic:has(.dialog-textarea) {
-        width: inherit;
-        max-width: 800px;
-    }
-    dialog.dialog-form .dialog-body textarea,
-    dialog.dialog-generic:has(.dialog-textarea) .dialog-textarea {
-        width: 100%;
-        box-sizing: border-box;
-    }
-    /* Checkboxes/radios keep their natural size, not the 100% width above. */
-    dialog.dialog-form {
-        & input[type=checkbox],
-        & input[type=radio] {
-            width: auto;
-        }
-        /* Inline grouped radio/checkbox options, overriding core. */
-        & .inputs label,
-        & label:has(input[type=radio]),
-        & label:has(input[type=checkbox]) {
-            display: inline-block;
-            width: auto;
-            margin-right: 1em;
-        }
-        /* Submit row aligned right, without the empty meta column. */
-        & button[name=submit],
-        & input[name=submit],
-        & .dialog-header-close-button {
-            float: right;
-        }
-        & .field:has(button[name=submit]) .field-meta,
-        & .field:has(input[name=submit]) .field-meta {
-            display: none;
-        }
-    }
-
+	dialog.dialog-form,
+	dialog.dialog-generic:has(.dialog-textarea) {
+	    width: inherit;
+	    max-width: 800px;
+	}
+	dialog.dialog-form .dialog-body textarea,
+	dialog.dialog-generic:has(.dialog-textarea) .dialog-textarea {
+	    width: 100%;
+	    box-sizing: border-box;
+	}
+	/* Checkboxes/radios keep their natural size, not the 100% width above. */
+	dialog.dialog-form {
+	    & input[type=checkbox],
+	    & input[type=radio] {
+	        width: auto;
+	    }
+	    /* Inline grouped radio/checkbox options, overriding core. */
+	    & .inputs label,
+	    & label:has(input[type=radio]),
+	    & label:has(input[type=checkbox]) {
+	        display: inline-block;
+	        width: auto;
+	        margin-right: 1em;
+	    }
+	    /* Submit row aligned right, without the empty meta column. */
+	    & button[name=submit],
+	    & input[name=submit],
+	    & .dialog-header-close-button {
+	        float: right;
+	    }
+	    & .field:has(button[name=submit]) .field-meta,
+	    & .field:has(input[name=submit]) .field-meta {
+	        display: none;
+	    }
+	}
 }

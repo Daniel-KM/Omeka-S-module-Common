@@ -1,172 +1,175 @@
 /* Manage sub-menus above right sidebar */
 #page-actions {
     z-index: 1001;
-}
+    & .page-action-menu {
+        display: inline-block;
+        position: relative;
+        & .with-sub-menu {
+            display: inline-block;
+            position: relative;
+        }
 
-#page-actions .page-action-menu {
-    display: inline-block;
-    position: relative;
-}
+        & ul {
+            display: none;
+            list-style: none;
+            border: 1px solid #dfdfdf;
+            background-color: #fff;
+            border-radius: 3px;
+            text-align: left;
+            padding: 0;
+            position: absolute;
+            box-shadow: 0 0 5px #dfdfdf;
+            width: auto;
+            white-space: nowrap;
+            margin: 12px 0;
+            z-index: 5;
+            &::before {
+                content: "";
+                position: absolute;
+                bottom: calc(100% - 1px);
+                right: 12px;
+                width: 0;
+                height: 0;
+                border-bottom: 12px solid #fff;
+                border-left: 6px solid transparent;
+                border-right: 6px solid transparent;
+            }
 
-#page-actions .page-action-menu .with-sub-menu {
-    display: inline-block;
-    position: relative;
-}
+            &::after {
+                content: "";
+                position: absolute;
+                bottom: calc(100% - 1px);
+                right: 11px;
+                width: 0;
+                height: 0;
+                border-bottom: 14px solid #dfdfdf;
+                border-left: 7px solid transparent;
+                border-right: 7px solid transparent;
+                z-index: -1;
+            }
 
-#page-actions .page-action-menu ul {
-    display: none;
-    list-style: none;
-    border: 1px solid #dfdfdf;
-    background-color: #fff;
-    border-radius: 3px;
-    text-align: left;
-    padding: 0;
-    position: absolute;
-    box-shadow: 0 0 5px #dfdfdf;
-    width: auto;
-    white-space: nowrap;
-    margin: 12px 0;
-    z-index: 5;
-}
+            & a,
+            & span,
+            & button {
+                padding: 6px 12px 5px;
+                display: block;
+                position: relative;
+                width: 100%;
+                text-align: left;
+                background: none;
+                border: 0;
+                box-shadow: none;
+                margin: 0;
+                color: inherit;
+                cursor: pointer;
+                font: inherit;
+            }
 
-#page-actions .page-action-menu ul::before {
-    content: "";
-    position: absolute;
-    bottom: calc(100% - 1px);
-    right: 12px;
-    width: 0;
-    height: 0;
-    border-bottom: 12px solid #fff;
-    border-left: 6px solid transparent;
-    border-right: 6px solid transparent;
-}
+            & li {
+                position: relative;
+            }
+        }
 
-#page-actions .page-action-menu ul::after {
-    content: "";
-    position: absolute;
-    bottom: calc(100% - 1px);
-    right: 11px;
-    width: 0;
-    height: 0;
-    border-bottom: 14px solid #dfdfdf;
-    border-left: 7px solid transparent;
-    border-right: 7px solid transparent;
-    z-index: -1;
-}
+        & .collapsible {
+            & ul {
+                display: block;
+                position: static;
+                width: auto;
+                margin: 0;
+                padding: 0;
+                border: 0;
+                border-radius: 0;
+                box-shadow: none;
+                background: none;
+            }
 
-#page-actions .page-action-menu ul a,
-#page-actions .page-action-menu ul span,
-#page-actions .page-action-menu ul button {
-    padding: 6px 12px 5px;
-    display: block;
-    position: relative;
-    width: 100%;
-    text-align: left;
-    background: none;
-    border: 0;
-    box-shadow: none;
-    margin: 0;
-    color: inherit;
-    cursor: pointer;
-    font: inherit;
-}
+            & ul::before,
+            & ul::after {
+                content: none;
+            }
+        }
 
-#page-actions .page-action-menu ul li {
-    position: relative;
-}
+        & .menu-group {
+            & > .menu-group-label {
+                cursor: default;
+                font-size: 0.85em;
+                font-weight: bold;
+                letter-spacing: 0.06em;
+                text-transform: uppercase;
+                color: #575757;
+                padding-top: 10px;
+                border-bottom: 0;
+            }
 
-#page-actions .page-action-menu .collapsible ul {
-    display: block;
-    position: static;
-    width: auto;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    border-radius: 0;
-    box-shadow: none;
-    background: none;
-}
+            &:not(:first-child) .menu-group-label {
+                border-top: 1px solid #8f8f8f;
+                margin-top: 4px;
+            }
+        }
 
-#page-actions .page-action-menu .collapsible ul::before,
-#page-actions .page-action-menu .collapsible ul::after {
-    content: none;
-}
+        & ul {
+            & li form {
+                margin: 0;
+            }
 
-#page-actions .page-action-menu .menu-group > .menu-group-label {
-    cursor: default;
-    font-size: 0.85em;
-    font-weight: bold;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: #575757;
-    padding-top: 10px;
-    border-bottom: 0;
-}
+            & li.separator span {
+                cursor: default;
+                font-size: 0.85em;
+                font-weight: bold;
+                letter-spacing: 0.06em;
+                text-transform: uppercase;
+                color: #575757;
+                padding-top: 10px;
+            }
 
-#page-actions .page-action-menu .menu-group:not(:first-child) .menu-group-label {
-    border-top: 1px solid #8f8f8f;
-    margin-top: 4px;
-}
+            & li.separator:not(:last-child) span {
+                border-bottom: 0;
+            }
 
-#page-actions .page-action-menu ul li form {
-    margin: 0;
-}
+            & li.separator:not(:first-child) span {
+                border-top: 1px solid #8f8f8f;
+                margin-top: 4px;
+            }
 
-#page-actions .page-action-menu ul li.separator span {
-    cursor: default;
-    font-size: 0.85em;
-    font-weight: bold;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: #575757;
-    padding-top: 10px;
-}
+            & li:not(.separator):not(.menu-group):hover {
+                background-color: #f0f0f0;
+            }
 
-#page-actions .page-action-menu ul li.separator:not(:last-child) span {
-    border-bottom: 0;
-}
+            & li:not(.separator):not(.menu-group):hover::before {
+                content: "";
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: 3px;
+                background-color: #6b6b6b;
+            }
 
-#page-actions .page-action-menu ul li.separator:not(:first-child) span {
-    border-top: 1px solid #8f8f8f;
-    margin-top: 4px;
-}
+            & li:not(:last-child) > a,
+            & li:not(:last-child) > span,
+            & li:not(:last-child) > button,
+            & li:not(:last-child) > form > button {
+                border-bottom: 1px solid #dfdfdf;
+            }
+        }
 
-#page-actions .page-action-menu ul li:not(.separator):not(.menu-group):hover {
-    background-color: #f0f0f0;
-}
+        & .expand::after {
+            content: "\f0d7";
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            margin-left: 6px;
+        }
 
-#page-actions .page-action-menu ul li:not(.separator):not(.menu-group):hover::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background-color: #6b6b6b;
-}
+        & .collapse::after {
+            content: "\f0d8";
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            margin-left: 6px;
+        }
 
-#page-actions .page-action-menu ul li:not(:last-child) > a,
-#page-actions .page-action-menu ul li:not(:last-child) > span,
-#page-actions .page-action-menu ul li:not(:last-child) > button,
-#page-actions .page-action-menu ul li:not(:last-child) > form > button {
-    border-bottom: 1px solid #dfdfdf;
-}
-
-#page-actions .page-action-menu .expand::after {
-    content: "\f0d7";
-    font-family: "Font Awesome 5 Free";
-    font-weight: 900;
-    margin-left: 6px;
-}
-
-#page-actions .page-action-menu .collapse::after {
-    content: "\f0d8";
-    font-family: "Font Awesome 5 Free";
-    font-weight: 900;
-    margin-left: 6px;
-}
-
-#page-actions .page-action-menu .collapse + .collapsible {
-    overflow: visible;
-    display: block;
+        & .collapse + .collapsible {
+            overflow: visible;
+            display: block;
+        }
+    }
 }

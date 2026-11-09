@@ -122,12 +122,14 @@
     .common-pairs-cell-remove {
         flex: 0 0 1.5em;
     }
-    .common-pairs-row input {
-        width: 100%;
-        margin: 0;
-    }
-    .common-pairs-row input[readonly] {
-        background: #f7f7f7;
+    .common-pairs-row {
+        & input {
+            width: 100%;
+            margin: 0;
+            &[readonly] {
+                background: #f7f7f7;
+            }
+        }
     }
 
     .common-pairs-element {
@@ -135,41 +137,41 @@
         align-items: center;
         gap: 0.5em;
         min-width: 0;
-    }
-    .common-pairs-element .asset-form-element,
-    .common-pairs-element .query-form-element {
-        display: flex;
-        align-items: center;
-        gap: 0.5em;
-        min-width: 0;
-        flex: 1 1 auto;
-        line-height: normal;
-    }
-    .common-pairs-element .selected-asset {
-        display: flex;
-        align-items: center;
-        gap: 0.5em;
-        min-width: 0;
-        flex: 1 1 auto;
-    }
-    .common-pairs-element .selected-asset-image {
-        width: 2.5em;
-        height: 2.5em;
-        object-fit: contain;
-        background: #f7f7f7;
-    }
-    .common-pairs-element .selected-asset-name {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        min-width: 0;
-    }
-    .common-pairs-element .asset-form-select,
-    .common-pairs-element .asset-form-clear {
-        flex: 0 0 auto;
-        margin: 0;
-        padding: 0.25em 0.5em;
-        font-size: 0.9em;
+        & .asset-form-element,
+        & .query-form-element {
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+            min-width: 0;
+            flex: 1 1 auto;
+            line-height: normal;
+        }
+        & .selected-asset {
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+            min-width: 0;
+            flex: 1 1 auto;
+        }
+        & .selected-asset-image {
+            width: 2.5em;
+            height: 2.5em;
+            object-fit: contain;
+            background: #f7f7f7;
+        }
+        & .selected-asset-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            min-width: 0;
+        }
+        & .asset-form-select,
+        & .asset-form-clear {
+            flex: 0 0 auto;
+            margin: 0;
+            padding: 0.25em 0.5em;
+            font-size: 0.9em;
+        }
     }
     .common-pairs-remove {
         background: none;
@@ -185,12 +187,12 @@
         color: #a91919;
         font-size: 0.85em;
         cursor: pointer;
-    }
-    .common-pairs-remove:hover,
-    .common-pairs-remove:focus-visible {
-        color: #e11717;
-        background-color: rgba(169, 25, 25, 0.08);
-        border-radius: 3px;
+        &:hover,
+        &:focus-visible {
+            color: #e11717;
+            background-color: rgba(169, 25, 25, 0.08);
+            border-radius: 3px;
+        }
     }
     .common-pairs-actions {
         display: flex;
@@ -214,14 +216,16 @@
     }
 }
 
-.field .field-meta[hidden],
-.field label[hidden] {
-    display: none;
-}
+.field {
+    & .field-meta[hidden],
+    & label[hidden] {
+        display: none;
+    }
 
-.field.common-pairs-field-note > .inputs {
-    width: 100%;
-    max-width: none;
+    &.common-pairs-field-note > .inputs {
+        width: 100%;
+        max-width: none;
+    }
 }
 
 .common-pairs-note {
