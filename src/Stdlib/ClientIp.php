@@ -83,7 +83,10 @@ class ClientIp
      * @param string[]|null $trustedProxies Specific trusted proxies, else the
      *   configured ones.
      * @param bool $strict When no proxy is set, ignore the headers instead of
-     *   trusting the private addresses.
+     *   trusting the private addresses and the server itself. On a shared
+     *   hosting, another account may send requests from the address of the
+     *   server, so the strict mode is used for the access rights and the
+     *   locks, that require the explicit proxies.
      */
     public function getIp(?array $server = null, ?array $trustedProxies = null, bool $strict = false): string
     {
@@ -98,7 +101,9 @@ class ClientIp
         if (!static::isValidIp($remoteIp)) {
             return self::UNKNOWN;
         }
-        if (!$this->isTrusted($remoteIp, $trustedProxies)) {
+        if (!$this->isTrusted($remoteIp, $trustedProxies)
+            && !static::isSameServer($remoteIp, $server)
+        ) {
             return $remoteIp;
         }
 
@@ -164,7 +169,7 @@ class ClientIp
             || trim((string) ($server['HTTP_X_REAL_IP'] ?? '')) !== '';
         if (!$hasHeaders || !static::isValidIp($peer)) {
             $status = 'direct';
-        } elseif ($this->isTrusted($peer, $trustedProxies)) {
+        } elseif ($this->isTrusted($peer, $trustedProxies) || static::isSameServer($peer, $server)) {
             $status = 'proxy';
         } else {
             $status = 'untrusted';
@@ -173,6 +178,22 @@ class ClientIp
             'peer' => $peer,
             'status' => $status,
         ];
+    }
+
+    /**
+     * Check if the request comes from the server itself, for example from a
+     * reverse proxy on the same machine (Caddy or Nginx in front of Apache).
+     *
+     * A remote client cannot connect with the address of the server, so the
+     * proxy headers of such a request are set by a local process.
+     */
+    public static function isSameServer(string $ip, ?array $server = null): bool
+    {
+        $server ??= $_SERVER;
+        $serverIp = trim((string) ($server['SERVER_ADDR'] ?? ''));
+        return static::isValidIp($ip)
+            && static::isValidIp($serverIp)
+            && inet_pton($ip) === inet_pton($serverIp);
     }
 
     /**
