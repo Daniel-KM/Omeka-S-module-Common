@@ -135,6 +135,7 @@ class FieldsTextarea extends ArrayTextarea
 
         return $this
             ->setAttribute('data-raw-keys', $rawKeys)
+            ->setAttribute('data-raw-message', (string) ($this->options['raw_message'] ?? ''))
             ->setAttribute('data-enable-form', $enableForm ? '1' : '0')
             ->setAttribute('data-enable-yaml', $enableYaml ? '1' : '0')
             ->setAttribute('data-enable-preview', empty($this->options['enable_preview']) ? '0' : '1')

@@ -613,7 +613,8 @@
                 if (!silent) {
                     notify(map === null
                         ? t('invalidYaml', 'The YAML cannot be parsed. Fix it before switching to the form.') + '\n\n' + yamlError(textarea.value)
-                        : t('rawSyntax', 'This syntax cannot be edited as a form. Convert it to the simple syntax first.'));
+                        : t('rawSyntax', 'This syntax cannot be edited as a form. Convert it to the simple syntax first.')
+                            + (textarea.dataset.rawMessage ? '\n\n' + textarea.dataset.rawMessage : ''));
                 }
                 return false;
             }
