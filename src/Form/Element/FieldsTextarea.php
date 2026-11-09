@@ -47,6 +47,21 @@ class FieldsTextarea extends ArrayTextarea
         'textarea' => Element\Textarea::class,
         'time' => OptionalTime::class,
         'url' => OptionalUrl::class,
+        // Types of optional modules, available when the module is active.
+        'customvocab' => \CustomVocab\Form\Element\CustomVocabSelect::class,
+        'table' => \Table\Form\Element\TableSelect::class,
+        'thesaurus' => \Thesaurus\Form\Element\ThesaurusSelect::class,
+    ];
+
+    /**
+     * Types of optional modules and the option required to list the values.
+     *
+     * @var array
+     */
+    protected $typesWithSource = [
+        'customvocab' => 'custom_vocab_id',
+        'table' => 'table',
+        'thesaurus' => 'thesaurus',
     ];
 
     /**
@@ -217,8 +232,26 @@ class FieldsTextarea extends ArrayTextarea
             ) {
                 return false;
             }
+            if (isset($this->typesWithSource[$type])
+                && (!class_exists($this->typeClasses[$type])
+                    || empty($spec['options'][$this->typesWithSource[$type]]))
+            ) {
+                return false;
+            }
         }
         return true;
+    }
+
+    /**
+     * Get the types of the active optional modules and their required option.
+     */
+    public function getTypesWithSource(): array
+    {
+        return array_filter(
+            $this->typesWithSource,
+            fn ($type) => class_exists($this->typeClasses[$type]),
+            ARRAY_FILTER_USE_KEY
+        );
     }
 
     protected function normalizeEntry(string $name, $value): array

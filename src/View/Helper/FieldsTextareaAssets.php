@@ -21,7 +21,10 @@ class FieldsTextareaAssets extends AbstractHelper
         $view = $this->getView();
         $translate = $view->plugin('translate');
 
+        $sources = (new \Common\Form\Element\FieldsTextarea())->getTypesWithSource();
+
         $data = [
+            'sources' => (object) $sources,
             'types' => [
                 'checkbox',
                 'date',
@@ -38,6 +41,7 @@ class FieldsTextareaAssets extends AbstractHelper
                 'textarea',
                 'time',
                 'url',
+                ...array_keys($sources),
             ],
             'labels' => [
                 'editAsForm' => $translate('Edit as a form'), // @translate

@@ -29,6 +29,8 @@
         'radio',
         'multicheckbox',
     ];
+    // Types of optional modules and the option required to list their values.
+    var sources = config.sources || {};
 
     function t(key, fallback) {
         return labels[key] || fallback;
@@ -277,6 +279,25 @@
         }
     }
 
+    // A type of an optional module requires an option to list its values, and
+    // an empty option to keep the field optional.
+    function addSourceOptions($row) {
+        var key = sources[$row.find('.cft-type').val()];
+        var $sub = $row.find('.cft-sub[data-kind="options"]');
+        var editor = $sub[0] && $sub[0].pairsEditor;
+        if (!key || !editor) {
+            return;
+        }
+        var keys = editor.getRows().map(function (p) { return p.key.trim(); });
+        if (keys.indexOf('empty_option') === -1) {
+            editor.addRow({ key: 'empty_option', value: '' }, false);
+        }
+        if (keys.indexOf(key) === -1) {
+            editor.addRow({ key: key, value: '' }, true);
+        }
+        $sub.show();
+    }
+
     function readPairs($row, kind) {
         var sub = $row.find('.cft-sub[data-kind="' + kind + '"]')[0];
         if (!sub || !sub.pairsEditor) {
@@ -317,6 +338,9 @@
         var type = field.type;
         if (type === 'textarea') {
             return $('<textarea rows="3" disabled></textarea>');
+        }
+        if (sources[type]) {
+            return $('<select disabled></select>');
         }
         if (type === 'select') {
             var $select = $('<select disabled></select>');
@@ -505,6 +529,7 @@
         $editor.on('input change', 'input, select', function () {
             if ($(this).hasClass('cft-type')) {
                 toggleValues($(this).closest('.cft-row'));
+                addSourceOptions($(this).closest('.cft-row'));
             }
             serialize($rows, textarea);
         });
