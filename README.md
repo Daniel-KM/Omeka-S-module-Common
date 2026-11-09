@@ -887,6 +887,45 @@ When the url is rewritten internally, for example by a rule of the htaccess, the
 path to set is the requested one, not the rewritten one: so the module Access
 sets the paths `/access/files/` and `/files/`.
 
+### Client ip behind a reverse proxy
+
+The service `Omeka\ClientIp` returns the address of the visitor, even when the
+server is behind a reverse proxy (Traefik, Caddy, nginx, load balancer, cdn).
+The headers `X-Forwarded-For` and `X-Real-IP` can be written by anybody, so they
+are read only when the request comes from a trusted proxy. The client is then
+the first address from the right of `X-Forwarded-For` that is not a proxy.
+
+The trusted proxies are set in the main settings, section Security, as addresses
+or cidr ranges, one by line. They may be set in the file `config/local.config.php`
+too, that takes precedence over the setting:
+
+```php
+'trusted_proxies' => [
+    '10.0.0.1',
+    '172.18.0.0/16',
+],
+```
+
+When the list is empty, the proxies with a private, a loopback or a reserved
+address are trusted, like a proxy in the same host or network, and the proxy
+with the address of the server itself, like a proxy of the hosting on the same
+machine. So most installations need no setting.
+
+The features that grant rights or locks by address use a strict mode, that
+trusts only the listed proxies, because another account of a shared hosting or a
+machine of the local network may send requests with the address of the server
+or of a private proxy. So, behind a proxy, the list is required for them: for
+example the access by ip of the module Access, or the lockout of the module
+Lockout, that would else see all visitors with the address of the proxy.
+
+```php
+/** @var \Common\Stdlib\ClientIp $clientIp */
+$clientIp = $services->get('Omeka\ClientIp');
+$ip = $clientIp->getIp();
+// Strict mode, for rights or locks.
+$ip = $clientIp->getIp(null, null, true);
+```
+
 ### Secret settings (encrypted at rest in database)
 
 To store a sensitive setting (API key, password, token), use the form element
