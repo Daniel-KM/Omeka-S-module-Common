@@ -1013,6 +1013,13 @@ trait TraitModule
         $fieldset->setName($space);
         $form = $event->getTarget();
 
+        // Keep the secret elements of the module, since the elements of all
+        // the modules may be merged in the same form below.
+        $secretElements = array_filter(
+            $fieldset->getElements(),
+            fn ($element) => $element instanceof \Common\Form\Element\Secret
+        );
+
         // In Omeka S v4, settings  are no more managed with fieldsets, but with
         // "element groups", to de-correlate setting storage and display.
 
@@ -1088,6 +1095,7 @@ trait TraitModule
             }
             $formFieldset->populateValues($data);
             $fieldset = $formFieldset;
+            $secretPostKey = 'user-settings';
         } else {
             // Allow to save data and to manage modules compatible with
             // Omeka S v3 and v4.
@@ -1111,6 +1119,7 @@ trait TraitModule
             if (version_compare(\Omeka\Module::VERSION, '4', '<')) {
                 $form->add($fieldset);
                 $form->get($space)->populateValues($data);
+                $secretPostKey = $space;
             } else {
                 foreach ($fieldset->getFieldsets() as $subFieldset) {
                     $form->add($subFieldset);
@@ -1120,10 +1129,53 @@ trait TraitModule
                 }
                 $form->populateValues($data);
                 $fieldset = $form;
+                $secretPostKey = null;
             }
         }
 
+        $this->prepareSecretSettings($secretElements, $data, $secretPostKey);
+
         return $fieldset;
+    }
+
+    /**
+     * Prepare the secret elements of a settings fieldset.
+     *
+     * The core controllers save the settings forms directly, without event, so
+     * each secret element filters its own value: it is encrypted, the stored
+     * value is kept when the submission is empty, and it is cleared when the
+     * companion checkbox "{name}_remove" is checked. The stored value is never
+     * rendered.
+     * @see \Common\Form\Element\Secret::filterSecret()
+     *
+     * @param \Common\Form\Element\Secret[] $elements
+     * @param string|null $postKey Key of the fieldset in the post, if any.
+     */
+    protected function prepareSecretSettings(array $elements, array $data, ?string $postKey): void
+    {
+        if (!$elements) {
+            return;
+        }
+
+        $services = $this->getServiceLocator();
+        $cipher = $services->get('Omeka\Cipher');
+        $request = $services->get('Request');
+        $post = $request instanceof \Laminas\Http\Request ? $request->getPost()->toArray() : [];
+        if ($postKey !== null) {
+            $post = $post[$postKey] ?? [];
+        }
+
+        foreach ($elements as $element) {
+            $name = $element->getName();
+            $stored = (string) ($data[$name] ?? '');
+            $element
+                ->setOption('secret_cipher', $cipher)
+                ->setOption('secret_stored', $stored)
+                ->setOption('secret_remove', !empty($post[$name . '_remove']))
+                // Drives the inline "remove" control of the view helper.
+                ->setOption('has_value', $stored !== '')
+                ->setValue('');
+        }
     }
 
     /**
