@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-02 00:00+0000\n"
-"PO-Revision-Date: 2026-11-02 00:00+0000\n"
+"POT-Creation-Date: 2026-11-09 00:00+0000\n"
+"PO-Revision-Date: 2026-11-09 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -59,7 +59,7 @@ msgid "Edit with the query builder"
 msgstr "Modifier avec le requêteur"
 
 #: src/View/Helper/ArrayQueriesTextareaAssets.php:37
-#: src/View/Helper/FieldsTextareaAssets.php:44
+#: src/View/Helper/FieldsTextareaAssets.php:48
 #: src/View/Helper/PairsTextareaAssets.php:27
 msgid "Edit as text"
 msgstr "Modifier par texte"
@@ -69,75 +69,99 @@ msgid "Add a query"
 msgstr "Ajouter une requête"
 
 #: src/View/Helper/ArrayQueriesTextareaAssets.php:43
-#: src/View/Helper/FieldsTextareaAssets.php:58
+#: src/View/Helper/FieldsTextareaAssets.php:62
 #: src/View/Helper/PairsTextareaAssets.php:28
 msgid "key"
 msgstr "clé"
 
-#: src/View/Helper/FieldsTextareaAssets.php:43
+#: src/View/Helper/FieldsTextareaAssets.php:47
 #: src/View/Helper/PairsTextareaAssets.php:26
 msgid "Edit as a form"
 msgstr "Modifier par formulaire"
 
-#: src/View/Helper/FieldsTextareaAssets.php:46
+#: src/View/Helper/FieldsTextareaAssets.php:50
 msgid "Hide preview"
 msgstr "Cacher l’aperçu"
 
-#: src/View/Helper/FieldsTextareaAssets.php:48
+#: src/View/Helper/FieldsTextareaAssets.php:52
 msgid "Add a field"
 msgstr "Ajouter un champ"
 
-#: src/View/Helper/FieldsTextareaAssets.php:50
+#: src/View/Helper/FieldsTextareaAssets.php:54
 msgid "label"
 msgstr "libellé"
 
-#: src/View/Helper/FieldsTextareaAssets.php:51
+#: src/View/Helper/FieldsTextareaAssets.php:55
 msgid "required"
 msgstr "requis"
 
-#: src/View/Helper/FieldsTextareaAssets.php:54
+#: src/View/Helper/FieldsTextareaAssets.php:58
 msgid "Attributes"
 msgstr "Attributs"
 
-#: src/View/Helper/FieldsTextareaAssets.php:55
+#: src/View/Helper/FieldsTextareaAssets.php:59
 msgid "Add a value"
 msgstr "Ajouter une valeur"
 
-#: src/View/Helper/FieldsTextareaAssets.php:56
+#: src/View/Helper/FieldsTextareaAssets.php:60
 msgid "Add an option"
 msgstr "Ajouter une option"
 
-#: src/View/Helper/FieldsTextareaAssets.php:57
+#: src/View/Helper/FieldsTextareaAssets.php:61
 msgid "Add an attribute"
 msgstr "Ajouter un attribut"
 
-#: src/View/Helper/FieldsTextareaAssets.php:59
+#: src/View/Helper/FieldsTextareaAssets.php:63
 #: src/View/Helper/PairsTextareaAssets.php:29
 msgid "value"
 msgstr "valeur"
 
-#: src/View/Helper/FieldsTextareaAssets.php:60
+#: src/View/Helper/FieldsTextareaAssets.php:64
 msgid "Delete this field"
 msgstr "Supprimer ce champ"
 
-#: src/View/Helper/FieldsTextareaAssets.php:62
+#: src/View/Helper/FieldsTextareaAssets.php:66
 msgid "Move"
 msgstr "Déplacer"
 
-#: src/View/Helper/FieldsTextareaAssets.php:63
+#: src/View/Helper/FieldsTextareaAssets.php:67
 #: src/View/Helper/PairsTextareaAssets.php:35
 msgid "Move up"
 msgstr "Déplacer avant"
 
-#: src/View/Helper/FieldsTextareaAssets.php:64
+#: src/View/Helper/FieldsTextareaAssets.php:68
 #: src/View/Helper/PairsTextareaAssets.php:36
 msgid "Move down"
 msgstr "Déplacer après"
 
-#: src/View/Helper/FieldsTextareaAssets.php:65
+#: src/View/Helper/FieldsTextareaAssets.php:69
 msgid "The YAML cannot be parsed. Fix it before switching to the form."
 msgstr ""
 "Le YAML ne peut pas être lu. Corriger avant de basculer sur le formulaire."
+
+#: src/View/Helper/FieldsTextareaAssets.php:70
+msgid ""
+"This syntax cannot be edited as a form. Convert it to the simple syntax "
+"first."
+msgstr ""
+"Cette syntaxe ne peut pas être modifiée comme un formulaire. Convertissez-la "
+"d’abord dans la syntaxe simplifiée."
+
+#: src/View/Helper/FieldsTextareaAssets.php:71
+msgid ""
+"The text is not a list of fields: each field should start a line with its "
+"name followed by \":\"."
+msgstr ""
+"Le texte n’est pas une liste de champs : chaque champ doit commencer une "
+"ligne par son nom suivi de « : »."
+
+#: src/View/Helper/FieldsTextareaAssets.php:72
+msgid ""
+"These names of field contain forbidden characters: only the letters without "
+"accent, the digits, \"_\" and \"-\" are allowed."
+msgstr ""
+"Ces noms de champ contiennent des caractères interdits : seuls les lettres "
+"sans accent, les chiffres, « _ » et « - » sont autorisés."
 
 #: src/View/Helper/PairsTextareaAssets.php:31
 msgid "Add…"
@@ -175,13 +199,74 @@ msgstr ""
 "aria-live sur les messages. Les modules et les thèmes reprenant ce gabarit "
 "ou utilisant ses classes css doivent être vérifiées."
 
-#: Module.php:116
+#: data/scripts/upgrade.php:164
+msgid ""
+"The trusted reverse proxies are now managed in the security section of the "
+"main settings and apply to all modules, including the ones that grant rights "
+"or lock out by ip. Check that each one is a reverse proxy of the server: "
+"{list}."
+msgstr ""
+"Les proxys inverses de confiance sont désormais gérés dans la section "
+"sécurité des paramètres généraux et s’appliquent à tous les modules, y "
+"compris ceux qui accordent des droits ou bloquent par adresse ip. Vérifiez "
+"que chacun est bien un proxy inverse du serveur : {list}."
+
+#: Module.php:85
+msgid "Trusted reverse proxies"
+msgstr "Proxys inverses de confiance"
+
+#: Module.php:87
+msgid "The trusted proxies are set in the file config/local.config.php."
+msgstr ""
+"Les proxys de confiance sont définis dans le fichier config/local.config.php."
+
+#: Module.php:88
+msgid ""
+"Addresses or cidr ranges of the reverse proxies in front of the server "
+"(Traefik, nginx, load balancer, cdn), one by line. The address of the "
+"visitor is read in the headers X-Forwarded-For and X-Real-IP only when the "
+"request comes from one of them, else anybody could write any address in "
+"them. When empty, the proxies with a private or loopback address are "
+"trusted, that is the common case of a proxy in the same host or network. A "
+"proxy connecting with the address of the server itself, like a proxy of the "
+"hosting on the same machine, is trusted too. These automatic proxies are not "
+"used for the features that grant rights or locks by address, because another "
+"account of a shared hosting may use the address of the server. The list may "
+"be set in the file config/local.config.php too."
+msgstr ""
+"Adresses ou plages cidr des proxys inverses placés devant le serveur "
+"(Traefik, nginx, répartiteur de charge, cdn), une par ligne. L’adresse du "
+"visiteur n’est lue dans les en-têtes X-Forwarded-For et X-Real-IP que si la "
+"requête provient de l’un d’eux, sinon n’importe qui pourrait y écrire "
+"n’importe quelle adresse. Si la liste est vide, les proxys ayant une adresse "
+"privée ou de bouclage sont considérés comme de confiance, ce qui est le cas "
+"courant d’un proxy sur le même hôte ou le même réseau. Un proxy qui se "
+"connecte avec l’adresse du serveur lui-même, comme un proxy de l’hébergeur "
+"sur la même machine, est aussi considéré comme de confiance. Ces proxys "
+"automatiques ne sont pas utilisés pour les fonctionnalités qui accordent des "
+"droits ou bloquent selon l’adresse, car un autre compte d’un hébergement "
+"mutualisé peut utiliser l’adresse du serveur. La liste peut aussi être "
+"définie dans le fichier config/local.config.php."
+
+#: Module.php:105
+msgid ""
+"The request comes with proxy headers from {ip}, that is not a trusted proxy, "
+"so the headers are ignored. If it is the reverse proxy of the server, add it "
+"to the trusted proxies, else the address of all visitors is the address of "
+"the proxy."
+msgstr ""
+"La requête contient des en-têtes de proxy provenant de {ip}, qui n’est pas "
+"un proxy de confiance : les en-têtes sont donc ignorés. S’il s’agit du proxy "
+"inverse du serveur, ajoutez-le aux proxys de confiance, sinon l’adresse de "
+"tous les visiteurs sera celle du proxy."
+
+#: Module.php:195
 msgid "A secret key was generated in config/secret_key.php to encrypt secrets."
 msgstr ""
 "Une clé secrète a été créée dans config/secret_key.php pour chiffrer les "
 "secrets."
 
-#: Module.php:119
+#: Module.php:198
 msgid ""
 "The secret key could not be created: set it manually in config/"
 "secret_key.php or set the environment variable \"OMEKA_SECRET_KEY\" to "
@@ -192,7 +277,7 @@ msgstr ""
 "\"OMEKA_SECRET_KEY\" pour chiffrer les secrets (clés d’api des modules, "
 "etc.)."
 
-#: Module.php:150
+#: Module.php:229
 msgid ""
 "The php extension \"intl\" is not available. It is recommended to install it "
 "to manage diacritics and non-latin characters and to translate dates, "
@@ -202,15 +287,15 @@ msgstr ""
 "gérer les caractères diacritiques et non-latin et pour traduire les dates, "
 "les nombres et plus."
 
-#: Module.php:340
+#: Module.php:419
 msgid "Added {count} database indexes: {list}."
 msgstr "{count} index ajoutés avec succès : {list}"
 
-#: Module.php:346
+#: Module.php:425
 msgid "Failed to add {count} database indexes: {list}."
 msgstr "Échec de l’ajout de {count} index dans la base de données : {list}"
 
-#: Module.php:378
+#: Module.php:457
 msgid ""
 "PHP-CLI unavailable for {count} large-table indexes ({list}). Ask your DBA "
 "to run: {sql}"
@@ -218,7 +303,7 @@ msgstr ""
 "L’accès php via cli n’est pas disponible pour {count} index avec de grandes "
 "tables ({list}). Lancer la commande suivant manuellement : {sql}"
 
-#: Module.php:390
+#: Module.php:469
 msgid ""
 "{count} large-table indexes are being added in background with online DDL "
 "({list}). Track progress in logs/common-add-index.log."
@@ -226,9 +311,13 @@ msgstr ""
 "{count} index pour des grandes tables ont été ajoutés en arrière plan "
 "({list}). Suivez la progression dans le fichier logs/common-add-index.log."
 
-#: Module.php:426
+#: Module.php:505
 msgid "The module Generic is no longer needed and can be removed."
 msgstr "Le module Generic n’est plus nécessaire et peut être supprimé."
+
+#: tests/CommonTest/Job/DispatcherTest.php:105
+msgid "x"
+msgstr "x"
 
 #: src/Log/Writer/Messenger.php:93
 msgid ""
@@ -404,7 +493,7 @@ msgstr "Chaîne ini invalide ou valeurs avec des guillemets droits"
 msgid "The field {label} has an issue: {msg}"
 msgstr "Le champ {label} a un problème : {msg}"
 
-#: src/Form/Element/FieldsTextarea.php:119
+#: src/Form/Element/FieldsTextarea.php:142
 msgid ""
 "Invalid fields: check the yaml syntax, the field names (ascii, no space), "
 "the types and, for select/radio/multicheckbox, the list of values."
@@ -604,7 +693,7 @@ msgstr ""
 msgid "A vocabulary must have a namespace uri and a prefix."
 msgstr "Un vocabulaire doit avoir une uri pour l’espace de nom et un préfixe."
 
-#: src/TraitModule.php:148 src/TraitModule.php:1372
+#: src/TraitModule.php:148 src/TraitModule.php:1424
 msgid "This module requires the module \"{module}\"."
 msgstr "Ce module requiert le module « {module} »."
 
@@ -629,7 +718,7 @@ msgid "The module removed tables \"{tables}\" from a previous broken install."
 msgstr ""
 "Le module a supprimé les tables \"{tables}\" depuis une installation échouée."
 
-#: src/TraitModule.php:1299
+#: src/TraitModule.php:1351
 msgid ""
 "Some libraries should be installed: use the release zip of the module or run "
 "\"composer install --no-dev\" in its directory. Missing libraries: "
@@ -639,13 +728,13 @@ msgstr ""
 "publiée du module ou lancez « composer install --no-dev » dans son dossier. "
 "Dépendances manquantes : {libraries}."
 
-#: src/TraitModule.php:1367
+#: src/TraitModule.php:1419
 msgid ""
 "This module requires the module \"{module}\", version {version} or above."
 msgstr ""
 "Ce module requiert le module « {module} », version {version} ou supérieure."
 
-#: src/TraitModule.php:1503
+#: src/TraitModule.php:1555
 msgid ""
 "The module \"{module}\" was automatically deactivated because the "
 "dependencies are unavailable."
@@ -661,7 +750,7 @@ msgstr "Choisir un ingéreur de média…"
 msgid "Select media renderers…"
 msgstr "Choisir un rendu pour le média…"
 
-#: src/Stdlib/UpgradeJobDispatch.php:108
+#: src/Stdlib/UpgradeJobDispatch.php:109
 msgid ""
 "The job #{job_id} is still starting after the sleep delay. It may need to be "
 "relaunched manually."
@@ -772,15 +861,15 @@ msgid ""
 msgstr ""
 "Le dossier « {path} » ne peut pas être protégé par un .htaccess : {error}."
 
-#: config/module.config.php:184
+#: config/module.config.php:191
 msgid "An error occurred."
 msgstr "Une erreur est survenue."
 
-#: config/module.config.php:188
+#: config/module.config.php:195
 msgid "Information"
 msgstr "Information"
 
-#: config/module.config.php:190
+#: config/module.config.php:197
 msgid "OK"
 msgstr "OK"
 
