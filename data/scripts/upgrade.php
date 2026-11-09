@@ -133,3 +133,37 @@ if (version_compare($oldVersion, '3.4.89', '<')) {
     $directoryManager->protectDirectory(OMEKA_PATH . '/logs');
     $directoryManager->protectSensitiveDirectories($basePath);
 }
+
+if (version_compare($oldVersion, '3.4.96', '<')) {
+    // The trusted proxies are managed in the main settings, so merge the lists
+    // of the modules into it and remove them.
+    $settings = $services->get('Omeka\Settings');
+    $moduleKeys = [
+        'access_ip_proxy_trusted',
+        'analytics_trusted_proxies',
+        'analyticssnippet_trusted_proxies',
+        'botchallenge_trusted_proxies',
+        'lockout_trusted_proxies',
+    ];
+    $trustedProxies = (array) ($settings->get('trusted_proxies') ?: []);
+    $hasModuleKeys = false;
+    foreach ($moduleKeys as $moduleKey) {
+        $value = $settings->get($moduleKey);
+        if ($value === null) {
+            continue;
+        }
+        $hasModuleKeys = true;
+        $trustedProxies = array_merge($trustedProxies, is_array($value) ? $value : [(string) $value]);
+        $settings->delete($moduleKey);
+    }
+    if ($hasModuleKeys) {
+        $trustedProxies = \Common\Stdlib\ClientIp::normalizeTrustedProxies($trustedProxies);
+        $settings->set('trusted_proxies', $trustedProxies);
+        if ($trustedProxies) {
+            $messenger->addWarning(new \Common\Stdlib\PsrMessage(
+                'The trusted reverse proxies are now managed in the security section of the main settings and apply to all modules, including the ones that grant rights or lock out by ip. Check that each one is a reverse proxy of the server: {list}.', // @translate
+                ['list' => implode(', ', $trustedProxies)]
+            ));
+        }
+    }
+}
