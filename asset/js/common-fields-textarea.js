@@ -376,6 +376,16 @@
         var enableYaml = textarea.dataset.enableYaml !== '0';
         var enablePreview = textarea.dataset.enablePreview === '1';
         var defaultDisplay = textarea.dataset.defaultDisplay || 'form';
+        // A root key of another syntax (for example "elements" for the full
+        // specifications of Laminas) cannot be edited as a form.
+        var rawKeys = (textarea.dataset.rawKeys || '').split(',')
+            .map(function (k) { return k.trim(); })
+            .filter(function (k) { return k !== ''; });
+        function isRawSyntax(map) {
+            return map !== null && rawKeys.some(function (k) {
+                return Object.prototype.hasOwnProperty.call(map, k);
+            });
+        }
         if (!enableForm && !enableYaml) {
             enableYaml = true;
         }
@@ -410,7 +420,7 @@
                 });
             } else {
                 var map = parseYaml(textarea.value);
-                if (map) {
+                if (map && !isRawSyntax(map)) {
                     Object.keys(map).forEach(function (name) {
                         list.push(entryToData(name, map[name]));
                     });
@@ -539,9 +549,11 @@
 
         function showForm(silent) {
             var map = parseYaml(textarea.value);
-            if (map === null) {
+            if (map === null || isRawSyntax(map)) {
                 if (!silent) {
-                    window.alert(t('invalidYaml', 'The YAML cannot be parsed. Fix it before switching to the form.'));
+                    window.alert(map === null
+                        ? t('invalidYaml', 'The YAML cannot be parsed. Fix it before switching to the form.')
+                        : t('rawSyntax', 'This syntax cannot be edited as a form. Convert it to the simple syntax first.'));
                 }
                 return false;
             }

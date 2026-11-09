@@ -90,7 +90,14 @@ class FieldsTextarea extends ArrayTextarea
         $enableYaml = !array_key_exists('enable_edit_yaml', $this->options) || $this->options['enable_edit_yaml'];
         $default = ($this->options['default_display'] ?? 'form') === 'text' ? 'text' : 'form';
 
+        // The root keys of another syntax disable the form mode, for example
+        // "elements" when the textarea accepts the full Laminas specifications.
+        $rawKeys = isset($this->options['raw_keys']) && is_array($this->options['raw_keys'])
+            ? implode(',', $this->options['raw_keys'])
+            : '';
+
         return $this
+            ->setAttribute('data-raw-keys', $rawKeys)
             ->setAttribute('data-enable-form', $enableForm ? '1' : '0')
             ->setAttribute('data-enable-yaml', $enableYaml ? '1' : '0')
             ->setAttribute('data-enable-preview', empty($this->options['enable_preview']) ? '0' : '1')

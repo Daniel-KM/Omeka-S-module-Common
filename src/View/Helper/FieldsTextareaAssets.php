@@ -63,6 +63,7 @@ class FieldsTextareaAssets extends AbstractHelper
                 'moveUp' => $translate('Move up'), // @translate
                 'moveDown' => $translate('Move down'), // @translate
                 'invalidYaml' => $translate('The YAML cannot be parsed. Fix it before switching to the form.'), // @translate
+                'rawSyntax' => $translate('This syntax cannot be edited as a form. Convert it to the simple syntax first.'), // @translate
             ],
         ];
 
