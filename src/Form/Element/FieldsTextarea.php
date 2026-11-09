@@ -365,7 +365,11 @@ class FieldsTextarea extends ArrayTextarea
         unset($elementOptions['label'], $elementOptions['value_options']);
         $attributes = $spec['attributes'] ?? [];
         $required = !empty($attributes['required']);
-        unset($attributes['required'], $attributes['multiple']);
+        unset($attributes['required']);
+        // The multi checkbox sets "multiple" itself, unlike a multiple select.
+        if ($type === 'multicheckbox') {
+            unset($attributes['multiple']);
+        }
 
         if ($type === 'text' && !$valueOptions && !$attributes && !$required && !$elementOptions) {
             return $label === '' ? null : $label;
