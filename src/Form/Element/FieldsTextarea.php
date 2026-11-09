@@ -47,10 +47,32 @@ class FieldsTextarea extends ArrayTextarea
         'textarea' => Element\Textarea::class,
         'time' => OptionalTime::class,
         'url' => OptionalUrl::class,
+        // Selects of resources and vocabulary members of Omeka.
+        'itemset' => \Omeka\Form\Element\ItemSetSelect::class,
+        'property' => \Omeka\Form\Element\PropertySelect::class,
+        'resourceclass' => \Omeka\Form\Element\ResourceClassSelect::class,
+        'resourcetemplate' => \Omeka\Form\Element\ResourceTemplateSelect::class,
+        'site' => \Omeka\Form\Element\SiteSelect::class,
         // Types of optional modules, available when the module is active.
         'customvocab' => \CustomVocab\Form\Element\CustomVocabSelect::class,
         'table' => \Table\Form\Element\TableSelect::class,
         'thesaurus' => \Thesaurus\Form\Element\ThesaurusSelect::class,
+    ];
+
+    /**
+     * Types whose values are listed from the database.
+     *
+     * @var array
+     */
+    protected $typesWithDynamicValues = [
+        'customvocab',
+        'itemset',
+        'property',
+        'resourceclass',
+        'resourcetemplate',
+        'site',
+        'table',
+        'thesaurus',
     ];
 
     /**
@@ -240,6 +262,17 @@ class FieldsTextarea extends ArrayTextarea
             }
         }
         return true;
+    }
+
+    /**
+     * Get the available types whose values are listed from the database.
+     */
+    public function getTypesWithDynamicValues(): array
+    {
+        return array_values(array_filter(
+            $this->typesWithDynamicValues,
+            fn ($type) => class_exists($this->typeClasses[$type])
+        ));
     }
 
     /**

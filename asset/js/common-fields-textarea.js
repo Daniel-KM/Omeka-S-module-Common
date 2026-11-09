@@ -29,7 +29,9 @@
         'radio',
         'multicheckbox',
     ];
-    // Types of optional modules and the option required to list their values.
+    // Types whose values are listed from the database, and the types of
+    // optional modules with the option required to list their values.
+    var dynamics = config.dynamics || [];
     var sources = config.sources || {};
 
     function t(key, fallback) {
@@ -279,20 +281,22 @@
         }
     }
 
-    // A type of an optional module requires an option to list its values, and
-    // an empty option to keep the field optional.
+    // A select listed from the database has an empty option to keep the field
+    // optional, and a type of an optional module requires an option to list its
+    // values.
     function addSourceOptions($row) {
-        var key = sources[$row.find('.cft-type').val()];
+        var type = $row.find('.cft-type').val();
+        var key = sources[type];
         var $sub = $row.find('.cft-sub[data-kind="options"]');
         var editor = $sub[0] && $sub[0].pairsEditor;
-        if (!key || !editor) {
+        if (dynamics.indexOf(type) === -1 || !editor) {
             return;
         }
         var keys = editor.getRows().map(function (p) { return p.key.trim(); });
         if (keys.indexOf('empty_option') === -1) {
-            editor.addRow({ key: 'empty_option', value: '' }, false);
+            editor.addRow({ key: 'empty_option', value: '' }, !key);
         }
-        if (keys.indexOf(key) === -1) {
+        if (key && keys.indexOf(key) === -1) {
             editor.addRow({ key: key, value: '' }, true);
         }
         $sub.show();
@@ -339,7 +343,7 @@
         if (type === 'textarea') {
             return $('<textarea rows="3" disabled></textarea>');
         }
-        if (sources[type]) {
+        if (dynamics.indexOf(type) !== -1) {
             return $('<select disabled></select>');
         }
         if (type === 'select') {
