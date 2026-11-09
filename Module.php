@@ -20,6 +20,8 @@ if (file_exists(__DIR__ . '/vendor/autoload.php')) {
     require_once __DIR__ . '/vendor/autoload.php';
 }
 
+use Laminas\EventManager\Event;
+use Laminas\EventManager\SharedEventManagerInterface;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Omeka\Module\AbstractModule;
 
@@ -44,6 +46,83 @@ class Module extends AbstractModule
     public function getConfig()
     {
         return require __DIR__ . '/config/module.config.php';
+    }
+
+    public function attachListeners(SharedEventManagerInterface $sharedEventManager): void
+    {
+        // Backfill of the setting of the trusted proxies of the core.
+        if (!class_exists(\Omeka\Stdlib\ClientIp::class)) {
+            $sharedEventManager->attach(
+                \Omeka\Form\SettingForm::class,
+                'form.add_elements',
+                [$this, 'handleMainSettingsTrustedProxies']
+            );
+            $sharedEventManager->attach(
+                \Omeka\Form\SettingForm::class,
+                'form.add_input_filters',
+                [$this, 'handleMainSettingsTrustedProxiesFilters']
+            );
+        }
+    }
+
+    /**
+     * Add the setting of the trusted proxies in the security settings.
+     *
+     * @see \Omeka\Form\SettingForm
+     */
+    public function handleMainSettingsTrustedProxies(Event $event): void
+    {
+        $services = $this->getServiceLocator();
+        $configTrustedProxies = Stdlib\ClientIp::normalizeTrustedProxies($services->get('Config')['trusted_proxies'] ?? []);
+
+        /** @var \Omeka\Form\SettingForm $form */
+        $form = $event->getTarget();
+        $form->add([
+            'name' => 'trusted_proxies',
+            'type' => \Omeka\Form\Element\ArrayTextarea::class,
+            'options' => [
+                'element_group' => 'security',
+                'label' => 'Trusted reverse proxies', // @translate
+                'info' => $configTrustedProxies
+                    ? 'The trusted proxies are set in the file config/local.config.php.' // @translate
+                    : 'Addresses or cidr ranges of the reverse proxies in front of the server (Traefik, nginx, load balancer, cdn), one by line. The address of the visitor is read in the headers X-Forwarded-For and X-Real-IP only when the request comes from one of them, else anybody could write any address in them. When empty, the proxies with a private or loopback address are trusted, that is the common case of a proxy in the same host or network, except for the features that grant rights by address. The list may be set in the file config/local.config.php too.', // @translate
+            ],
+            'attributes' => [
+                'value' => $configTrustedProxies ?: $services->get('Omeka\Settings')->get('trusted_proxies', []),
+                'id' => 'trusted_proxies',
+                'rows' => 4,
+                'placeholder' => "127.0.0.1\n172.16.0.0/12",
+                'readonly' => (bool) $configTrustedProxies,
+            ],
+        ]);
+
+        // Warn when the request comes through a proxy that is not trusted.
+        $request = $services->get('Application')->getRequest();
+        if ($request->isGet()) {
+            $detected = $services->get('Omeka\ClientIp')->detect();
+            if ($detected['status'] === 'untrusted') {
+                $services->get('ControllerPluginManager')->get('messenger')->addWarning(new Stdlib\PsrMessage(
+                    'The request comes with proxy headers from {ip}, that is not a trusted proxy, so the headers are ignored. If it is the reverse proxy of the server, add it to the trusted proxies, else the address of all visitors is the address of the proxy.', // @translate
+                    ['ip' => $detected['peer']]
+                ));
+            }
+        }
+    }
+
+    public function handleMainSettingsTrustedProxiesFilters(Event $event): void
+    {
+        $event->getParam('inputFilter')->add([
+            'name' => 'trusted_proxies',
+            'required' => false,
+            'filters' => [
+                [
+                    'name' => 'callback',
+                    'options' => [
+                        'callback' => [Stdlib\ClientIp::class, 'normalizeTrustedProxies'],
+                    ],
+                ],
+            ],
+        ]);
     }
 
     public function install(ServiceLocatorInterface $services): void

@@ -23,6 +23,10 @@ return [
             'Omeka\Cipher' => class_exists(\Omeka\Stdlib\Cipher::class)
                 ? null
                 : Service\Stdlib\CipherFactory::class,
+            // Backfill of the core client ip, managing the trusted proxies.
+            'Omeka\ClientIp' => class_exists(\Omeka\Stdlib\ClientIp::class)
+                ? null
+                : Service\Stdlib\ClientIpFactory::class,
         ]),
         'aliases' => [
             // @deprecated Use "Common\EasyMeta". Will be removed in a future version.
