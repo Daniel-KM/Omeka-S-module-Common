@@ -5,6 +5,7 @@ namespace Common\Stdlib;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Omeka\Entity\Job;
 use Omeka\Job\Dispatcher;
+use Omeka\Job\DispatchStrategy\PhpCli;
 
 /**
  * Dispatch a background job during a module upgrade or install.
@@ -93,7 +94,7 @@ class UpgradeJobDispatch
         );
 
         $dispatcher = $services->get(Dispatcher::class);
-        $job = $dispatcher->dispatch($jobClass, $args);
+        $job = $dispatcher->dispatch($jobClass, $args, $this->dispatchStrategy());
 
         sleep(5);
 
@@ -123,5 +124,30 @@ class UpgradeJobDispatch
         }
 
         return $job;
+    }
+
+    /**
+     * Get a strategy with a valid server url when the upgrade is run via cli.
+     *
+     * In cli, the server url has no host, so the background script cannot
+     * parse it. A placeholder is used, since the real host is unknown.
+     */
+    protected function dispatchStrategy(): ?PhpCli
+    {
+        if (!$this->services->get('Omeka\Job\DispatchStrategy') instanceof PhpCli) {
+            return null;
+        }
+        $viewHelpers = $this->services->get('ViewHelperManager');
+        $serverUrl = (string) $viewHelpers->get('ServerUrl')->__invoke();
+        if (parse_url($serverUrl, PHP_URL_HOST)) {
+            return null;
+        }
+        $config = $this->services->get('Config');
+        return new PhpCli(
+            $this->services->get('Omeka\Cli'),
+            $viewHelpers->get('BasePath')->__invoke(),
+            'http://localhost',
+            empty($config['cli']['phpcli_path']) ? null : $config['cli']['phpcli_path']
+        );
     }
 }
