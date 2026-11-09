@@ -48,6 +48,23 @@ class UpgradeJobDispatchTest extends AbstractTestCase
         $this->assertSame(['is_active' => 0, 'version' => '1.2.3'], $this->moduleRow());
     }
 
+    /**
+     * In cli, the server url has no host, so the strategy gets a valid url for
+     * the background script.
+     */
+    public function testDispatchStrategyHasServerUrlInCli(): void
+    {
+        $upgradeJobDispatch = $this->getService('Common\UpgradeJobDispatch');
+        $method = new \ReflectionMethod($upgradeJobDispatch, 'dispatchStrategy');
+        $method->setAccessible(true);
+        $strategy = $method->invoke($upgradeJobDispatch);
+
+        $this->assertInstanceOf(\Omeka\Job\DispatchStrategy\PhpCli::class, $strategy);
+        $property = new \ReflectionProperty($strategy, 'serverUrl');
+        $property->setAccessible(true);
+        $this->assertNotEmpty(parse_url($property->getValue($strategy), PHP_URL_HOST));
+    }
+
     protected function dispatchAndCaptureRow(): ?array
     {
         $this->loginAsAdmin();

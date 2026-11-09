@@ -134,9 +134,11 @@ class Bootstrap
 
         $loader->register(true);
 
-        // Make sure error reporting is on for testing.
+        // Make sure error reporting is on for testing. The errors are displayed
+        // on stderr, so a deprecation of a dependency is not an output of the
+        // test, that a strict suite would mark as risky.
         error_reporting(E_ALL);
-        ini_set('display_errors', '1');
+        ini_set('display_errors', 'stderr');
 
         // Use Omeka DbTestCase to drop and install schema.
         if ($verbose) {

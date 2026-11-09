@@ -111,6 +111,37 @@ class FieldsTextareaTest extends TestCase
         $this->assertFalse($element->validateFields($specs));
     }
 
+    public function testTypeOfModuleRequiresItsOptionAndModule(): void
+    {
+        $element = $this->element();
+        $specs = $element->stringToArray("v:\n  type: customvocab\n");
+        $this->assertSame(\CustomVocab\Form\Element\CustomVocabSelect::class, $specs['v']['type']);
+        $this->assertFalse($element->validateFields($specs));
+
+        $specs = $element->stringToArray("v:\n  type: customvocab\n  options:\n    custom_vocab_id: 3\n");
+        $available = class_exists(\CustomVocab\Form\Element\CustomVocabSelect::class);
+        $this->assertSame($available, $element->validateFields($specs));
+        $this->assertSame($available, isset($element->getTypesWithSource()['customvocab']));
+    }
+
+    public function testSelectsOfOmekaAreDynamic(): void
+    {
+        $element = $this->element();
+        $specs = $element->stringToArray("s:\n  type: site\n");
+        $this->assertSame(\Omeka\Form\Element\SiteSelect::class, $specs['s']['type']);
+        $this->assertTrue($element->validateFields($specs));
+        $this->assertContains('itemset', $element->getTypesWithDynamicValues());
+        $this->assertSame($specs, $element->stringToArray($element->arrayToString($specs)));
+    }
+
+    public function testMultipleSelectIsKept(): void
+    {
+        $element = $this->element();
+        $specs = $element->stringToArray("t:\n  type: select\n  values: [A, B]\n  attributes:\n    multiple: true\n");
+        $reparsed = $element->stringToArray($element->arrayToString($specs));
+        $this->assertTrue($reparsed['t']['attributes']['multiple']);
+    }
+
     public function testBadNameIsInvalid(): void
     {
         $element = $this->element();

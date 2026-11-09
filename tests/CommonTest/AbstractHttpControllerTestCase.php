@@ -28,6 +28,13 @@
  *         $this->dispatch('/admin/my-module');
  *     }
  *
+ *     public function testRestApi(): void
+ *     {
+ *         // The rest api ignores the session: a temporary key is used.
+ *         $this->dispatchApi('/api/items');
+ *         $this->assertResponseStatusCode(200);
+ *     }
+ *
  *     public function testRequiresLogin(): void
  *     {
  *         // Test without authentication
@@ -47,7 +54,6 @@ namespace CommonTest;
 
 use Laminas\Test\PHPUnit\Controller\AbstractHttpControllerTestCase as LaminasAbstractHttpControllerTestCase;
 use Omeka\Entity\User;
-use Omeka\Mvc\Application;
 
 abstract class AbstractHttpControllerTestCase extends LaminasAbstractHttpControllerTestCase
 {
@@ -77,6 +83,11 @@ abstract class AbstractHttpControllerTestCase extends LaminasAbstractHttpControl
      */
     protected ?int $dispatchUserId = null;
 
+    /**
+     * Url and method of the next dispatch, set in the request before bootstrap.
+     */
+    protected ?array $dispatchRequest = null;
+
     public function setUp(): void
     {
         $config = require OMEKA_PATH . '/application/config/application.config.php';
@@ -101,13 +112,48 @@ abstract class AbstractHttpControllerTestCase extends LaminasAbstractHttpControl
             return $this->application;
         }
 
-        $appConfig = $this->applicationConfig;
-        $this->application = Application::init($appConfig);
+        $this->application = $this->initApplication($this->applicationConfig);
 
         $events = $this->application->getEventManager();
         $this->application->getServiceManager()->get('SendResponseListener')->detach($events);
 
         return $this->application;
+    }
+
+    /**
+     * Init the application like Omeka\Mvc\Application::init().
+     *
+     * The url of the dispatch is set in the request before the bootstrap,
+     * because some modules check the route during the bootstrap (admin or site
+     * request, via the service Omeka\Status that caches the result). Else the
+     * request is empty and an admin page is managed as a public one.
+     */
+    protected function initApplication(array $configuration): \Laminas\Mvc\Application
+    {
+        $smConfig = new \Laminas\Mvc\Service\ServiceManagerConfig($configuration['service_manager'] ?? []);
+        $serviceManager = new \Laminas\ServiceManager\ServiceManager();
+        $smConfig->configureServiceManager($serviceManager);
+        $serviceManager->setService('ApplicationConfig', $configuration);
+
+        $activeModules = $serviceManager->get('Omeka\ModuleManager')
+            ->getModulesByState(\Omeka\Module\Manager::STATE_ACTIVE);
+        $moduleManager = $serviceManager->get('ModuleManager');
+        $moduleManager->setModules(array_merge($configuration['modules'], array_keys($activeModules)));
+        $moduleManager->loadModules();
+
+        if ($this->dispatchRequest) {
+            $uri = new \Laminas\Uri\Http($this->dispatchRequest['url']);
+            /** @var \Laminas\Http\PhpEnvironment\Request $request */
+            $request = $serviceManager->get('Request');
+            $request
+                ->setMethod($this->dispatchRequest['method'] ?: 'GET')
+                ->setUri($uri)
+                ->setRequestUri($uri->getPath());
+        }
+
+        $config = $serviceManager->get('Config');
+        $listeners = array_unique(array_merge($config['listeners'] ?? [], $configuration['listeners'] ?? []));
+        return $serviceManager->get('Application')->bootstrap($listeners);
     }
 
     /**
@@ -142,8 +188,13 @@ abstract class AbstractHttpControllerTestCase extends LaminasAbstractHttpControl
         // Reset application to get clean state.
         $this->reset();
 
-        // Ensure application is initialized.
-        $this->getApplication();
+        // Ensure application is initialized, with the url of the request.
+        $this->dispatchRequest = ['url' => $url, 'method' => $method];
+        try {
+            $this->getApplication();
+        } finally {
+            $this->dispatchRequest = null;
+        }
 
         // Re-authenticate: the reset cleared the identity.
         if ($this->dispatchUserId) {
@@ -285,6 +336,53 @@ abstract class AbstractHttpControllerTestCase extends LaminasAbstractHttpControl
         // Restore login requirement.
         $this->requiresLogin = $originalRequiresLogin;
         $this->dispatchUserId = $originalUserId;
+    }
+
+    /**
+     * Run a dispatch on the rest api, authenticated with a temporary api key.
+     *
+     * The rest api (/api) authenticates by key only and ignores the identity
+     * of the session, so a dispatch() is anonymous there. Use /api-local for a
+     * request authenticated by the session.
+     *
+     * @param User|int|string $user The user, its id or its email.
+     */
+    public function dispatchApi(string $url, ?string $method = null, array $params = [], $user = 'admin@example.com'): void
+    {
+        $entityManager = $this->getEntityManager();
+        $owner = $user instanceof User || is_int($user)
+            ? $entityManager->find(User::class, $user instanceof User ? $user->getId() : $user)
+            : $entityManager->getRepository(User::class)->findOneBy(['email' => (string) $user]);
+        if (!$owner) {
+            throw new \InvalidArgumentException('Unknown user for the api key.');
+        }
+        $apiKey = new \Omeka\Entity\ApiKey();
+        $apiKey->setId();
+        $apiKey->setLabel('Test');
+        $apiKey->setOwner($owner);
+        $credential = $apiKey->setCredential();
+        $entityManager->persist($apiKey);
+        $entityManager->flush();
+        $keyId = $apiKey->getId();
+
+        // The key adapter stores the ip of the client, missing in cli.
+        $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? null;
+        $_SERVER['REMOTE_ADDR'] ??= '127.0.0.1';
+        $url .= (strpos($url, '?') === false ? '?' : '&')
+            . http_build_query(['key_identity' => $keyId, 'key_credential' => $credential]);
+        try {
+            $this->dispatch($url, $method, $params);
+        } finally {
+            if ($remoteAddr === null) {
+                unset($_SERVER['REMOTE_ADDR']);
+            }
+            $entityManager = $this->getEntityManager();
+            $apiKey = $entityManager->find(\Omeka\Entity\ApiKey::class, $keyId);
+            if ($apiKey) {
+                $entityManager->remove($apiKey);
+                $entityManager->flush();
+            }
+        }
     }
 
     /**
