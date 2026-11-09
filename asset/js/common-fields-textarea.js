@@ -57,6 +57,37 @@
             : null;
     }
 
+    // The reason why a text cannot be read as a list of fields.
+    function yamlError(text) {
+        if (!window.jsyaml) {
+            return '';
+        }
+        try {
+            var data = window.jsyaml.load(text);
+        } catch (e) {
+            return e.message || String(e);
+        }
+        return (data !== null && data !== undefined && (typeof data !== 'object' || Array.isArray(data)))
+            ? t('notFields', 'The text is not a list of fields: each field should start a line with its name followed by ":".')
+            : '';
+    }
+
+    // The names of field are used as keys of the form.
+    function invalidNames(map) {
+        return Object.keys(map).filter(function (name) {
+            return !/^[A-Za-z0-9_-]+$/.test(name);
+        });
+    }
+
+    // Use the dialog of module Common when available.
+    function notify(message) {
+        if (window.CommonDialog && typeof window.CommonDialog.dialogAlert === 'function') {
+            window.CommonDialog.dialogAlert({ message: message, nl2br: true });
+        } else {
+            window.alert(message);
+        }
+    }
+
     function dumpYaml(map) {
         if (!window.jsyaml || !Object.keys(map).length) {
             return '';
@@ -580,11 +611,15 @@
             var map = parseYaml(textarea.value);
             if (map === null || isRawSyntax(map)) {
                 if (!silent) {
-                    window.alert(map === null
-                        ? t('invalidYaml', 'The YAML cannot be parsed. Fix it before switching to the form.')
+                    notify(map === null
+                        ? t('invalidYaml', 'The YAML cannot be parsed. Fix it before switching to the form.') + '\n\n' + yamlError(textarea.value)
                         : t('rawSyntax', 'This syntax cannot be edited as a form. Convert it to the simple syntax first.'));
                 }
                 return false;
+            }
+            var invalid = invalidNames(map);
+            if (invalid.length && !silent) {
+                notify(t('invalidNames', 'These names of field contain forbidden characters: only the letters without accent, the digits, "_" and "-" are allowed.') + '\n\n' + invalid.join('\n'));
             }
             $rows.empty();
             Object.keys(map).forEach(function (name) {
