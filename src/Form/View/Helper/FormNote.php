@@ -28,10 +28,13 @@ class FormNote extends AbstractHelper
             $text = $view->escapeHtml($text);
         }
 
+        // Keep the attributes (id, class, data…), used by forms and scripts.
+        $attributes = array_diff_key($element->getAttributes(), ['type' => null, 'name' => null]);
+        $attributes['class'] = trim('note ' . ($attributes['class'] ?? ''));
+
         // Use div instead of p to manage raw and html notes.
-        $output = $escape
-            ? '<p class="note">' . $text . '</p>'
-            : '<div class="note">' . $text . '</div>';
+        $tag = $escape ? 'p' : 'div';
+        $output = sprintf('<%1$s %2$s>%3$s</%1$s>', $tag, $this->createAttributesString($attributes), $text);
 
         // Restore the summary display over admin theme normalize.css.
         if (!$this->summaryStyleAppended && stripos($text, '<summary') !== false) {
