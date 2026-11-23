@@ -113,8 +113,12 @@ trait CommonAdapterTrait
      *   zero (0) means to search empty values (0 or null).
      *   Note that values are casted first to integer in all cases.
      * - "id" is like a simplified "int_empty", because the id is never 0.
-     *   Support id = 0 (no id) and id < 0 (not the specified id).
+     *   Support id = 0 (no id, for example no owner) and id < 0 (not the
+     *   specified id). The main id is filtered by the core only.
      *   Furthermore, a join may be added in a future version if really needed.
+     * - For integers, a string may list values separated by commas. For "id",
+     *   "int" and "int_empty", empty strings are skipped and a non-numeric
+     *   value returns no result.
      * - For datetime, it is simpler to use the mathematical operators that are
      *   more versatile, but the key names are used for compatibility with omeka
      *   main adapter. In Omeka Classic, since" and "until" were used.
@@ -179,19 +183,25 @@ trait CommonAdapterTrait
                             // TODO A boolean parameter type can be used.
                             ->setParameter($fieldAlias, $value ? 1 : 0, ParameterType::INTEGER);
                     } else {
-                        $qb
-                            ->andWhere($entityAlias . '.' . $field . ' = "bad value"');
+                        $qb->andWhere('1 = 0');
                     }
                     break;
 
                 case 'id':
                     // Unlike main AbstractEntityAdapter, supports:
-                    // - an id may be "0" to search empty values;
+                    // - an id may be "0" to search empty values, for example
+                    //   the resources without owner;
                     // - a negative id "-N" means to exclude the id N.
+                    // The main id is already filtered by the core.
                     // TODO In AbstractResourceEntityAdapter, a join is added for id. It may manage rights, but is it still useful?
-                    $rawValues = is_array($value)
-                        ? array_map('intval', $value)
-                        : [(int) $value];
+                    if ($field === 'id' && $entityAlias === 'omeka_root') {
+                        break;
+                    }
+                    $rawValues = $this->intValues($value);
+                    if ($rawValues === null) {
+                        $qb->andWhere('1 = 0');
+                        break;
+                    }
                     $include = [];
                     $exclude = [];
                     foreach ($rawValues as $v) {
@@ -242,24 +252,35 @@ trait CommonAdapterTrait
                     break;
 
                 case 'int':
+                    $values = $this->intValues($value);
+                    if ($values === null) {
+                        $qb->andWhere('1 = 0');
+                        break;
+                    } elseif (!$values) {
+                        break;
+                    }
+                    $values = array_values(array_unique($values));
                     $fieldAlias = $this->createAlias();
-                    if (is_array($value)) {
-                        $values = array_values(array_unique(array_map('intval', $value)));
+                    if (count($values) === 1) {
+                        $qb
+                            ->andWhere($entityAlias . '.' . $field . ' = :' . $fieldAlias)
+                            ->setParameter($fieldAlias, reset($values), ParameterType::INTEGER);
+                    } else {
                         $qb
                             ->andWhere($expr->in($entityAlias . '.' . $field, ':' . $fieldAlias))
                             ->setParameter($fieldAlias, $values, Connection::PARAM_INT_ARRAY);
-                    } else {
-                        $value = (int) $value;
-                        $qb
-                            ->andWhere($entityAlias . '.' . $field . ' = :' . $fieldAlias)
-                            ->setParameter($fieldAlias, $value, ParameterType::INTEGER);
                     }
                     break;
 
                 case 'int_empty':
-                    $values = is_array($value)
-                        ? array_values(array_unique(array_map('intval', $value)))
-                        : [(int) $value];
+                    $values = $this->intValues($value);
+                    if ($values === null) {
+                        $qb->andWhere('1 = 0');
+                        break;
+                    } elseif (!$values) {
+                        break;
+                    }
+                    $values = array_values(array_unique($values));
                     $fieldAlias = $this->createAlias();
                     if ($values === [0]) {
                         // Unlike "id", a value may be 0.
@@ -290,11 +311,15 @@ trait CommonAdapterTrait
                 case 'int_operator':
                     // There is no optimization with sql "between" in lieu of
                     // </≤ and >/≥. It can be done in adapter if really needed.
-                    $values = is_array($value) ? $value : [$value];
+                    $values = is_array($value) ? $value : explode(',', (string) $value);
                     // Simplify the list of values by operator.
                     $opVals = [];
                     foreach ($values as $value) {
-                        $operator = mb_substr((string) $value, 0, 1);
+                        $value = trim((string) $value);
+                        if ($value === '') {
+                            continue;
+                        }
+                        $operator = mb_substr($value, 0, 1);
                         if (is_numeric($operator) || $operator === '-') {
                             $opVals['='][] = (int) $value;
                         } elseif ($operator === '=') {
@@ -302,12 +327,11 @@ trait CommonAdapterTrait
                         } elseif ($operator === '≠') {
                             $opVals['<>'][] = (int) mb_substr((string) $value, 1);
                         } elseif (isset($this->operatorsSql[$operator])) {
-                            $opVals[$this->operatorsSql[$operator]][] = (int) mb_substr($value, 1);
+                            $opVals[$this->operatorsSql[$operator]][] = (int) mb_substr((string) $value, 1);
                         } else {
                             // Unknown operator means error, so no result.
-                            $qb
-                                ->andWhere('"bad" = "operator"');
-                            break;
+                            $qb->andWhere('1 = 0');
+                            break 2;
                         }
                     }
                     foreach ($opVals as $opSql => $vals) {
@@ -429,8 +453,8 @@ trait CommonAdapterTrait
                                     ->setParameter($fieldAlias, reset($vals), ParameterType::STRING);
                             } else {
                                 $qb
-                                ->andWhere($expr->notIn($entityAlias . '.' . $field, ':' . $fieldAlias))
-                                ->setParameter($fieldAlias, $vals, Connection::PARAM_STR_ARRAY);
+                                    ->andWhere($expr->notIn($entityAlias . '.' . $field, ':' . $fieldAlias))
+                                    ->setParameter($fieldAlias, $vals, Connection::PARAM_STR_ARRAY);
                             }
                         } else {
                             $val = $opSql === '<' || $opSql === '<=' ? min($vals) : max($vals);
@@ -464,16 +488,16 @@ trait CommonAdapterTrait
                             $value = mb_substr((string) $value, 1);
                         } else {
                             // Unknown operator means error, so no result.
-                            $qb
-                                ->andWhere('"bad" = "operator"');
-                            continue;
+                            $qb->andWhere('1 = 0');
+                            break 2;
                         }
                         $value = $this->dateComplete($value, $operator);
                         if (!$value) {
                             // Empty date means error, so no result.
-                            $qb
-                                ->andWhere('"bad" = "date"');
-                        } elseif (is_array($value)) {
+                            $qb->andWhere('1 = 0');
+                            break 2;
+                        }
+                        if (is_array($value)) {
                             $fieldAliasFrom = $this->createAlias();
                             $fieldAliasTo = $this->createAlias();
                             if ($operator === '=') {
@@ -502,6 +526,29 @@ trait CommonAdapterTrait
     }
 
     /**
+     * Get the integers of a query value, or null when a value is not numeric.
+     *
+     * A string may list values separated by commas. Empty strings are skipped:
+     * use 0 to search empty values, for example the resources without owner.
+     */
+    protected function intValues($value): ?array
+    {
+        $values = is_array($value) ? $value : explode(',', (string) $value);
+        $result = [];
+        foreach ($values as $v) {
+            $v = is_scalar($v) ? trim((string) $v) : null;
+            if ($v === '') {
+                continue;
+            }
+            if ($v === null || !is_numeric($v)) {
+                return null;
+            }
+            $result[] = (int) $v;
+        }
+        return $result;
+    }
+
+    /**
      * Format a full or partial date for search.
      *
      * Min/max year is 10000. In other cases, an integer is enough.
@@ -518,7 +565,8 @@ trait CommonAdapterTrait
      *
      * @param string|DateTime $value
      * @param string $operator One character math operator: <≤=≠≥>.
-     * @return string|array|null The output may be array to manage partial date.
+     * @return string|array|null The output may be array to manage partial date,
+     *   or null when the value is not a date.
      */
     protected function dateComplete($value, string $operator = '=')
     {
@@ -536,6 +584,13 @@ trait CommonAdapterTrait
         if ($isNegative) {
             $value = mb_substr($value, 1);
         }
+
+        // Only a date, optionally with a time; the fractional seconds and the
+        // iso time zone are removed.
+        if (!preg_match('~^(\d{1,4}(?:-\d{2}(?:-\d{2}(?: \d{2}(?::\d{2}(?::\d{2})?)?)?)?)?)(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})?$~', $value, $matches)) {
+            return null;
+        }
+        $value = $matches[1];
 
         // Pad the year with leading zeros if less than 4 digits.
         $parts = explode('-', $value, 2);
