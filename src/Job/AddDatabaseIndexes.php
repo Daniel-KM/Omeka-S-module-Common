@@ -72,14 +72,19 @@ class AddDatabaseIndexes extends AbstractJob
             }
         }
 
-        if ($added) {
-            $logger->info(
-                'Successfully added {count} database indexes: {list}', // @translate
-                [
-                    'count' => count($added),
-                    'list' => implode(', ', $added),
-                ]
+        if (!$added) {
+            throw new \Common\Job\Exception\RuntimeException(
+                'No database index was added: all the {count} indexes failed.', // @translate
+                ['count' => count($missingIndexes)]
             );
         }
+
+        $logger->info(
+            'Successfully added {count} database indexes: {list}', // @translate
+            [
+                'count' => count($added),
+                'list' => implode(', ', $added),
+            ]
+        );
     }
 }

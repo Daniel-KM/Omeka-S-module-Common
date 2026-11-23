@@ -104,7 +104,13 @@ class Dispatcher extends \Omeka\Job\Dispatcher implements EventManagerAwareInter
         try {
             $strategy->send($job);
         } catch (\Throwable $e) {
-            $this->logger->err((string) $e);
+            // A job exception is a failure raised by the job itself, so its
+            // message is enough.
+            if ($e instanceof \Common\Job\Exception\RuntimeException) {
+                $this->logger->err($e->getMessage(), $e->getContext());
+            } else {
+                $this->logger->err($e instanceof Exception\ExceptionInterface ? $e->getMessage() : (string) $e);
+            }
             // Account for "inside Doctrine" errors that close the entity
             // manager.
             $entityManager = $this->entityManager->isOpen()
