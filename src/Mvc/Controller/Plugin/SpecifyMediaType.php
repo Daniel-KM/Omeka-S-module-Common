@@ -393,8 +393,10 @@ class SpecifyMediaType extends AbstractPlugin
      * Detect specialized formats among files reported as text/plain.
      *
      * finfo returns text/plain for several binary or structured formats whose
-     * header happens to be printable ascii.
+     * header happens to be printable ascii, and for the subtitles WebVTT without
+     * header.
      *
+     * @link https://www.w3.org/TR/webvtt1/
      * @link https://www.asprs.org/wp-content/uploads/2019/07/LAS_1_4_r15.pdf
      * @link https://openusd.org/release/spec_usdz.html
      */
@@ -404,11 +406,21 @@ class SpecifyMediaType extends AbstractPlugin
         if (!$handle) {
             return null;
         }
-        $head = fread($handle, 16);
+        $head = fread($handle, 512);
         fclose($handle);
 
         if (strlen($head) < 4) {
             return null;
+        }
+
+        // Subtitles: an optional identifier then a timing line, with
+        // milliseconds separated by a dot (WebVTT) or a comma (SubRip).
+        $text = preg_replace('~^\xEF\xBB\xBF~', '', $head);
+        if (strncmp($text, 'WEBVTT', 6) === 0) {
+            return 'text/vtt';
+        }
+        if (preg_match('~^(?:[^\r\n]+\r?\n)?(?:\d{2}:)?\d{2}:\d{2}([.,])\d{3} +--> +(?:\d{2}:)?\d{2}:\d{2}[.,]\d{3}~', $text, $matches)) {
+            return $matches[1] === ',' ? 'application/x-subrip' : 'text/vtt';
         }
 
         // LAS (LIDAR point cloud): magic "LASF" at offset 0.
