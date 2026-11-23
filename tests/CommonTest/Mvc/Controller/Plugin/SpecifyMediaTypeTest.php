@@ -126,6 +126,26 @@ class SpecifyMediaTypeTest extends TestCase
             ($this->plugin)($path, 'text/plain'));
     }
 
+    /**
+     * The subtitles reported as text/plain are identified from their header or
+     * from their first timing line.
+     */
+    public function testSubtitles(): void
+    {
+        $vtt = $this->fixture('header.vtt', "\xEF\xBB\xBFWEBVTT\n\n00:00:01.000 --> 00:00:02.000\nHello\n");
+        $this->assertSame('text/vtt', ($this->plugin)($vtt, 'text/plain'));
+
+        $vtt = $this->fixture('noheader.vtt', "intro\n00:01.000 --> 00:02.500 align:start\nHello\n");
+        $this->assertSame('text/vtt', ($this->plugin)($vtt, 'text/plain'));
+
+        $srt = $this->fixture('cue.srt', "\xEF\xBB\xBF1\r\n00:00:01,000 --> 00:00:02,000\r\nHello\r\n");
+        $this->assertSame('application/x-subrip', ($this->plugin)($srt, 'text/plain'));
+
+        // A text with an arrow is not a subtitle.
+        $text = $this->fixture('arrow.txt', "a --> b\n");
+        $this->assertSame('text/plain', ($this->plugin)($text, 'text/plain'));
+    }
+
     public function testUnknownTextPassthrough(): void
     {
         $path = $this->fixture('readme.txt',

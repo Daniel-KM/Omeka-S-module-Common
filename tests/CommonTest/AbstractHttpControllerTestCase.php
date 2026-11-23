@@ -339,6 +339,26 @@ abstract class AbstractHttpControllerTestCase extends LaminasAbstractHttpControl
     }
 
     /**
+     * Dispatch an url and assert that the access is denied by the acl.
+     *
+     * The current core throws the exception out of the mvc event, but a next
+     * version converts it into a dispatch error, so a 403 with the exception in
+     * the mvc event. Both are managed. It must be the last call of the test,
+     * because the exception of the mvc event is rethrown as expected.
+     */
+    protected function assertDispatchIsDenied($url, $method = null, $params = [], $isXmlHttpRequest = false): void
+    {
+        try {
+            $this->dispatch($url, $method, $params, $isXmlHttpRequest);
+        } catch (\Omeka\Mvc\Exception\PermissionDeniedException $e) {
+            $this->addToAssertionCount(1);
+            return;
+        }
+        $this->assertResponseStatusCode(403);
+        $this->assertApplicationException(\Omeka\Mvc\Exception\PermissionDeniedException::class);
+    }
+
+    /**
      * Run a dispatch on the rest api, authenticated with a temporary api key.
      *
      * The rest api (/api) authenticates by key only and ignores the identity
