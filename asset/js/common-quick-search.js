@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$(function() {
     $('#content').on('click', '.quick-search', function(e) {
         e.preventDefault();
         var sidebar = $('#sidebar-search');
