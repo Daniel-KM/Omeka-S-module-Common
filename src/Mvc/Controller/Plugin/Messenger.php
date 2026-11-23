@@ -19,6 +19,12 @@ class Messenger extends \Omeka\Mvc\Controller\Plugin\Messenger
         foreach ($formOrFieldset->getIterator() as $elementOrFieldset) {
             if ($elementOrFieldset instanceof Fieldset) {
                 $this->addFormErrors($elementOrFieldset);
+            } elseif ($elementOrFieldset instanceof \Laminas\Form\Element\Csrf) {
+                // The token has no label and its error is the expiration of the
+                // form in most cases.
+                if ($elementOrFieldset->getMessages()) {
+                    $this->addError('The form has expired. Reload the page and submit the form again.'); // @translate
+                }
             } else {
                 // Sub-names are not kept here, only main label.
                 $label = $this->getController()->translate($elementOrFieldset->getLabel());
