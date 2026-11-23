@@ -1577,6 +1577,20 @@ trait TraitModule
      * @param bool $protect Deny direct web access to the directory.
      * @return string|null The dirpath if valid, else null.
      */
+    /**
+     * Allow media types and extensions missing in the whitelists of the core.
+     *
+     * Generally used on install, for the files managed by the module.
+     */
+    protected function allowMediaTypes(array $mediaTypes, array $extensions = []): bool
+    {
+        return \Common\Stdlib\MediaTypes::allow(
+            $this->getServiceLocator()->get('Omeka\Settings'),
+            $mediaTypes,
+            $extensions
+        );
+    }
+
     protected function checkDestinationDir(string $dirPath, bool $protect = false): ?string
     {
         return $this->getServiceLocator()->get('Common\DirectoryManager')
