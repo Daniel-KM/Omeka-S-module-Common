@@ -23,11 +23,11 @@
 	    position: relative;
 	    min-height: 2em;
 	}
-	.dialog-contents,
-	.dialog-heading,
-	.dialog-message,
-	.dialog-body,
-	.dialog-footer {
+	dialog .dialog-contents,
+	dialog .dialog-heading,
+	dialog .dialog-message,
+	dialog .dialog-body,
+	dialog .dialog-footer {
 	    margin-top: 1em;
 	}
 	dialog .dialog-header-close-button {
