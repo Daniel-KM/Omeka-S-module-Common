@@ -18,45 +18,9 @@ class AddDatabaseIndexes extends AbstractJob
         $referenceIdProcessor->setReferenceId('common/add-database-indexes/job_' . $this->job->getId());
         $logger->addProcessor($referenceIdProcessor);
 
-        // Simple: ['table' => 'column'].
-        // Composite: ['table' => ['idx_name' => 'sql']].
-        $tableIndexes = [
-            ['fulltext_search' => 'is_public'],
-            ['media' => 'ingester'],
-            ['media' => 'renderer'],
-            ['media' => 'media_type'],
-            ['media' => 'extension'],
-            ['resource' => 'resource_type'],
-            ['resource' => ['idx_type_created' => '`resource_type`, `created`']],
-            ['resource' => ['idx_type_modified' => '`resource_type`, `modified`']],
-            ['value' => 'type'],
-            ['value' => 'lang'],
-            ['value' => ['idx_property_value' => '`property_id`, `value`(190)']],
-            ['item_site' => ['idx_site_item' => '`site_id`, `item_id`']],
-            // Keep session last, because it may fail on a big database.
-            ['session' => 'modified'],
-        ];
-
-        // Do not create index if it exists, whatever the name is.
-        $newIndices = [];
-        foreach ($tableIndexes as $key => $tableIndex) {
-            $table = key($tableIndex);
-            $columns = reset($tableIndex);
-            if (is_array($columns)) {
-                $indexName = key($columns);
-                $checkSql = "SHOW INDEX FROM `$table` WHERE `Key_name` = '$indexName'";
-            } else {
-                $indexName = $columns;
-                $checkSql = "SHOW INDEX FROM `$table` WHERE `Column_name` = '$columns'";
-            }
-            $result = $connection
-                ->executeQuery($checkSql)->fetchOne();
-            if ($result) {
-                unset($tableIndexes[$key]);
-            } else {
-                $newIndices[] = "$table/$indexName";
-            }
-        }
+        // Do not create an index if it exists, whatever its name is.
+        $missingIndexes = \Common\Stdlib\DatabaseIndexes::missing($connection);
+        $newIndices = array_map(fn ($entry) => $entry['table'] . '/' . $entry['index'], $missingIndexes);
 
         if (!$newIndices) {
             $logger->info(
@@ -74,26 +38,23 @@ class AddDatabaseIndexes extends AbstractJob
         );
 
         $added = [];
-        foreach ($tableIndexes as $tableIndex) {
-            $table = key($tableIndex);
-            $columns = reset($tableIndex);
-            if (is_array($columns)) {
-                $indexName = key($columns);
-                $columnsSql = reset($columns);
-            } else {
-                $indexName = $columns;
-                $columnsSql = "`$columns`";
-            }
+        foreach ($missingIndexes as $entry) {
+            $table = $entry['table'];
+            $indexName = $entry['index'];
+            $columnsSql = $entry['columns'];
             try {
                 $logger->info(
                     'Adding index `{index}` on table `{table}`.', // @translate
                     ['index' => $indexName, 'table' => $table]
                 );
-                $connection->executeStatement(
-                    "ALTER TABLE `$table`"
-                    . " ADD INDEX `$indexName`"
-                    . " ($columnsSql)"
-                );
+                // Online ddl avoids to lock a big table during the process. It
+                // is not supported by some engines and versions, so retry.
+                $sql = "ALTER TABLE `$table` ADD INDEX `$indexName` ($columnsSql)";
+                try {
+                    $connection->executeStatement($sql . ', ALGORITHM=INPLACE, LOCK=NONE');
+                } catch (\Throwable $e) {
+                    $connection->executeStatement($sql);
+                }
                 $added[] = "$table/$indexName";
                 $logger->info(
                     'Successfully added index `{index}` on table `{table}`.', // @translate

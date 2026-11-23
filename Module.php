@@ -298,56 +298,11 @@ class Module extends AbstractModule
             }
         }
 
-        // Add indices to speed up omeka.
-        // - simple: ['table' => 'column'];
-        // - composite: ['table' => ['idx_name' => 'sql']].
+        // Add indices to speed up omeka. Do not create an index if it exists,
+        // whatever its name is.
+        $missingIndexes = \Common\Stdlib\DatabaseIndexes::missing($connection);
 
-        $tableIndexes = [
-            ['fulltext_search' => 'is_public'],
-            ['media' => 'ingester'],
-            ['media' => 'renderer'],
-            ['media' => 'media_type'],
-            ['media' => 'extension'],
-            ['resource' => 'resource_type'],
-            ['resource' => ['idx_type_created' => '`resource_type`, `created`']],
-            ['resource' => ['idx_type_modified' => '`resource_type`, `modified`']],
-            ['item_site' => ['idx_site_item' => '`site_id`, `item_id`']],
-            // Speed searches and references.
-            ['value' => 'type'],
-            ['value' => 'lang'],
-            ['value' => ['idx_property_value' => '`property_id`, `value`(190)']],
-            ['value' => ['idx_property_value_resource' => '`property_id`, `value_resource_id`']],
-            // Keep session last, because it may fail on a big database.
-            ['session' => 'modified'],
-        ];
-
-        // Do not create index if it exists, whatever the name is.
-        $newIndices = [];
-        foreach ($tableIndexes as $key => $tableIndex) {
-            $table = key($tableIndex);
-            $columns = reset($tableIndex);
-            if (is_array($columns)) {
-                $indexName = key($columns);
-                $checkSql = "SHOW INDEX FROM `$table` WHERE `Key_name` = '$indexName'";
-            } else {
-                $indexName = $columns;
-                $checkSql = "SHOW INDEX FROM `$table` WHERE `Column_name` = '$columns'";
-            }
-            try {
-                $result = $connection
-                    ->executeQuery($checkSql)->fetchOne();
-                if ($result) {
-                    unset($tableIndexes[$key]);
-                } else {
-                    $newIndices[] = "$table/$indexName";
-                }
-            } catch (\Throwable $e) {
-                // Table does not exist yet.
-                unset($tableIndexes[$key]);
-            }
-        }
-
-        if ($newIndices) {
+        if ($missingIndexes) {
             // Strategy: classify each missing index as "small" or "large" by
             // table size, then: - small: ALTER TABLE inline, immediate
             // messenger feedback; - large: aggregated into ONE detached PHP CLI
@@ -364,7 +319,7 @@ class Module extends AbstractModule
             // session table from crawlers).
             $largeRowThreshold = 100000;
 
-            $tableNames = array_unique(array_map(fn ($t) => key($t), $tableIndexes));
+            $tableNames = array_unique(array_column($missingIndexes, 'table'));
             $tableRows = [];
             try {
                 $rs = $connection->executeQuery(
@@ -382,17 +337,8 @@ class Module extends AbstractModule
 
             $small = [];
             $large = [];
-            foreach ($tableIndexes as $tableIndex) {
-                $table = key($tableIndex);
-                $columns = reset($tableIndex);
-                if (is_array($columns)) {
-                    $indexName = key($columns);
-                    $columnsSql = reset($columns);
-                } else {
-                    $indexName = $columns;
-                    $columnsSql = "`$columns`";
-                }
-                $entry = ['table' => $table, 'index' => $indexName, 'columns' => $columnsSql];
+            foreach ($missingIndexes as $entry) {
+                $table = $entry['table'];
                 if (($tableRows[$table] ?? 0) >= $largeRowThreshold) {
                     $large[] = $entry;
                 } else {
