@@ -167,3 +167,28 @@ if (version_compare($oldVersion, '3.4.96', '<')) {
         }
     }
 }
+
+if (version_compare($oldVersion, '3.4.97', '<')) {
+    // The module Access 3.4.51 stored the exact private address of the proxy,
+    // that changes when a container is recreated: trust its private range.
+    $settings = $services->get('Omeka\Settings');
+    $trustedProxies = (array) ($settings->get('trusted_proxies') ?: []);
+    $accessVersion = $connection->fetchOne('SELECT `version` FROM `module` WHERE `id` = "Access"');
+    if ($accessVersion
+        && version_compare((string) $accessVersion, '3.4.51', '>=')
+        && count($trustedProxies) === 1
+        && strpos((string) reset($trustedProxies), '/') === false
+    ) {
+        $proxy = (string) reset($trustedProxies);
+        $range = \Common\Stdlib\TrustedProxies::widen($proxy);
+        if ($range !== $proxy) {
+            $settings->set('trusted_proxies', [$range]);
+            $messenger->addWarning(new \Common\Stdlib\PsrMessage(
+                'The trusted proxy {ip} has been replaced by its private range {range}, so it remains valid when the proxy changes of address. Revert it in the security section of the main settings if other machines of this network are not trusted.', // @translate
+                ['ip' => $proxy, 'range' => $range]
+            ));
+        }
+    }
+
+    \Common\Stdlib\TrustedProxies::autoDetect($services);
+}
