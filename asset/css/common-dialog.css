@@ -96,6 +96,10 @@
 	    right: 0.5em;
 	    background: inherit;
 	}
+	/* Fix some themes that draw focus outline against the button. */
+	dialog .dialog-header-close-button:focus {
+	    outline-offset: 2px;
+	}
 	.dialog-close-label {
 	    font-size: 0.85em;
 	}
