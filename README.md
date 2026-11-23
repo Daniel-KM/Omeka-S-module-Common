@@ -374,6 +374,24 @@ first segment of the job class namespace.
 Use this only for jobs that must run as part of an upgrade (data migration,
 long-running conversion). For regular deferred jobs, use `DeferredJobDispatch`.
 
+#### Job exception
+
+A job ends with the status "completed", even when it sets another status itself.
+The only way to mark a failed job is to throw an exception. Throw the exception
+`Common\Job\Exception\RuntimeException` when the job cannot reach its goal: the
+job gets the status "error", and the dispatcher logs its message like a PSR-3
+one, with its context and without the trace, so it remains translatable:
+
+```php
+throw new \Common\Job\Exception\RuntimeException(
+    'The file "{file}" cannot be read.', // @translate
+    ['file' => $filepath]
+);
+```
+
+A secondary failure, like a resource that cannot be processed, should be logged
+as an error and the job should go on.
+
 #### EasyMeta
 
 This service can be used as helper or plugin. It allows to get ids, terms and
