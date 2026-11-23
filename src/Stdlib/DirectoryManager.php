@@ -169,7 +169,7 @@ class DirectoryManager
     public function isSensitiveDir(string $name): bool
     {
         return (bool) preg_match(
-            '/(backup|bkp|dump|sql|import|export|log|temp|tmp|trash|contribution|contactus|userdata|private|preload|result|meminfo|triplestore)/i',
+            '/(backup|bkp|dump|sql|import|export|log|temp|tmp|trash|contribution|contactus|userdata|private|preload|result|meminfo|triplestore|noid)/i',
             $name
         );
     }
