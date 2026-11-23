@@ -17,13 +17,17 @@
  *       [--algorithm INPLACE] [--lock NONE]
  *
  * Usage (batch of indexes via JSON file, one ALTER per array element):
- *   php add-database-index.php --batch /path/to/indexes.json JSON format:
+ *   php add-database-index.php --batch /path/to/indexes.json [--omeka-path /path/to/omeka]
+ *   JSON format:
  *   [{"table":"value","index":"type","columns":"`type`"}, ...]
+ *
+ * The option --omeka-path is required when the module is a symbolic link,
+ * because php resolves the links in __DIR__.
  *
  * Exit code 0 always (background script — non-zero would not surface).
  */
 
-$opts = getopt('', ['table::', 'index::', 'columns::', 'algorithm::', 'lock::', 'batch::']);
+$opts = getopt('', ['table:', 'index:', 'columns:', 'algorithm:', 'lock:', 'batch:', 'omeka-path:']);
 
 openlog('omeka-common-add-index', LOG_PID | LOG_ODELAY, LOG_USER);
 
@@ -33,7 +37,9 @@ $fail = function (string $msg): void {
     exit(0);
 };
 
-$omekaPath = realpath(__DIR__ . '/../../../..');
+$omekaPath = empty($opts['omeka-path'])
+    ? realpath(__DIR__ . '/../../../..')
+    : realpath($opts['omeka-path']);
 if (!$omekaPath) {
     $fail('Cannot resolve Omeka root.');
 }

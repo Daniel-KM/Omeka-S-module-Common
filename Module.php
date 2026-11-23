@@ -459,10 +459,11 @@ class Module extends AbstractModule
                     ));
                 } else {
                     $command = sprintf(
-                        '%s %s --batch %s > /dev/null 2>&1 &',
+                        '%s %s --batch %s --omeka-path %s > /dev/null 2>&1 &',
                         escapeshellcmd($phpPath),
                         escapeshellarg($script),
-                        escapeshellarg($batchFile)
+                        escapeshellarg($batchFile),
+                        escapeshellarg(OMEKA_PATH)
                     );
                     $cli->execute($command);
                     $messenger->addSuccess(new \Common\Stdlib\PsrMessage(
